@@ -1,0 +1,212 @@
+﻿/*
+ * 卡片管理表 <-- > 卡领取 Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.card;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+/**
+ * TODO - High level description about type's responsibility.
+ * 
+ * @trace TODO
+ * @author wangshuqing
+ */
+@Entity
+@Table(name = "FK_T_CARDINOUT")
+public class FkTCardInOutEntity implements StandardBean {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ID
+	 */
+	@Id
+	@Column(name = "`ID`")
+	@GeneratedValue
+	private Integer id;
+
+	/**
+	 * 日期
+	 */
+	@Column(name = "`WORKDATE`")
+	private String workdate;
+
+	@Column(name = "`INOUTNO`")
+	private String inOutNo;
+
+	@Column(name = "STYPE")
+	private String receiptType;
+
+	@Column(name = "SSTATUS")
+	private String receiptStatus;
+
+	@Column(name = "OUTNO")
+	private String supplier;
+
+	@Column(name = "OUTDATE")
+	private String leftStorageDate;
+
+	@Column(name = "INNO")
+	private String receiver;
+
+	@Column(name = "INDATE")
+	private String putInStorageDate;
+
+	@Column(name = "CARDSUM")
+	private Integer cardAcount;
+
+	@Column(name = "CARDGG")
+	private String cardType;
+
+	@Column(name = "NOTE")
+	private String note;
+
+	@Column(name = "STATIONNO")
+	private String stationNo;
+
+	@Column(name = "USERID")
+	private String operatorId;
+
+	@Column(name = "BZ")
+	private String bz;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getInOutNo() {
+		return inOutNo;
+	}
+
+	public void setInOutNo(String inOutNo) {
+		this.inOutNo = inOutNo;
+	}
+
+	public String getReceiptType() {
+		return receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
+	}
+
+	public String getReceiptStatus() {
+		return receiptStatus;
+	}
+
+	public void setReceiptStatus(String receiptStatus) {
+		this.receiptStatus = receiptStatus;
+	}
+
+	public String getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+
+	public String getLeftStorageDate() {
+		return leftStorageDate;
+	}
+
+	public void setLeftStorageDate(String leftStorageDate) {
+		this.leftStorageDate = leftStorageDate;
+	}
+
+	public String getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+
+	public String getPutInStorageDate() {
+		return putInStorageDate;
+	}
+
+	public void setPutInStorageDate(String putInStorageDate) {
+		this.putInStorageDate = putInStorageDate;
+	}
+
+	public Integer getCardAcount() {
+		return cardAcount;
+	}
+
+	public void setCardAcount(Integer cardAcount) {
+		this.cardAcount = cardAcount;
+	}
+
+	public String getCardType() {
+		return cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getStationNo() {
+		return stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getOperatorId() {
+		return operatorId;
+	}
+
+	public void setOperatorId(String operatorId) {
+		this.operatorId = operatorId;
+	}
+
+	public String getBz() {
+		return bz;
+	}
+
+	public void setBz(String bz) {
+		this.bz = bz;
+	}
+
+	public void setWorkdate(String workdate) {
+		this.workdate = workdate;
+	}
+
+	public String getWorkdate() {
+		return workdate;
+	}
+
+	@Override
+	public String toString() {
+		return "FkTCardInOutEntity [id=" + id + ", workdate=" + workdate + ", inOutNo=" + inOutNo + ", receiptType="
+				+ receiptType + ", receiptStatus=" + receiptStatus + ", supplier=" + supplier + ", leftStorageDate="
+				+ leftStorageDate + ", receiver=" + receiver + ", putInStorageDate=" + putInStorageDate + ", cardAcount="
+				+ cardAcount + ", cardType=" + cardType + ", note=" + note + ", stationNo=" + stationNo + ", operatorId="
+				+ operatorId + ", bz=" + bz + "]";
+	}
+
+}

@@ -1,0 +1,188 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.card.UpdateCardInfoBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTGuestEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.dao.CorpInfoDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * 卡片明细的DAO的实现
+ * 
+ * @author _yy
+ */
+@Repository
+public class CorpInfoDaoImpl extends AbstractBaseDAO<FkTGuestEntity> implements CorpInfoDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CorpInfoDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	private static final String STATION_NO = "stationNo";
+
+	private static final String CARD_NO = "cardno";
+
+	// ------- Instance Variables (private) ------------------------------------
+	/**
+	 * 查询卡片明细SQL
+	 */
+
+	private final String getGuestInfoHql = "FROM FkTGuestEntity WHERE  ";
+
+	private final String saveGuestInfoSql = "UPDATE FK_T_GUEST SET idcard_type=?,idcard_num=?,name=?,[add]=?,tel=?,post=?,"
+			+ "email=?,birthday=?,bankno=?,bankacc=?,taxno=?,beizhu=?,update_date=? WHERE guestno=?";
+
+	private final String saveCardInfoSql = "UPDATE FK_T_CARD SET guesttype=?,guestnum=?,guestname=?,guestadd=?,"
+			+ "guesttel=?,guestpost=?,email=?,bz=?,update_date=? WHERE cardno=?";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CorpInfoDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 得到客户信息
+	 */
+
+	@Override
+	public UpdateCardInfoBean getCorpInfo(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		UpdateCardInfoBean resultCardBean = null;
+		try { // retrieve search value from client request. StringBuilder builder =
+			  // retrieve search value from client request.
+			StringBuilder builder = this.validateInputGuestCriteria(updateCardInfoBean);
+			FkTGuestEntity guestEntity = null;
+			// 执行查询语句
+			List<FkTGuestEntity> guestEntityList = this.findByHql(this.getGuestInfoHql + builder);
+			if (guestEntityList.size() > 0) {
+				guestEntity = guestEntityList.get(0);
+			}
+			// get result list.
+			resultCardBean = this.convertGuestDataToBean(guestEntity);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get card detail info occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultCardBean;
+	}
+
+	/**
+	 * 执行修改客户信息操作
+	 */
+	@Override
+	public void saveGuestInfo(UpdateCardInfoBean updateCardInfoBean) {
+		Object[] args1 = { updateCardInfoBean.getContactType(), updateCardInfoBean.getContactNum(),
+				updateCardInfoBean.getContactName(), updateCardInfoBean.getCustomerAddr(), updateCardInfoBean.getGuestTel(),
+				updateCardInfoBean.getZipCode(), updateCardInfoBean.getEmail(), updateCardInfoBean.getContactBir(),
+				updateCardInfoBean.getBankType(), updateCardInfoBean.getBankAcc(), updateCardInfoBean.getTaxNum(),
+				updateCardInfoBean.getRemark(), DateUtil.currentTimestamp(), updateCardInfoBean.getGuestNo() };
+		this.upateBySql(this.saveGuestInfoSql, args1);
+		Object[] args2 = { updateCardInfoBean.getContactType(), updateCardInfoBean.getContactNum(),
+				updateCardInfoBean.getContactName(), updateCardInfoBean.getCustomerAddr(), updateCardInfoBean.getGuestTel(),
+				updateCardInfoBean.getZipCode(), updateCardInfoBean.getEmail(), updateCardInfoBean.getRemark(),
+				DateUtil.currentTimestamp(), updateCardInfoBean.getMainCardNo() };
+		this.upateBySql(this.saveCardInfoSql, args2);
+	}
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 增加SQL判断条件
+	 */
+
+	private StringBuilder validateInputGuestCriteria(UpdateCardInfoBean updateCardInfoBean) {
+		StringBuilder builder = new StringBuilder();
+		if (ApplicationContext.getInstance().getStationNum() != null) {
+			builder.append(STATION_NO).append(SqlConsts.EQUAL)
+					.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		}
+		if (updateCardInfoBean.getMainCardNo() != null) {
+			builder.append(SqlConsts.ADD).append(CARD_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(updateCardInfoBean.getMainCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 将entity转换为bean
+	 */
+
+	private UpdateCardInfoBean convertGuestDataToBean(FkTGuestEntity guestEntity) {
+		UpdateCardInfoBean updateCardInfoBean = null;
+		// temporary save the card cash
+		// ApplicationContext.getInstance().setFkTGuestEntity(guestEntity);
+		if (guestEntity != null) {
+			updateCardInfoBean = new UpdateCardInfoBean();
+			if (guestEntity.getGuestname() != null) {
+				updateCardInfoBean.setGuestName(guestEntity.getGuestname());
+			}
+			if (guestEntity.getGuesttype() != null) {
+				updateCardInfoBean.setGuestType(guestEntity.getGuesttype());
+			}
+			if (guestEntity.getGuestno() != null) {
+				updateCardInfoBean.setGuestNo(String.valueOf(guestEntity.getGuestno()));
+			}
+			if (guestEntity.getIdcardType() != null) {
+				updateCardInfoBean.setContactType(guestEntity.getIdcardType());
+			}
+			if (guestEntity.getIdcardNum() != null) {
+				updateCardInfoBean.setContactNum(guestEntity.getIdcardNum());
+			}
+			if (guestEntity.getName() != null) {
+				updateCardInfoBean.setContactName(guestEntity.getName());
+			}
+			if (guestEntity.getAdd() != null) {
+				updateCardInfoBean.setCustomerAddr(guestEntity.getAdd());
+			}
+			if (guestEntity.getTel() != null) {
+				updateCardInfoBean.setGuestTel(guestEntity.getTel());
+			}
+			if (guestEntity.getPost() != null) {
+				updateCardInfoBean.setZipCode(guestEntity.getPost());
+			}
+			if (guestEntity.getEmail() != null) {
+				updateCardInfoBean.setEmail(guestEntity.getEmail());
+			}
+			if (guestEntity.getBirthday() != null) {
+				updateCardInfoBean.setContactBir(DateUtil.formatDate(guestEntity.getBirthday(), DateUtil.DATE_PATTERN_17));
+			}
+			if (guestEntity.getBankno() != null) {
+				updateCardInfoBean.setBankType(guestEntity.getBankno());
+			}
+			if (guestEntity.getBankacc() != null) {
+				updateCardInfoBean.setBankAcc(guestEntity.getBankacc());
+			}
+			if (guestEntity.getTaxno() != null) {
+				updateCardInfoBean.setTaxNum(guestEntity.getTaxno());
+			}
+			if (guestEntity.getCardno() != null) {
+				updateCardInfoBean.setMainCardNo(guestEntity.getCardno());
+			}
+			if (guestEntity.getBeizhu() != null) {
+				updateCardInfoBean.setRemark(guestEntity.getBeizhu());
+			}
+
+		}
+		return updateCardInfoBean;
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

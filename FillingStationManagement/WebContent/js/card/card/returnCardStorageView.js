@@ -1,0 +1,54 @@
+/**
+ * this js works for returnCardStorage.jsp
+ */
+		$(function(){
+			var lastIndex;
+			
+			$('#tt').datagrid({
+				toolbar:[{
+					text:'增加一行',
+					iconCls:'icon-add',
+					handler:function(){						
+							$('#tt').datagrid('endEdit', lastIndex);
+							$('#tt').datagrid('appendRow',{
+								startNo:'',
+								endNo:'',
+								cardSum:'',
+								note:''
+							});
+							lastIndex = $('#tt').datagrid('getRows').length-1;
+							$('#tt').datagrid('selectRow', lastIndex);
+							$('#tt').datagrid('beginEdit', lastIndex);
+						
+						
+					}
+				},'-',{
+					text:'删除一行',
+					iconCls:'icon-remove',
+					handler:function(){
+						var row = $('#tt').datagrid('getSelected');
+						if (row){
+							var index = $('#tt').datagrid('getRowIndex', row);
+							$('#tt').datagrid('deleteRow', index);
+						}
+					}
+				},'-',{
+					text:'撤销',
+					iconCls:'icon-undo',
+					handler:function(){
+						$('#tt').datagrid('rejectChanges');
+					}
+				}],
+				onBeforeLoad:function(){
+					$(this).datagrid('rejectChanges');
+				},
+				onClickRow:function(rowIndex){
+					if (lastIndex != rowIndex){
+						$('#tt').datagrid('endEdit', lastIndex);
+						$('#tt').datagrid('beginEdit', rowIndex);
+					}
+					lastIndex = rowIndex;
+				}
+				
+			});
+		});

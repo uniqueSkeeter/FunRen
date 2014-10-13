@@ -1,0 +1,66 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	$(document).ready(function(){
+		$("#department_add").click(function() {
+			alert("增加部门");
+		$('#addDepIFrame')[0].src= server_context + '/view/card/customer/saleMultiUserCard/departmentAdd.jsp'; 
+        	$('#addDepDialog').form('clear');
+            $('#addDepDialog').dialog({
+                closed : false,
+                title : '新增部门',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '保存',
+                    iconCls : 'icon-save',
+                    id : 'sBtn',
+                    handler:function() {
+                    	var rDocument = document.getElementById("addDepIFrame").contentWindow.document;
+                    	var flag = validateDep(rDocument);
+                    	var addDepForm = rDocument.getElementsByTagName('form');
+                    	alert($(addDepForm).serialize());
+                    	if(flag){
+                    		alert("验证通过");
+                    		$.ajax({
+                    			data:$(addDepForm).serialize(),
+                    			url:encodeURI("saveDepartment"),type:'POST',timeout:3000,dataType:'html',
+	                			success:function(data){
+	    	        				$("#addDepDialog").dialog("close");
+	    	        				$.messager.alert('成功','恭喜你保存成功!');
+	    	        			},
+	    	        			error:function(){
+	    	        				$.messager.alert('错误','保存失败，请重试!');
+	    	        			}
+	            		});
+                    	}
+                    }
+                }, {
+                    text : '取消',
+                    id : 'cBtn',
+                    handler : function() {
+                    	alert("取消");
+                        $('#addDepDialog').dialog('close');
+                    }
+                } ]
+        });
+	
+	});
+	});
+
+	function validateDep(rDocument){
+    	var guestNo = rDocument.getElementById('guestNo');
+		var depName = rDocument.getElementById('depName');
+		var depMaster = rDocument.getElementById('depMaster');
+		var depTel = rDocument.getElementById('depTel');
+		var limitStaion = rDocument.getElementById('limitStation');
+		if (check(guestNo) || check(depName)){
+			return false;
+		}else{
+			return true;
+		}
+	}
+		
+	

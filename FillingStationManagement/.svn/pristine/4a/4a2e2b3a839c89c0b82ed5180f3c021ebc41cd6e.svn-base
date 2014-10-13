@@ -1,0 +1,395 @@
+package com.fr.station.common.bean;
+
+import java.math.BigDecimal;
+
+/**
+ * @author WR
+ * 
+ */
+public class RegisterCustomerBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public RegisterCustomerBean() {
+		super();
+	}
+
+	private Integer id;
+
+	/**
+	 * display records data
+	 */
+	// 持卡人姓名
+	private String guestName;
+
+	// 客户编号
+	private String guestNo;
+
+	// 卡号
+	private String cardNo;
+
+	// 卡状态
+	private String cardStatus;
+
+	// 用户证件类型
+	private String guestType;
+
+	// 证件号
+	private String guestNum;
+
+	// 联系电话
+	private String guestTel;
+
+	// 创建日期
+	private String create_date;
+
+	// 站点号
+	private String stationNo;
+
+	/**
+	 * search criteria, for guest records
+	 */
+	// 卡片印刷号
+	private String cardExno;
+
+	// 卡片类型
+	private String cardType;
+
+	/**
+	 * for saleAnonymousCard need
+	 */
+	// 押金
+	private BigDecimal deposit;
+
+	// 卡内金额
+	private BigDecimal cardAmount;
+
+	// 卡密码
+	private String cardPass;
+
+	// 每次加油限量
+	private String refuelLimit;
+
+	// 每天加油次数
+	private String refuelTimes;
+
+	// 每天消费金额
+	private String consumeAmount;
+
+	// 限制油品
+	private String oilTypeLimit;
+
+	// 启用日期
+	private String effectiveDate;
+
+	// 有效日期
+	private String disEffectiveDate;
+
+	// 限站信息
+	private String stationInfoLimit;
+
+	// 备注
+	private String remark;
+
+	/**
+	 * for salePersonalCard need
+	 */
+
+	// 性别
+	private String gender;
+
+	// 电子邮箱
+	private String email;
+
+	// 邮编
+	private String zipCode;
+
+	// 客户地址
+	private String customerAddr;
+
+	// 车号限制
+	private String carNoConstr;
+
+	// 开票类型
+	private String billType;
+
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getGuestName() {
+		return guestName;
+	}
+
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	public String getCardNo() {
+		return cardNo;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public String getCardStatus() {
+		return cardStatus;
+	}
+
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	public String getGuestType() {
+		return guestType;
+	}
+
+	public void setGuestType(String guestType) {
+		this.guestType = guestType;
+	}
+
+	public String getGuestNum() {
+		return guestNum;
+	}
+
+	public void setGuestNum(String guestNum) {
+		this.guestNum = guestNum;
+	}
+
+	public String getGuestTel() {
+		return guestTel;
+	}
+
+	public void setGuestTel(String guestTel) {
+		this.guestTel = guestTel;
+	}
+
+	public String getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
+	}
+
+	public String getStationNo() {
+		return stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getCardExno() {
+		return cardExno;
+	}
+
+	public void setCardExno(String cardExno) {
+		this.cardExno = cardExno;
+	}
+
+	public String getCardType() {
+		return cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalData() {
+		return totalData;
+	}
+
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	public String getGuestNo() {
+		return guestNo;
+	}
+
+	public void setGuestNo(String guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	public BigDecimal getDeposit() {
+		return deposit;
+	}
+
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
+	}
+
+	public BigDecimal getCardAmount() {
+		return cardAmount;
+	}
+
+	public void setCardAmount(BigDecimal cardAmount) {
+		this.cardAmount = cardAmount;
+	}
+
+	public String getCardPass() {
+		return cardPass;
+	}
+
+	public void setCardPass(String cardPass) {
+		this.cardPass = cardPass;
+	}
+
+	public String getRefuelLimit() {
+		return refuelLimit;
+	}
+
+	public void setRefuelLimit(String refuelLimit) {
+		this.refuelLimit = refuelLimit;
+	}
+
+	public String getRefuelTimes() {
+		return refuelTimes;
+	}
+
+	public void setRefuelTimes(String refuelTimes) {
+		this.refuelTimes = refuelTimes;
+	}
+
+	public String getConsumeAmount() {
+		return consumeAmount;
+	}
+
+	public void setConsumeAmount(String consumeAmount) {
+		this.consumeAmount = consumeAmount;
+	}
+
+	public String getOilTypeLimit() {
+		return oilTypeLimit;
+	}
+
+	public void setOilTypeLimit(String oilTypeLimit) {
+		this.oilTypeLimit = oilTypeLimit;
+	}
+
+	public String getEffectiveDate() {
+		return effectiveDate;
+	}
+
+	public void setEffectiveDate(String effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+
+	public String getDisEffectiveDate() {
+		return disEffectiveDate;
+	}
+
+	public void setDisEffectiveDate(String disEffectiveDate) {
+		this.disEffectiveDate = disEffectiveDate;
+	}
+
+	public String getStationInfoLimit() {
+		return stationInfoLimit;
+	}
+
+	public void setStationInfoLimit(String stationInfoLimit) {
+		this.stationInfoLimit = stationInfoLimit;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getZipCode() {
+		return zipCode;
+	}
+
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getCustomerAddr() {
+		return customerAddr;
+	}
+
+	public void setCustomerAddr(String customerAddr) {
+		this.customerAddr = customerAddr;
+	}
+
+	public String getCarNoConstr() {
+		return carNoConstr;
+	}
+
+	public void setCarNoConstr(String carNoConstr) {
+		this.carNoConstr = carNoConstr;
+	}
+
+	public String getBillType() {
+		return billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
+	@Override
+	public String toString() {
+		return "RegisterCustomerBean [id=" + id + ", guestName=" + guestName + ", guestNo=" + guestNo + ", cardNo=" + cardNo
+				+ ", cardStatus=" + cardStatus + ", guestType=" + guestType + ", guestNum=" + guestNum + ", guestTel="
+				+ guestTel + ", create_date=" + create_date + ", stationNo=" + stationNo + ", cardExno=" + cardExno
+				+ ", cardType=" + cardType + ", deposit=" + deposit + ", cardAmount=" + cardAmount + ", cardPass=" + cardPass
+				+ ", refuelLimit=" + refuelLimit + ", refuelTimes=" + refuelTimes + ", consumeAmount=" + consumeAmount
+				+ ", oilTypeLimit=" + oilTypeLimit + ", effectiveDate=" + effectiveDate + ", disEffectiveDate="
+				+ disEffectiveDate + ", stationInfoLimit=" + stationInfoLimit + ", remark=" + remark + ", gender=" + gender
+				+ ", email=" + email + ", zipCode=" + zipCode + ", customerAddr=" + customerAddr + ", carNoConstr="
+				+ carNoConstr + ", billType=" + billType + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize
+				+ ", totalData=" + totalData + "]";
+	}
+
+}

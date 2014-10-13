@@ -1,0 +1,66 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path
+			+ "/";
+%>
+<html>
+<head>
+<!-- common css -->
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>css/demo.css">
+<!-- common js -->
+<script type="text/javascript" src="<%=basePath%>js/system/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/locale/easyui-lang-zh_CN.js"></script>
+<!-- css -->
+<!-- js -->
+<title>增加部门</title>
+</head>
+<body id="department_body">
+<p style="color: #2874ff; font-size: 14px; text-align: right">
+当前站点:<span>${stationName}</span>
+当前班次 :<span>???</span>
+</p>
+<hr color="#ff8000">
+<form id="department_form" method="post" action="saveDepartment">
+<table style="font-size: 9px; font-family: Arial; table-layout: fixed;">
+	<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">单位客户编号<span style="color:red;">*</span></td>
+		<td>
+			<input name="registerCustomerBean.guestNo" id="guestNo" value="${registerCustomerBean.guestNo}">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">部门名称<span style="color:red;">*</span></td>
+		<td>
+			<input name="registerCustomerBean.depName" id="depName" value="${registerCustomerBean.depName}">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">联系人</td>
+		<td>
+			<input name="registerCustomerBean.depMaster" id="depMaster" value="${registerCustomerBean.depMaster}">
+		</td>
+	</tr>
+	<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">联系人电话</td>
+		<td>
+			<input name="registerCustomerBean.depTel" id="depTel" value="${registerCustomerBean.depTel}">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">定点油站</td>
+		<td>
+			<input name="registerCustomerBean.limitStation" id="limitStation" value="${registerCustomerBean.limitStation}">
+		</td>
+		<td>
+			<input name="registerCustomerBean.deptNo" style="display:none" id="deptNo" value="${registerCustomerBean.deptNo}">
+			<input name="registerCustomerBean.id" style="display:none" id="id" value="${registerCustomerBean.id}">
+		</td>
+	</tr>
+</table>
+</form>
+<hr color="#ff8000">
+</body>
+</html>

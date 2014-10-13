@@ -1,0 +1,160 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.*"%>
+<%@ page import="java.text.*" %>
+<%@include file="../../common/common.jsp" %>
+	<style   media=print>
+		.Noprint{display:none;}
+		.PageNext{page-break-after:   always;}
+	</style>
+<html>
+<head>
+	<title>富仁高科加油站管理系统</title>
+	<base href="<%=basePath%>" />
+	<link rel="shortcut icon" type="image/x-icon"
+	href="<%=basePath%>images/favicon.ico" />
+	<!-- common -->
+	<link href="css/common.css" rel="stylesheet" type="text/css" />
+	<link href="css/commonDialog.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div style="height:250px">
+	<p style="color:#2874ff;font-size: 14px;text-align: right">当前站点:${stationNo} ${stationName} 当前班次 :${classNo}</p>
+	<hr class="subLineColor">
+	<form  method="post">
+		<span class="pageFontSubStyle">主卡信息</span>
+		<table style="font-size: 10px;width:700px; height: 90px">
+			<tr>
+				<td height="10px" width="70px">姓名：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.mainCardGuestName}</td>
+				<td height="10px" width="90px">单位证件号：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.mainCardIDNum}</td>
+				<td height="10px" width="90px">客户状态：</td>
+				<td  height="10px" width="100px">
+					<s:set var="mainCardGuestStatusKey" value="transferAccountsBean.mainCardGuestStatus ">
+					</s:set>
+					${guestStatus[mainCardGuestStatusKey]}
+				</td>
+				
+			</tr>
+			<tr>
+				<td height="10px" width="70px">卡状态：</td>
+				<td  height="10px" width="150px">
+					<s:set var="mainCardStatusKey" value="transferAccountsBean.mainCardStatus ">
+					</s:set>
+					${cardStatus[mainCardStatusKey]}
+				</td>
+				<td height="10px" width="90px">备付账户余额：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.mainCardProvisionAccount}</td>
+				<td height="10px" width="90px">积分余额</td>
+				<td height="10px" width="100px">${transferAccountsBean.mainCardPoint}</td>
+			</tr>
+			<tr>
+				<td height="10px" width="70px"></td>
+				<td height="10px" width="150px">
+					<input type= "hidden" name="transferAccountsBean.guestNo" id="guestNo" value="${transferAccountsBean.guestNo}">
+				</td>
+				<td style="display:none">
+					<input type= "hidden" name="transferAccountsBean.mainCardGuestName" id="mainCardGuestName" value="${transferAccountsBean.mainCardGuestName}">
+					<input type= "hidden" name="transferAccountsBean.mainCardProvisionAccount" id="mainCardProvisionAccount" value="${transferAccountsBean.mainCardProvisionAccount}">
+					<input type= "hidden" name="transferAccountsBean.mainCardNo" id="mainCardNo" value="${transferAccountsBean.mainCardNo}">
+					<input type= "hidden" name="transferAccountsBean.mainCardPoint" id="mainCardPoint" value="${transferAccountsBean.mainCardPoint}">
+				</td>
+			</tr>
+		</table>
+		<br>
+		<span class="pageFontSubStyle">副卡信息</span>
+		<table style="font-size: 10px;width:700px; height: 120px">
+			<tr>
+				<td height="10px" width="70px">卡号：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.viceCardNo}</td>
+				<td height="10px" width="90px">司机姓名：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.viceCardGuestName}</td>
+				<td height="10px" width="90px">部门名称：</td>
+				<td  height="10px" width="100px">${transferAccountsBean.viceCardDepName}</td>
+			</tr>
+			<tr>
+				<td height="10px" width="70px">卡类型：</td>
+				<td height="10px" width="150px">
+					<s:set var="viceCardTypeKey" value="transferAccountsBean.viceCardType ">
+					</s:set>
+					${cardType[viceCardTypeKey]}
+				</td>
+				<td height="10px" width="90px">卡状态：</td>
+				<td height="10px" width="150px">
+					<s:set var="viceCardStatusKey" value="transferAccountsBean.viceCardStatus ">
+					</s:set>
+					${cardStatus[viceCardStatusKey]}
+				</td>
+				<td height="10px" width="90px">积分余额：</td>
+				<td  height="10px" width="100px">${transferAccountsBean.viceCardPoint}</td>
+			</tr>
+			<tr>
+				<td height="10px" width="70px">卡内余额：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.viceCardBalance}</td>
+				<td height="10px" width="100px">备付账户余额：</td>
+				<td  height="10px" width="150px">${transferAccountsBean.viceCardProvisionAccount}</td>
+				<td height="10px" width="90px">支付方式：</td>
+				<td height="10px" width="100px">
+					<select name="transferAccountsBean.payType" id="payType" style="width:90px">
+						<s:set var="payTypeKey" value="transferAccountsBean.payType">
+						</s:set>
+						<option value="${payTypeKey}" selected>${payType[payTypeKey]}</option>
+						<!--<c:forEach var="payType" items="${payType}">
+							<option value="${payType.key}">
+								${payType.value }
+							</option>
+						</c:forEach>-->
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td height="10px" width="70px">交易类型：</td>
+				<td height="10px" width="145px">
+					<select name="transferAccountsBean.tradeType" id="tradeType" style="width:90px">
+						<option selected></option>
+						<c:forEach var="tradeType" items="${chargeTradeType}">
+							<option value="${tradeType.key}">
+								${tradeType.value }
+							</option>
+						</c:forEach>
+					</select>
+				</td>
+				<td height="10px" width="90px">汇总类型：</td>
+				<td  height="10px" width="150px">
+					<select name="transferAccountsBean.allocateType" id="allocateType" style="width:90px">
+						<option selected></option>
+						<c:forEach var="allocateType" items="${allocateType}">
+							<option value="${allocateType.key}">
+								${allocateType.value }
+							</option>
+						</c:forEach>
+					</select>
+					<!-- <input type="text" name="transferAccountsBean.allocateAmount" id="allocateAmount" style="width:100px" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> -->
+				</td>
+				<td height="10px" width="90px">数额</td>
+				<td  height="10px" width="100px">
+					<input type="text" name="transferAccountsBean.gatherAmount" id="gatherAmount" style="width:90px" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+				</td>
+			</tr>
+			<tr style="display:none">
+				<td height="10px" width="80px"></td>
+				<td height="10px" width="100px">
+					<input type= "hidden" name="transferAccountsBean.viceCardNo" id="viceCardNo" value="${transferAccountsBean.viceCardNo}">
+					<input type= "hidden" name="transferAccountsBean.viceCardProvisionAccount" id="viceCardProvisionAccount" value="${transferAccountsBean.viceCardProvisionAccount}">
+					<input type= "hidden" name="transferAccountsBean.viceCardGuestName" id="viceCardGuestName" value="${transferAccountsBean.viceCardGuestName}">
+					<input type= "hidden" name="transferAccountsBean.viceCardBalance" id="viceCardBalance" value="${transferAccountsBean.viceCardBalance}">
+					<input type= "hidden" name="transferAccountsBean.viceCardStatus" id="viceCardStatus" value="${transferAccountsBean.viceCardStatus}">
+					<input type= "hidden" name="transferAccountsBean.viceCardPoint" id="viceCardPoint" value="${transferAccountsBean.viceCardPoint}">
+				</td>
+			</tr>
+		</table>
+	</form>
+	
+</div>
+<hr class="subLineColor">
+</body>
+</html>

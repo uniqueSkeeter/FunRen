@@ -1,0 +1,362 @@
+package com.fr.station.component.system.dao;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Id;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.transform.Transformers;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.entity.card.FkTGuestEntity;
+
+/**
+ * The class is mainly responsible to build a bridge between java object and DB.
+ *
+ * @author henry
+ */
+public abstract class AbstractBaseDAO<T extends Serializable> {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private final String HQL_LIST_ALL;
+
+	private final String HQL_COUNT_ALL;
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	private SessionFactory sessionFactory;
+
+	private Class<?> entityClass;
+
+	private String pkname;
+
+	@SuppressWarnings("unused")
+	private String tableName;
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	public AbstractBaseDAO() {
+		Type type = this.getClass().getGenericSuperclass();
+		if (type.toString().indexOf("BaseDAO") != -1) {
+			ParameterizedType type1 = (ParameterizedType) type;
+			Type[] types = type1.getActualTypeArguments();
+			this.setEntityClass((Class<?>) types[0]);
+		} else {
+			type = ((Class<?>) type).getGenericSuperclass();
+			ParameterizedType type1 = (ParameterizedType) type;
+			Type[] types = type1.getActualTypeArguments();
+			this.setEntityClass((Class<?>) types[0]);
+		}
+		this.getPkname();
+		this.getTableName();
+		this.HQL_LIST_ALL = "from " + this.entityClass.getSimpleName()
+				+ " order by " + this.pkname + " desc";
+		this.HQL_COUNT_ALL = "select count(*) from "
+				+ this.entityClass.getSimpleName();
+	}
+
+	/**
+	 * get the current table primary key
+	 *
+	 * @return primary key
+	 */
+	public String getPkname() {
+		Field[] fields = this.entityClass.getDeclaredFields();
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(Id.class)) {
+				this.pkname = field.getName();
+				break;
+			}
+		}
+		return this.pkname;
+	}
+
+	/**
+	 * get the table name
+	 *
+	 * @return
+	 */
+	public String getTableName() {
+		return this.entityClass.getSimpleName();
+	}
+
+	/**
+	 * save entity
+	 *
+	 * @param t
+	 */
+	public void save(T t) {
+		this.sessionFactory.getCurrentSession().save(t);
+	}
+
+	/**
+	 * update the entity
+	 *
+	 * @param t
+	 * @throws HibernateException
+	 */
+	public void update(T t) {
+		this.sessionFactory.getCurrentSession().update(t);
+	}
+
+	/**
+	 * save or update the entity
+	 *
+	 * @param t
+	 * @throws HibernateException
+	 */
+	public void saveOrUpdate(T t) {
+		this.sessionFactory.getCurrentSession().saveOrUpdate(t);
+	}
+
+	/**
+	 * delete the entity
+	 *
+	 * @param t
+	 * @throws HibernateException
+	 */
+	public void delete(T t) {
+		this.sessionFactory.getCurrentSession().delete(t);
+	}
+
+	/**
+	 * get the entity
+	 *
+	 * @param id
+	 * @throws ***
+	 */
+	@SuppressWarnings("unchecked")
+	public T get(Serializable id) throws Exception {
+		return (T) this.sessionFactory.getCurrentSession().get(
+				this.getEntityClass(), id);
+	}
+
+	/**
+	 * query all entity
+	 *
+	 * @throws HibernateException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> findAll() throws Exception {
+		return this.sessionFactory.getCurrentSession()
+				.createQuery(this.HQL_LIST_ALL).list();
+	}
+
+	/**
+	 * get the count of entity
+	 *
+	 * @throws HibernateException
+	 */
+	public Integer findAllCount() throws Exception {
+
+		Integer count = 0;
+		Query query = this.sessionFactory.getCurrentSession().createQuery(
+				this.HQL_COUNT_ALL);
+		List<?> list = query.list();
+		if (list != null && !list.isEmpty()) {
+			count = ((Integer) list.get(0)).intValue();
+		}
+		return count;
+	}
+
+
+    /**
+     * update using SQL
+     * @param hql
+     * @param objects
+     * @throws **
+     */
+    public int upateBySql(String sql, final Object... objects) {
+        if (objects == null) {
+            return 0;
+        }
+        Query query = this.sessionFactory.getCurrentSession().createSQLQuery(sql);
+        for (int i = 0; i < objects.length; i++) {
+            query.setParameter(i, objects[i]);
+        }
+        return query.executeUpdate();
+    }
+
+    /**
+     * update using SQL
+     * @param hql
+     * @param objects
+     * @throws **
+     */
+    public int upateBySql(String sql) {
+        Query query = this.sessionFactory.getCurrentSession().createSQLQuery(sql);
+        return query.executeUpdate();
+    }
+
+
+	/**
+	 * query using QBE
+	 *
+	 * @param t
+	 * @throws HibernateException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> findByExample(T t) throws Exception {
+
+		Example example = Example.create(t);
+		Criteria criteria = this.sessionFactory.getCurrentSession()
+				.createCriteria(this.getEntityClass());
+
+		criteria.add(example);
+		return criteria.list();
+	}
+    /**
+     * query using QBE
+     *
+     * @param thisClass 对象
+     * @return Criteria Criteria
+     * @throws Exception 异常
+     */
+    public Criteria findByDetachedCriteria(Class<?> thisClass, ProjectionList pList) throws Exception {
+
+        DetachedCriteria dc = DetachedCriteria.forClass(FkTGuestEntity.class);
+        dc.setProjection(pList);
+        dc.setResultTransformer(Transformers.aliasToBean(thisClass));
+        Criteria cr = dc.getExecutableCriteria(this.sessionFactory.getCurrentSession());
+        return cr;
+    }
+
+	/**
+	 * query using QBE
+	 *
+	 * @param t
+	 * @throws HibernateException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> findByExample(T t, Order... order) {
+		Criteria criteria = this.sessionFactory.getCurrentSession()
+				.createCriteria(this.getEntityClass());
+		if (null != t) {
+			Example example = Example.create(t);
+			criteria = criteria.add(example);
+		}
+
+		if (null != order) {
+			for (int i = 0; i < order.length; i++) {
+				criteria.addOrder(order[i]);
+			}
+		}
+		return criteria.list();
+	}
+
+	/**
+	 * query by Criteria
+	 *
+	 * @param thisClass
+	 * @return
+	 */
+	public Criteria findByCriteria(Class<?> thisClass) {
+		return this.sessionFactory.getCurrentSession().createCriteria(
+				this.getEntityClass());
+	}
+
+	/**
+	 * query using HQL
+	 *
+	 * @param hql
+	 * @param objects
+	 * @throws ***
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<T> findByHql(String hql, final Object... objects) throws Exception {
+		if (objects == null) {
+			return new ArrayList();
+		}
+		Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+		for (int i = 0; i < objects.length; i++) {
+			query.setParameter(i, objects[i]);
+		}
+		return query.list();
+	}
+
+	/**
+	 * query using HQL
+	 *
+	 * @param objects
+	 * @throws ***
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public List<T> findByHql(String hql) throws Exception {
+		Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+		return query.list();
+	}
+
+	/**
+	 * query using SQL
+	 *
+	 * @param hql
+	 * @param objects
+	 * @throws **
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<T[]> findBySql(String sql, final Object... objects)
+			throws Exception {
+		if (objects == null) {
+			return new ArrayList();
+		}
+		Query query = this.sessionFactory.getCurrentSession().createSQLQuery(sql);
+		for (int i = 0; i < objects.length; i++) {
+			query.setParameter(i, objects[i]);
+		}
+		return query.list();
+	}
+
+	/**
+	 * query using SQL
+	 *
+	 * @param hql
+	 * @param objects
+	 * @throws **
+	 */
+	public List<?> findBySql(String sql) throws Exception {
+		Query query = this.sessionFactory.getCurrentSession().createSQLQuery(sql);
+		return query.list();
+	}
+
+	/**
+	 * query using SQL
+	 *
+	 * @param hql
+	 * @param objects
+	 * @throws **
+	 */
+	public Query getQueryByCriteria(String sql) throws Exception {
+		return this.sessionFactory.getCurrentSession().createSQLQuery(sql);
+	}
+
+	public Class<?> getEntityClass() {
+		return this.entityClass;
+	}
+
+	public void setEntityClass(Class<?> entityClass) {
+		this.entityClass = entityClass;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+}

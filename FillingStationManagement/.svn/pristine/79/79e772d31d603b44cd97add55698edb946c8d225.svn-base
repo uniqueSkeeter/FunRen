@@ -1,0 +1,253 @@
+﻿/*
+ * 卡片管理表 <-- > 卡领取 Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.card;
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+/**
+ * TODO - High level description about type's responsibility.
+ *
+ * @trace TODO
+ * @author wangshuqing
+ */
+@Entity
+@Table(name = "FK_T_CARDINOUT")
+public class FkTCardInOutEntity implements StandardBean {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ID
+	 */
+	@Id
+	@Column(name = "`ID`")
+	@GeneratedValue
+	private Integer id;
+
+	/**
+	 * 日期
+	 */
+	@Column(name = "`WORKDATE`")
+	private Timestamp workdate;
+
+	@Column(name = "`CARDTYPE`")
+	private String workDate;
+
+	@Column(name = "`INOUTNO`")
+	private String inOutNo;
+
+	@Column(name = "STYPE")
+	private String receiptType;
+
+	@Column(name = "SSTATUS")
+	private String receiptStatus;
+
+	@Column(name = "OUTNO")
+	private String supplier;
+
+	@Column(name = "OUTDATE")
+	private String leftStorageDate;
+
+	@Column(name = "INNO")
+	private String receiver;
+
+	@Column(name = "INDATE")
+	private String putInStorageDate;
+
+	@Column(name = "CARDSUM")
+	private String cardAcount;
+
+	@Column(name = "CARDGG")
+	private String cardType;
+
+	@Column(name = "NOTE")
+	private String note;
+
+	@Column(name = "STATIONNO")
+	private String stationNo;
+
+	@Column(name = "USERID")
+	private String operatorId;
+
+	@Column(name = "BZ")
+	private String bz;
+
+	/**
+	 * 班结号
+	 */
+	@Column(name = "`BJID`")
+	private Integer shiftNum;
+
+	/**
+	 * 日结号
+	 */
+	@Column(name = "`RJID`")
+	private Integer darNum;
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Timestamp getWorkdate() {
+		return this.workdate;
+	}
+
+	public void setWorkdate(Timestamp workdate) {
+		this.workdate = workdate;
+	}
+
+	public String getWorkDate() {
+		return this.workDate;
+	}
+
+	public void setWorkDate(String workDate) {
+		this.workDate = workDate;
+	}
+
+	public String getInOutNo() {
+		return this.inOutNo;
+	}
+
+	public void setInOutNo(String inOutNo) {
+		this.inOutNo = inOutNo;
+	}
+
+	public String getReceiptType() {
+		return this.receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
+	}
+
+	public String getReceiptStatus() {
+		return this.receiptStatus;
+	}
+
+	public void setReceiptStatus(String receiptStatus) {
+		this.receiptStatus = receiptStatus;
+	}
+
+	public String getSupplier() {
+		return this.supplier;
+	}
+
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+
+	public String getLeftStorageDate() {
+		return this.leftStorageDate;
+	}
+
+	public void setLeftStorageDate(String leftStorageDate) {
+		this.leftStorageDate = leftStorageDate;
+	}
+
+	public String getReceiver() {
+		return this.receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+
+	public String getPutInStorageDate() {
+		return this.putInStorageDate;
+	}
+
+	public void setPutInStorageDate(String putInStorageDate) {
+		this.putInStorageDate = putInStorageDate;
+	}
+
+	public String getCardAcount() {
+		return this.cardAcount;
+	}
+
+	public void setCardAcount(String cardAcount) {
+		this.cardAcount = cardAcount;
+	}
+
+	public String getCardType() {
+		return this.cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public String getNote() {
+		return this.note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getStationNo() {
+		return this.stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getOperatorId() {
+		return this.operatorId;
+	}
+
+	public void setOperatorId(String operatorId) {
+		this.operatorId = operatorId;
+	}
+
+	public String getBz() {
+		return this.bz;
+	}
+
+	public void setBz(String bz) {
+		this.bz = bz;
+	}
+
+	public Integer getShiftNum() {
+		return this.shiftNum;
+	}
+
+	public void setShiftNum(Integer shiftNum) {
+		this.shiftNum = shiftNum;
+	}
+
+	public Integer getDarNum() {
+		return this.darNum;
+	}
+
+	public void setDarNum(Integer darNum) {
+		this.darNum = darNum;
+	}
+
+	@Override
+	public String toString() {
+		return "FkTCardInOutEntity [id=" + id + ", workdate=" + workdate + ", workDate=" + workDate + ", inOutNo=" + inOutNo
+				+ ", receiptType=" + receiptType + ", receiptStatus=" + receiptStatus + ", supplier=" + supplier
+				+ ", leftStorageDate=" + leftStorageDate + ", receiver=" + receiver + ", putInStorageDate=" + putInStorageDate
+				+ ", cardAcount=" + cardAcount + ", cardType=" + cardType + ", note=" + note + ", stationNo=" + stationNo
+				+ ", operatorId=" + operatorId + ", bz=" + bz + ", shiftNum=" + shiftNum + ", darNum=" + darNum + "]";
+	}
+
+}

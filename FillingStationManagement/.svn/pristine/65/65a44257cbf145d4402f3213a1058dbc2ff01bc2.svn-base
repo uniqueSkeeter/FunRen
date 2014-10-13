@@ -1,0 +1,268 @@
+package com.fr.station.component.system.action;
+
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ApplicationAware;
+import org.apache.struts2.interceptor.SessionAware;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.data.DataCollections;
+import com.fr.station.common.utility.CodeHelper;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.system.constants.SystemConstants;
+import com.fr.station.component.system.exception.EmployeeException;
+import com.fr.station.component.system.service.EmployeeService;
+import com.fr.station.component.system.service.ShiftChangeManagerService;
+import com.fr.station.component.system.service.UserService;
+import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
+import com.opensymphony.xwork2.validator.annotations.ValidatorType;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ *
+ * @author henry
+ */
+@Namespace("/")
+@ParentPackage("custom-default")
+// @InterceptorRefs({@InterceptorRef("checkLoginStack")})
+public class UserLoginAction extends AbstractAction implements SessionAware, ApplicationAware, SystemConstants {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	@Autowired
+	protected UserService userService;
+
+	@Autowired
+	protected EmployeeService employeeService;
+
+	@Autowired
+	protected ShiftChangeManagerService shiftChangeManagerService;
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	private Properties properties;
+
+	private String userName;
+
+	private String userPass;
+
+	private String checkCode;
+
+	private Map<String, Object> session;
+
+	private Map<String, Object> application;
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 *
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 *
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "userLogin", results = { @Result(name = "success", location = "/view/home.jsp"),
+			// @Result(name = "success", location = "/mainDemo.jsp"),
+			@Result(name = "input", location = "/view/login.jsp"), @Result(name = "error", location = "/view/login.jsp") })
+	public String loginUser() {
+		log.info("Starting to check the current user is legal...");
+		// read properties from card property
+		// truth check code
+		final String acturalCheckCode = (String) this.session.get(RAND);
+		try {
+			if (this.getUserName() == null || this.getUserPass() == null || acturalCheckCode == null) {
+				log.info("current login in is illegal, user name ,pass word or security code can't be null");
+				return ERROR;
+			}
+			if (CodeHelper.isNotNullOrEmpty(this.getCheckCode()) && acturalCheckCode.equalsIgnoreCase(this.getCheckCode())) {
+				if (CodeHelper.isNotNullOrEmpty(this.getUserName(), 1) && CodeHelper.isNotNullOrEmpty(this.getUserPass())) {
+					// TODO check authority
+					this.session.put(SystemConstants.USERTYPE, null);
+					int roleId = this.userService.getUserRoleByCriteria(this.getUserName(), this.getUserPass(), this.session,
+							this.application);
+					// set default class info value
+					this.shiftChangeManagerService.initialClassInfo();
+					this.saveCommonInfoToSession();
+					if (roleId > 0) {
+						// get menu and secondary navigation
+						log.info("User successfully login in the system, UserName = " + this.getUserName());
+						this.session.put(USERID, "1");
+						// prepare jason tree
+						// userService.getUserAuthor(1);
+						return SUCCESS;
+					} else {
+						this.addFieldError(LOGINFAILURE, this.properties.getProperty(LOGINFAILURE));
+						return ERROR;
+					}
+				} else {
+					this.addFieldError(LOGINFAILURE, this.properties.getProperty(LOGINFAILURE));
+				}
+			} else {
+				this.addFieldError(CHECKCODEFAILURE, this.properties.getProperty(CHECKCODEFAILURE));
+			}
+		} catch (EmployeeException ee) {
+			log.info("Login user failure, there is no corresponding data in DB, userName = " + this.userName);
+		}catch (final Exception e) {
+			log.info("Login user failure, please see the detail info /n[ " + e.getMessage() + "]" + ErrorLogUtil.printInfo(e));
+		}
+		return ERROR;
+	}
+
+	/**
+	 * Assign the value of session to session.
+	 *
+	 * @param session the session to set
+	 *
+	 */
+	@Override
+	public void setSession(Map<String, Object> session) {
+		this.session = session;
+		this.session.put(GAS_OIL_TYPE, DataCollections.oilType);
+		this.session.put(STATION_NUM, DataCollections.stationNum);
+		this.session.put(SHIFTSTATUS, DataCollections.shiftStatus);
+		this.session.put(SHIFTTYPE, DataCollections.shiftType);
+		this.session.put(LOGINSTATUS, DataCollections.loginStatus);
+		this.session.put(POLITICALSTATUS, DataCollections.poliStatus);
+		this.session.put(BANKTYPE, DataCollections.dicBank);
+		this.session.put(EDUCATION, DataCollections.educationType);
+		this.session.put(OPERA_TRATE_TYPE, DataCollections.tradeType);
+		this.session.put(OPERA_PAY_TYPE, DataCollections.dicPayType);
+		this.session.put(CARD_CATEGORY, DataCollections.cardCategory);
+
+		// for customer regist
+		this.session.put(CARD_TYPE, DataCollections.dicUseType);
+		this.session.put(GUEST_TYPE, DataCollections.dicCredType);
+		this.session.put(OIL_TYPE_LIMIT, DataCollections.oilType);
+		this.session.put(CARD_STATUS, DataCollections.cardStatus);
+		this.session.put(BILL_TYPE, DataCollections.billType);
+		this.session.put(GUEST_STATUS, DataCollections.dicCustomStats);
+		this.session.put(CORP_TYPE, DataCollections.dicCompany);
+		// for card charge
+		this.session.put(PAY_TYPE, DataCollections.dicPayType);
+		this.session.put(CHARGE_TRADE_TYPE, DataCollections.chargeTradeType);
+		// for card list
+		this.session.put(RECEIPT_TYPE, DataCollections.receiptType);
+		this.session.put(RECEIPT_STATUS, DataCollections.receiptStatus);
+		this.session.put(DIICREDTYPE, DataCollections.dicCredType);
+		// for report
+		this.session.put(CLASS_STATUS, DataCollections.classStatus);
+		// for customer allocate accounts
+		this.session.put(ALLOCATE_TYPE, DataCollections.allocateType);
+	}
+
+	/**
+	 * login out
+	 *
+	 * @return
+	 */
+	public String logout() {
+		// if the session is not null means the user is already login, otherwise
+		// the user is still not login.
+		if (null != this.session) {
+			this.session.clear();
+		}
+		return LOGIN;
+	}
+
+	/**
+	 * Get the value of or reference to userName.
+	 *
+	 * @return the userName
+	 */
+	@RequiredStringValidator(type = ValidatorType.SIMPLE, fieldName = "userName", message = "用户名和密码不能为空")
+	public String getUserName() {
+		return this.userName;
+	}
+
+	/**
+	 * Assign the value of userName to userName.
+	 *
+	 * @param age the userName to set
+	 *
+	 */
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	/**
+	 * Get the value of or reference to userPass.
+	 *
+	 * @return the userPass
+	 */
+	@RequiredStringValidator(type = ValidatorType.SIMPLE, fieldName = "userPass", message = "")
+	public String getUserPass() {
+		return this.userPass;
+	}
+
+	/**
+	 * Assign the value of userPass to userPass.
+	 *
+	 * @param age the userPass to set
+	 *
+	 */
+	public void setUserPass(String userPass) {
+		this.userPass = userPass;
+	}
+
+	/**
+	 * Get the value of or reference to checkCode.
+	 *
+	 * @return the checkCode
+	 */
+	@RequiredStringValidator(type = ValidatorType.SIMPLE, fieldName = "checkCode", message = "验证码不能为空")
+	public String getCheckCode() {
+		return this.checkCode;
+	}
+
+	/**
+	 * Assign the value of checkCode to checkCode.
+	 *
+	 * @param age the checkCode to set
+	 *
+	 */
+	public void setCheckCode(String checkCode) {
+		this.checkCode = checkCode;
+	}
+
+	/**
+	 * Assign the value of application to application.
+	 *
+	 * @param application the application to set
+	 *
+	 */
+	@Override
+	public void setApplication(Map<String, Object> application) {
+		this.application = application;
+
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private void saveCommonInfoToSession() {
+		// for station name
+		this.session.put(STATION_NAME, ApplicationContext.getInstance().getStationName());
+		// for station no
+		this.session.put(STATION_NUM, ApplicationContext.getInstance().getStationNum());
+		// for operator number
+		this.session.put(OPERATORNUM, ApplicationContext.getInstance().getOperatorNo());
+		// for station limit info
+		this.session.put(LIMIT_STATION_LIST, DataCollections.stationLimit);
+		// for class number to display in the page
+		this.session.put(CLASS_NUMBER, ApplicationContext.getInstance().getClassChangeBean().getClassNo());
+	}
+
+}

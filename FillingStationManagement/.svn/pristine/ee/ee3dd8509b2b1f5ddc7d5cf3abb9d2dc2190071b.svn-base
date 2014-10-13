@@ -1,0 +1,85 @@
+/**
+ * 
+ */
+
+function saveData(row){
+			var cardDetail = [];
+			for(var i=0; i<row.length; i++){
+			    cardDetail.push(row[i].startNo + ":" + row[i].endNo + ":" + row[i].note + ";");
+			}
+			var yz = $.ajax({
+				type : 'post',
+				url : "<%=basePath%>cardStorageDetail/saveCardDetailOrder",
+				data : {
+					"cardStorageDetailBean.cardDetail" : cardDetail.join('\n')
+					},
+				cache : false,
+				dataType : 'json',
+				success:function(data){
+    				$.messager.alert('成功','恭喜你保存成功!');
+    			},
+    			error:function(){
+    				$.messager.alert('错误','保存失败，请重试!');
+    			}
+			});
+		};
+		$(function(){
+			var lastIndex;
+			
+			$('#tt').datagrid({
+				toolbar:[{
+					text:'增加一行',
+					iconCls:'icon-add',
+					handler:function(){
+						var sel = document.getElementById("receiptType");
+						var index = sel.selectedIndex;
+						if(sel.options[index].value=='2'){
+							alert("单据类型为已入库记录，无法编辑！");
+						}
+						
+						else{
+							$('#tt').datagrid('endEdit', lastIndex);
+							$('#tt').datagrid('appendRow',{
+								startNo:'',
+								endNo:'',
+								cardSum:'',
+								note:'',
+							});
+							lastIndex = $('#tt').datagrid('getRows').length-1;
+							$('#tt').datagrid('selectRow', lastIndex);
+							$('#tt').datagrid('beginEdit', lastIndex);
+						}
+						
+					}
+				},'-',{
+					text:'删除一行',
+					iconCls:'icon-remove',
+					handler:function(){
+						var row = $('#tt').datagrid('getSelected');
+						if (row){
+							var index = $('#tt').datagrid('getRowIndex', row);
+							$('#tt').datagrid('deleteRow', index);
+						}
+					}
+				},'-',{
+					text:'撤销',
+					iconCls:'icon-undo',
+					handler:function(){
+						$('#tt').datagrid('rejectChanges');
+					}
+				}],
+				onBeforeLoad:function(){
+					$(this).datagrid('rejectChanges');
+				},
+				onClickRow:function(rowIndex){
+					if (lastIndex != rowIndex){
+						$('#tt').datagrid('endEdit', lastIndex);
+						$('#tt').datagrid('beginEdit', rowIndex);
+					}
+					lastIndex = rowIndex;
+				}
+				
+			});
+		});
+		
+		

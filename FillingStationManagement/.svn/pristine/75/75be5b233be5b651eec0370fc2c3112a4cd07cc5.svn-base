@@ -1,0 +1,155 @@
+package com.fr.station.component.system.dao.impl;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.system.ClassChangeBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.report.ClassInfoEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+import com.fr.station.component.system.dao.ShiftChangeManageDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites.
+ * Mainly responsible to handle user login
+ *
+ * @author henry
+ */
+@Repository
+public class ShiftChangeManageDaoImpl extends AbstractBaseDAO<ClassInfoEntity> implements ShiftChangeManageDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(ShiftChangeManageDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private String updateClassInfoSql = "UPDATE CLASS_INFO SET class_status = '2', update_date = getDate() WHERE id = ";
+
+	private final String selectShiftChangeNumSql = "SELECT CONVERT(varchar(100), co.create_date, 120), ci.MaxNo, co.id, co.userId, co.class_status FROM (SELECT MAX (class_no) AS MaxNo FROM [dbo].[CLASS_INFO]) ci INNER JOIN CLASS_INFO co ON co.class_no = ci.MaxNo";
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	@Override
+	public ClassChangeBean getCurrentShiftNum() {
+		Object[] resultArray = null;
+		ClassInfoEntity classInfoEntity = null;
+		ClassChangeBean classChangeBean = null;
+		try {
+			StringBuilder sqlBuilder = new StringBuilder();
+			String stationNum = this.getStationNum();
+			if(stationNum == null) {
+				return null;
+			}
+			sqlBuilder.append(this.selectShiftChangeNumSql).append(SqlConsts.ADD).append("co.stationNo").append(SqlConsts.EQUAL).append(stationNum);
+			List<?> resultList = this.findBySql(sqlBuilder.toString());
+			if (resultList.size() > 0) {
+				resultArray = (Object[]) resultList.get(0);
+				classChangeBean = this.convertToBean(classInfoEntity, resultArray);
+			}else{
+				// set default value
+				classInfoEntity = this.createDefaultClassInfo(stationNum, "001", "早班");
+				this.save(classInfoEntity);
+				// convert to bean for display in the jsp
+				classChangeBean = this.convertToBean(classInfoEntity, resultArray);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log\n" + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return classChangeBean;
+
+	}
+
+	@Override
+	public ClassChangeBean saveCurrentShift(ClassChangeBean classChangeBean) {
+		log.info("Begain to update current class information and calculate the next shift information");
+		// save current class information
+		this.updateCurrentClassInfo(classChangeBean);
+		// save next class information
+		ClassInfoEntity classInfoEntity = this.saveCurrentClassInfo(classChangeBean);
+		// refresh the data
+		ApplicationContext.getInstance().setClassChangeBean(this.transferDataToBean(classInfoEntity));
+		log.info("End to update current class information and calculate the next shift information");
+		return this.transferDataToBean(classInfoEntity);
+	}
+
+	private ClassInfoEntity saveCurrentClassInfo(ClassChangeBean classChangeBean) {
+		// get sataion number
+		String stationNum = this.getStationNum();
+		// get next class number
+		String currentClassNo = this.calculateShiftNumber(classChangeBean);
+		ClassInfoEntity classInfoEntity = this.createDefaultClassInfo(stationNum, currentClassNo, "default");
+		this.save(classInfoEntity);
+		return classInfoEntity;
+	}
+
+	private String getStationNum() {
+		String stationNum = ApplicationContext.getInstance().getStationNum();
+		return stationNum;
+	}
+
+	private String calculateShiftNumber(ClassChangeBean classChangeBean) {
+		String lastClassNo = classChangeBean.getClassNo();
+		String comparedClassNo = DateUtil.getCurrentDate(DateUtil.DATE_PATTERN_0);
+		String currentClassNo = null;
+		if(comparedClassNo.equalsIgnoreCase(lastClassNo.substring(0, 8))){
+			currentClassNo = String.valueOf(Integer.valueOf(lastClassNo.substring(7))+ 1).substring(1);
+		}else{
+			currentClassNo = "001";
+		}
+		return currentClassNo;
+	}
+
+	private void updateCurrentClassInfo(ClassChangeBean classChangeBean) {
+		String updateSql = this.updateClassInfoSql + String.valueOf(classChangeBean.getId());
+		this.upateBySql(updateSql);
+	}
+
+	private ClassChangeBean convertToBean(ClassInfoEntity classInfoEntity, Object[] resultArray) {
+		ClassChangeBean classChangeBean = new ClassChangeBean();
+		if(classInfoEntity != null){
+			return this.transferDataToBean(classInfoEntity);
+		}else{
+			classChangeBean.setStartDate((String) resultArray[0]);
+			classChangeBean.setClassNo((String) resultArray[1]);
+			classChangeBean.setId((Integer) resultArray[2]);
+			classChangeBean.setUserId((Integer) resultArray[3]);
+			classChangeBean.setClassStatus((String) resultArray[4]);
+		}
+		return classChangeBean;
+
+	}
+
+	private ClassChangeBean transferDataToBean(ClassInfoEntity classInfoEntity) {
+		ClassChangeBean classChangeBean = new ClassChangeBean();
+		classChangeBean.setClassNo(classInfoEntity.getClassNo());
+		classChangeBean.setClassStatus(classInfoEntity.getClassStatus());
+		classChangeBean.setStartDate(DateUtil.formatDate(DateUtil.currentTimestamp(), DateUtil.DATE_PATTERN_17));
+		classChangeBean.setUserId(Integer.valueOf(classInfoEntity.getUserid()));
+		classChangeBean.setId(Integer.valueOf(classInfoEntity.getId()));
+		return classChangeBean;
+	}
+
+	private ClassInfoEntity createDefaultClassInfo(String stationNum, String classNo, String className) {
+		ClassInfoEntity classInfoEntity = new ClassInfoEntity();
+		classInfoEntity.setClassNo(DateUtil.getCurrentDate(DateUtil.DATE_PATTERN_0) + classNo);
+		classInfoEntity.setName(className);
+		classInfoEntity.setClassStatus("1");
+		classInfoEntity.setStationNo(stationNum);
+		classInfoEntity.setUserid(ApplicationContext.getInstance().getOperatorNo());
+		classInfoEntity.setCreateDate(DateUtil.currentTimestamp());
+		return classInfoEntity;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+}

@@ -1,0 +1,35 @@
+package com.fr.station.component.report.dao.impl;
+
+import java.util.List;
+
+import com.fr.station.common.bean.report.CardTradeReportBean;
+import com.fr.station.component.report.dao.ExportShiftChangeDataDAO;
+
+
+public class ExportShiftChangeDataDaoImpl implements ExportShiftChangeDataDAO {
+
+	@Override
+	public List<CardTradeReportBean> generateShiftChangeExcel(CardTradeReportBean cardTradeBean, int startPage, int number) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

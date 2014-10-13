@@ -1,0 +1,168 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * this DaoImpl is for find registerCustomer records from DB to display in displayRegisterCustomer.jsp by implements
+ * getRegisterCustomerRecordsByCriteria() method
+ * 
+ * @author WR
+ */
+@Repository
+public class RegisterCustomerDaoImpl extends AbstractBaseDAO<FkTCardEntity> implements RegisterCustomerDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RegisterCustomerDaoImpl.class);
+
+	private static final String CARD_NO = "cardNo";
+
+	private static final String GUEST_NAME = "guestName";
+
+	private static final String CARD_EXNO = "cardExno";
+
+	private static final String CARD_TYPE = "cardType";
+
+	private static final String GUEST_TYPE = "guestType";
+
+	private static final String GUEST_NUM = "guestNum";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String registerCustomerSql = "SELECT c.guestName,c.guestNo,c.cardNo,c.cardStatus,c.guestType,"
+			+ "c.guestNum, c.guestTel,CONVERT(varchar(100), c.create_date, 21),c.stationNo FROM FK_T_CARD c WHERE ";
+
+	private final String countRegisterCustomerSql = "SELECT count(*) FROM FK_T_CARD c WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegisterCustomerDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RegisterCustomerBean> getRegisterCustomerRecordsByCriteria(RegisterCustomerBean registerCustomerBean,
+			int startPage, int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(registerCustomerSql);
+		builderForTotalResult.append(countRegisterCustomerSql);
+		try {
+			StringBuilder builder = validateInputCriteria(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	private StringBuilder validateInputCriteria(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		boolean searchFlag = false;
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardNo())) {
+			searchFlag = true;
+			builder.append(CARD_NO).append(" = '").append(registerCustomerBean.getCardNo()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestName())) {
+			if (searchFlag) {
+				builder.append(" AND ");
+			} else {
+				searchFlag = true;
+			}
+			builder.append(GUEST_NAME).append(" = '").append(registerCustomerBean.getGuestName()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardExno())) {
+			if (searchFlag) {
+				builder.append(" AND ");
+			} else {
+				searchFlag = true;
+			}
+			builder.append(CARD_EXNO).append(" = '").append(registerCustomerBean.getCardExno()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardType())) {
+			if (searchFlag) {
+				builder.append(" AND ");
+			} else {
+				searchFlag = true;
+			}
+			builder.append(CARD_TYPE).append(" = '").append(registerCustomerBean.getCardType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestType())) {
+			if (searchFlag) {
+				builder.append(" AND ");
+			} else {
+				searchFlag = true;
+			}
+			builder.append(GUEST_TYPE).append(" = '").append(registerCustomerBean.getGuestType()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNum())) {
+			if (searchFlag) {
+				builder.append(" AND ");
+			} else {
+				searchFlag = true;
+			}
+			builder.append(GUEST_NUM).append(" = '").append(registerCustomerBean.getGuestNum()).append("'");
+		}
+
+		return builder;
+	}
+
+	private List<RegisterCustomerBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[0]));
+			registerCustomerBean.setGuestNO(String.valueOf(dataRow[1]));
+			registerCustomerBean.setCardNo(String.valueOf(dataRow[2]));
+			registerCustomerBean.setCardStatus(String.valueOf(dataRow[3]));
+			registerCustomerBean.setGuestType(String.valueOf(dataRow[4]));
+			registerCustomerBean.setGuestNum(String.valueOf(dataRow[5]));
+			registerCustomerBean.setGuestTel(String.valueOf(dataRow[6]));
+			registerCustomerBean.setCreate_date(String.valueOf(dataRow[7]));
+			registerCustomerBean.setStationNo(String.valueOf(dataRow[8]));
+			registerCustomerBean.setTotalData(totalAccount);
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+
+}

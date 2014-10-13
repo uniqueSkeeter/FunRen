@@ -1,0 +1,113 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	$(document).ready(function(){
+		$("#readCard").click(function(){
+			alert("读卡");
+		});
+		$("#search").click(function(){
+			alert("查询");
+			var cardNo = $("#cardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(cardNo == '' && guestNo == ''){
+				$.messager.alert('错误', '至少要输入卡号或者客户编号');
+				return;
+			}
+			//提交表单
+			document.customAccount_form.submit();
+		});
+		$("#depositCharge").click(function(){
+			alert("备用金充值");
+			//判断是否经过查询
+			var cardNo = $("#cardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(!(cardNo != '' && guestNo != '')){
+				$.messager.alert('错误', '必须先查询!');
+				return;
+			}
+			//判断充值金额是否为空
+			var chargeAmount = $("#chargeAmount").val();
+			if(chargeAmount == ''){
+				$.messager.alert('错误', '充值额不能为空!');
+				return;
+			}
+			//判断交易类型是否是充值
+			var tradeType = $("#tradeType").find("option:selected").text();
+			alert(tradeType);
+			if(tradeType != '充值'){
+				$.messager.alert('错误', '交易类型只能是充值!');
+				return;
+			}
+			alert("做备用金充值");
+			doDepositCharge();
+		});
+		$("#reset").click(function(){
+			alert("重置");
+			document.customAccount_form.reset();
+		});
+		$("#payType").change(function(){
+			if(this.value == '12'||this.value == '13'){
+				$("#bankSerialNum").show();
+				$("#serialNumLabel").show();
+			}
+			else{
+				$("#bankSerialNum").hide();
+				$("#serialNumLabel").hide();
+			}
+		});
+	});
+	//备用金充值
+	function doDepositCharge(){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerCharge/saveCustomChargeInfo',
+			data : {
+				"customerChargeBean.id" : $("#guestAccId").val(),
+				"customerChargeBean.cardNo" : $("#cardNo").val(),
+				"customerChargeBean.guestName" : $("#guestName").val(),
+				"customerChargeBean.spareAccount" : $("#spareAccount").val(),
+				"customerChargeBean.rechargeAmount" : $("#rechargeAmount").val(),
+				"customerChargeBean.chargeAmount" : $("#chargeAmount").val(),
+				"customerChargeBean.payType" : $("#payType").val(),
+				"customerChargeBean.tradeType" : $("#tradeType").val(),
+				"customerChargeBean.bankSerialNum" : $("#bankSerialNum").val()
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '已充值!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/card/cardCharge/printCustomerCharge.jsp'
+				+'?cardNo='+document.getElementById("cardNo").value
+				+'&cardType='+encodeURI(encodeURI(document.getElementById("cardType").value))
+				+'&cardStatus='+encodeURI(encodeURI(document.getElementById("cardStatus").value))
+				+'&guestNo='+document.getElementById("guestNo").value
+				+'&guestName='+encodeURI(encodeURI(document.getElementById("guestName").value))
+				+'&guestStatus='+encodeURI(encodeURI(document.getElementById("guestStatus").value))
+				+'&chargeAmount='+document.getElementById("chargeAmount").value
+				+'&payType='+encodeURI(encodeURI($("#payType").find("option:selected").text()))
+				+'&spareAccount='+(parseFloat(document.getElementById("spareAccount").value)+parseFloat(document.getElementById("chargeAmount").value));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '备用金充值凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	//更新查询
+		        				document.customAccount_form.submit();
+		                    }
+		                }]
+				});
+				
+			},
+			error : function(){
+				$.messager.alert('错误', '充值失败!');
+			}
+		});
+	}

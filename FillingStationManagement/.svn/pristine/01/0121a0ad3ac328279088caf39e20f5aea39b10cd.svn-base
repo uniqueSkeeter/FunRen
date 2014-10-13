@@ -1,0 +1,77 @@
+package com.fr.station.component.report.service.impl;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.EmployeeBean;
+import com.fr.station.common.bean.OperateLogBean;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.component.report.dao.RefuelRecordsDAO;
+import com.fr.station.component.report.service.RefuelRecordsService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get station trade logs for each car.
+ * Mainly responsible to handle different scenario search
+ * 
+ * @author henry
+ */
+@SuppressWarnings("rawtypes")
+@Service("reportRefuelRecordsService")
+public class RefuelRecordsServiceImpl extends AbstractBaseService implements RefuelRecordsService {
+	
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RefuelRecordsServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private RefuelRecordsDAO reportRefuelRecordsDAOImpl;
+	
+	// ------- Constructors ----------------------------------------------------
+	
+	public RefuelRecordsServiceImpl() {
+		super();
+	}
+	
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 *  inherited java doc.
+	 *  
+	 */
+	@Override
+	public List<OperatelogEntity> findAllGasRecords(EmployeeBean employeeBean)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 *  inherited java doc.
+	 *  
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<OperateLogBean> findGasRecordsByCriteria(OperateLogBean operateLogBean, Object... args) {
+		return this.reportRefuelRecordsDAOImpl.getGasRecordsByCriteria(operateLogBean, args);
+		
+	}
+
+	@Autowired
+	public void setDataCenterDAOImpl(RefuelRecordsDAO reportRefuelRecordsDAOImpl) {
+		super.setBaseDao(reportRefuelRecordsDAOImpl);
+		this.reportRefuelRecordsDAOImpl = reportRefuelRecordsDAOImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	
+}

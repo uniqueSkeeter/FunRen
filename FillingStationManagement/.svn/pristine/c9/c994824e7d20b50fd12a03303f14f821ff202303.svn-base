@@ -1,0 +1,31 @@
+package com.fr.station.common.data;
+
+public class ApplicationContext {
+
+	public static ApplicationContext instance;
+	
+	private ApplicationContext(){
+		
+	}
+	private String stationNum;
+	
+	private String userName;
+	
+	private String roleName;
+	
+	public ApplicationContext getInstance(){
+		if(instance == null){
+			instance = new ApplicationContext();
+		}
+		return instance;
+	}
+
+	public String getStationNum() {
+		return stationNum;
+	}
+
+	public void setStationNum(String stationNum) {
+		this.stationNum = stationNum;
+	}
+
+}

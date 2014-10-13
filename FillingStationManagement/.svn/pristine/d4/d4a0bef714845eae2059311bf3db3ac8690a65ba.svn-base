@@ -1,0 +1,28 @@
+package com.fr.station.component.card.dao;
+
+import java.util.List;
+
+import com.fr.station.common.bean.CardStorageDetailBean;
+
+/**
+ * The interface for get Card Order Detail .
+ * 
+ * @trace FK_T_CARDINOUTNOTE.Table
+ * 
+ * @author hjq
+ */
+
+public interface CardStorageDetailDAO {
+
+	/**
+	 * get each card application records detail in order to display in the jsp page.
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param CardStorageBean CardInOutBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<CardStorageDetailBean> getCardStorageRecordsByCriteria(CardStorageDetailBean cardStorageDetialBean,
+			int startPage, int number);
+
+}

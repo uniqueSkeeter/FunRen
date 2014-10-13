@@ -1,0 +1,271 @@
+/*
+ * 对客户进行的一览基本信息进行管理和维护
+ * 提供检索、导出功能。衔接交费、发卡、编辑、预分配等功能实现
+ * 更新履历： guyj 2014/05/26 新规作成
+ */
+
+
+package com.fr.station.component.customer.service.impl;
+
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CustomBean;
+import com.fr.station.common.consts.AppConsts;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.consts.table.FkTGuestConst;
+import com.fr.station.common.entity.card.FkTGuestEntity;
+import com.fr.station.common.utility.DaoUtil;
+import com.fr.station.common.utility.StringUtil;
+import com.fr.station.component.customer.service.CustomService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+
+/**
+ * 获取客户一览信息
+ * @param userType 检索条件_用户类型
+ * @param idcardType 检索条件_联系人证件类型
+ * @param idcardNum 检索条件_联系人证件编号
+ * @param stats 检索条件_状态
+ * @param beginDate 检索条件_开始时间
+ * @param endDate 检索条件_结束时间
+ * @return 客户一览信息
+ */
+@SuppressWarnings({ "hiding", "rawtypes" })
+@Service("dictionaryService")
+public class CustomServiceImpl<Object> extends AbstractBaseService implements CustomService {
+
+    /**
+     * LOG
+     */
+    private static Logger log = Logger.getLogger(CustomServiceImpl.class);
+
+    /**
+     * 交费更新
+     */
+    private static final String BAL_UPDATE_SQL = StringUtil.connectString(
+        SqlConsts.UPDATE, FkTGuestConst.TABLE_NAME_SQL, SqlConsts.SET,
+        FkTGuestConst.BAL_SQL, SqlConsts.EQUAL, FkTGuestConst.BAL_SQL, SqlConsts.ADD,
+        SqlConsts.PARAM, SqlConsts.WHERE, FkTGuestConst.ID_SQL, SqlConsts.EQUAL,
+        SqlConsts.PARAM);
+
+    /**
+     * 获取客户一览信息
+     * @param userType 检索条件_用户类型
+     * @param idcardType 检索条件_联系人证件类型
+     * @param idcardNum 检索条件_联系人证件编号
+     * @param stats 检索条件_状态
+     * @param beginDate 检索条件_开始时间
+     * @param endDate 检索条件_结束时间
+     * @return 客户一览信息
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    public List<FkTGuestEntity> getCustomInfo(String userType, String idcardType,
+        String idcardNum, String stats, Timestamp beginDate, Timestamp endDate) {
+        log.info("客户一览 检索开始");
+        List<FkTGuestEntity> fList = null;
+        try {
+
+            // 检索 Criteria获取
+            Criteria criteria = this.findByDetachedCriteria(FkTGuestEntity.class,
+                DaoUtil.getProjectionList(
+                // id
+                    FkTGuestConst.ID_OBJ,
+                    // 客户编号（单位编号）
+                    FkTGuestConst.GUESTNO_OBJ,
+                    // 客户名称（单位名）
+                    FkTGuestConst.GUESTNAME_OBJ,
+                    // 用户类型
+                    FkTGuestConst.USERTYPE_OBJ,
+                    // 证件类型
+                    FkTGuestConst.IDCARDTYPE_OBJ,
+                    // 证件编号
+                    FkTGuestConst.IDCARDNUM_OBJ,
+                    // 姓名
+                    FkTGuestConst.NAME_OBJ,
+                    // 电话
+                    FkTGuestConst.TEL_OBJ,
+                    // 地址
+                    FkTGuestConst.ADD_OBJ,
+                    // 账户金额
+                    FkTGuestConst.BAL_OBJ,
+                    // 创建时间
+                    FkTGuestConst.CREATEDATE_OBJ,
+                    // 状态
+                    FkTGuestConst.STATS_OBJ));
+            // 检索条件_用户类型
+            if (!StringUtil.isEmpty(userType)) {
+                criteria.add(Restrictions.eq("usertype", userType));
+            }
+
+            // 检索条件_联系人证件类型
+            if (!StringUtil.isEmpty(idcardType)) {
+                criteria.add(Restrictions.eq("idcardType", idcardType));
+            }
+            // 检索条件_联系人证件编号
+            if (!StringUtil.isEmpty(idcardNum)) {
+                criteria.add(Restrictions.like("idcardNum",
+                    StringUtil.connectString(idcardNum, StringUtil.PERCENTAGE)));
+            }
+
+            // 检索条件_状态
+            if (!StringUtil.isEmpty(stats)) {
+                criteria.add(Restrictions.eq("stats", stats));
+            }
+
+            // 检索条件_开始时间/结束时间
+            if (beginDate != null && endDate != null) {
+                criteria.add(Restrictions.between("createDate", beginDate, endDate));
+            } else if (beginDate != null && endDate == null) {
+                criteria.add(Restrictions.ge("createDate", beginDate));
+            } else if (beginDate == null && endDate != null) {
+                criteria.add(Restrictions.ge("createDate", endDate));
+            }
+
+            fList = criteria.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        log.info("客户一览 检索结束");
+        return fList;
+    }
+
+
+    public CustomServiceImpl() {
+        super();
+    }
+
+
+    /**
+     * 客户注册登录
+     * @param fkTGuest 客户信息
+     */
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    public boolean saveOrUpdateCustom(CustomBean fkTGuest) {
+        log.info("客户注册登录 开始");
+        // 客户注册
+        FkTGuestEntity entity = new FkTGuestEntity();
+        if (fkTGuest.getId() != null) {
+            // ID
+            entity.setId(fkTGuest.getId());
+
+            try {
+                entity = (FkTGuestEntity) this.get(fkTGuest.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            // 状态
+            entity.setStats(AppConsts.CUSTOM_STATS_INUSE);
+        }
+        // 客户名称（单位名）
+        entity.setGuestname(fkTGuest.getGuestname());
+        // 客户类型（单位类型）
+        entity.setGuesttype(fkTGuest.getGuesttype());
+        // 联系人证件类型
+        entity.setIdcardType(fkTGuest.getIdcardType());
+        // 联系人证件编号
+        entity.setIdcardNum(fkTGuest.getIdcardNum());
+        // 联系人姓名
+        entity.setName(fkTGuest.getName());
+        // 地址
+        entity.setAdd(fkTGuest.getAdd());
+        // 电话
+        entity.setTel(fkTGuest.getTel());
+        // 邮编
+        entity.setPost(fkTGuest.getPost());
+        // 邮件
+        entity.setEmail(fkTGuest.getEmail());
+        // 银行编号
+        entity.setBankno(fkTGuest.getBankno());
+        // 银行编号
+        entity.setBankacc(fkTGuest.getBankacc());
+        // 税号
+        entity.setTaxno(fkTGuest.getTaxno());
+        // 备注1
+        entity.setBeizhu(fkTGuest.getBeizhu());
+        // 用户类型
+        entity.setUsertype(fkTGuest.getUsertype());
+        this.saveOrUpdate(entity);
+        log.info("客户注册登录 结束");
+        return true;
+    }
+
+    /**
+     * 金额支付
+     * @param customId 客户Id
+     * @param money 交费金额
+     * @return 成功失败
+     */
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    public boolean customPayMoney(String customId, String money) {
+
+        try {
+            int count = this.upateBySql(BAL_UPDATE_SQL, money, customId);
+            if (count > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 客户情报取得
+     * @param customId 客户ID
+     */
+    @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    public CustomBean getCustomInfoById(String customId) {
+        CustomBean bean = new CustomBean();
+        try {
+            FkTGuestEntity entity = (FkTGuestEntity) this.get(Integer.parseInt(customId));
+            // 客户名称（单位名）
+            bean.setGuestname(entity.getGuestname());
+            // 客户类型（单位类型）
+            bean.setGuesttype(entity.getGuesttype());
+            // 联系人证件类型
+            bean.setIdcardType(entity.getIdcardType());
+            // 联系人证件编号
+            bean.setIdcardNum(entity.getIdcardNum());
+            // 联系人姓名
+            bean.setName(entity.getName());
+            // 地址
+            bean.setAdd(entity.getAdd());
+            // 电话
+            bean.setTel(entity.getTel());
+            // 邮编
+            bean.setPost(entity.getPost());
+            // 邮件
+            bean.setEmail(entity.getEmail());
+            // 银行编号
+            bean.setBankno(entity.getBankno());
+            // 银行编号
+            bean.setBankacc(entity.getBankacc());
+            // 税号
+            bean.setTaxno(entity.getTaxno());
+            // 备注1
+            bean.setBeizhu(entity.getBeizhu());
+            // 用户类型
+            bean.setUsertype(entity.getUsertype());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bean;
+    }
+}

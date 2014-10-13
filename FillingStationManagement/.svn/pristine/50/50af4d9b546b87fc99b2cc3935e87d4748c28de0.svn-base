@@ -1,0 +1,146 @@
+/**
+ * this js works fot displayShiftChangeList.jsp
+ */
+$(function(){
+   $('#shiftChangeListTable').datagrid({
+    iconCls:'icon-ok',
+//    width:'auto',
+//    height:'300',
+    nowrap:false,
+    striped: true,
+    fit: true,//自动大小 
+    collapsible:true,
+    singleSelect:true,
+    loadMsg:'数据装载中......',
+    sortName:'code',
+    sortOrder:'desc',
+    remoteSort:false,
+    frozenColumns:[[
+     {field:'ck',checkbox:true}
+    ]],
+    columns:shiftChangeListcolumns,
+    pagination:true,
+    rownumbers:true,
+    AllowPaging:true
+   });
+// 设置分页控件  
+	var p = $('#shiftChangeListTable').datagrid('getPager');
+	$(p).pagination({
+		 onSelectPage:function(pageNumber,pageSize){  
+			 searchClassChange(pageNumber, pageSize);
+		 }  
+	});
+  
+  $(p).pagination({  
+      pageSize: 20,//每页显示的记录条数，默认为10  
+      pageList: [20,30,40,60,80],//可以设置每页记录条数的列表  
+      beforePageText: '第',//页数文本框前显示的汉字  
+      afterPageText: '页    共 {pages} 页',  
+      displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
+  }); 
+  
+ 
+
+ });
+$(document).ready(function(){
+	$('#shiftChangeList_search').click(function(){
+		var startdate=$("#datepicker1").datebox('getValue');
+		var enddate=$("#datepicker2").datebox('getValue');
+		var dailystatus=$("#classStatus").val();
+		alert("start:"+startdate+"end:"+enddate+"status:"+dailystatus);
+		if(startdate=='' && enddate=='' && dailystatus==''){
+			$.messager.alert('错误','至少填一项!');
+			return;
+		}
+		searchClassChange();	
+		
+	});
+});
+function searchClassChange(pageNumber, pageSize){
+	alert(server_context+'classChange/showClassChangeRecords');
+	var yz = $.ajax({
+		type : 'post',
+		url : server_context + '/classChange/showClassChangeRecords',
+		data : {
+			"classChangeBean.classStatus" : $("#classStatus").val(),
+			"classChangeBean.startDate" : $("#datepicker1").datebox('getValue'),
+			"classChangeBean.endDate" : $("#datepicker2").datebox('getValue'),
+			"classChangeBean.pageNumber" : pageNumber,
+			"classChangeBean.pageSize" : pageSize
+			},
+		cache : false,
+		dataType : 'json',
+		success : function(loaddata) {
+			gridData = loaddata.jsonData;
+			if(gridData == null){
+				$('#shiftChangeListTable').datagrid('loadData',{total:0,rows:[]});
+			}
+			var data = $.parseJSON(gridData);    
+			$('#shiftChangeListTable').datagrid('loadData', data);
+		},
+		error : function() {
+		}
+	});
+};
+var shiftChangeListcolumns = [[ 
+            			{field:'workDate',title:'业务日期',width:200,align:'left'},
+            			{field:'classNo',title:'班次号',width:100,align:'left'},
+            			{field:'classStatus',title:'班结状态',width:60,formatter: function(value,row,index){
+                  			var key = "option[value='" + value + "']";
+                  			var text = $("#classStatus").find(key).text();
+                  			return text;
+            			},align:'left'},
+            			{field:'startTime',title:'起始时间',width:200,align:'left'},
+            			{field:'endTime',title:'结束时间',width:200,align:'left'},
+            			{field:'userId',title:'操作员编号',width:80,align:'left'},
+            			{field:'action',title:'报表',width:70,align:'center',
+                            formatter:function(value,row,index){
+                            	var s = '<a href="javascript:void(0)" onclick="checkrow('+index+');">查看</a> ';
+                                var c = '<a href="javascript:void(0)" onclick="outputrow('+index+');">导出</a>';
+                                return s+'/ '+c;
+                            }
+                        }
+                       ]];
+
+function checkrow(target){
+	alert("target="+target);
+	var row = $('#shiftChangeListTable').datagrid('getRows');
+	$('#classSummaryDialog').form('clear');
+	alert("classno="+row[target].classNo);
+	alert(server_context+'/classChange/showShiftChangeInfo?classChangeBean.classNo='+row[target].classNo);
+	//window.location.href=server_context+'/classChange/checkShiftInfo?classChangeBean.classNo='+row[target].classNo;
+	$('#classSummaryIFrame')[0].src= server_context + '/classChange/showShiftChangeInfo?classChangeBean.classNo='+row[target].classNo;
+	$('#classSummaryDialog').dialog({
+		closed : false,
+        title : '查看',
+        shadow : true,
+        modal : true,
+        collapsible : true,
+        buttons : [ {
+            text : '返回',
+            id : 'cBtn',
+            iconCls:"icon-back",
+            handler : function() {
+                $('#classSummaryDialog').dialog('close');
+            }
+        } ]
+	});
+	//var index = $('#shiftChangeListTable').datagrid('getRowIndex',target);
+	//alert(index);
+};
+function outputrow(target){
+	var row = $('#shiftChangeListTable').datagrid('getRows');
+	alert(row[target].classNo);
+	alert("报表保存在C:\\班结报表\\ShiftChange Report.xls");
+	$.ajax({
+		type : 'post',
+		url : server_context + '/exportShiftChangeExcel',
+		data : {
+			"classChangeBean.classNo" :row[target].classNo
+			},
+		cache : false,
+		dataType : 'json'
+	});
+
+}
+

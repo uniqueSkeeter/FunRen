@@ -1,0 +1,103 @@
+/**
+ * this js works for trasferAccounts.jsp
+ */
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+$(function(){
+   $('#viceCardTable').datagrid({
+    iconCls:'icon-ok',
+//    width:'auto',
+//    height:'300',
+    nowrap:false,
+    striped: true,
+    fit: true,//自动大小 
+    collapsible:true,
+    singleSelect:true,
+    loadMsg:'数据装载中......',
+    sortName:'code',
+    sortOrder:'desc',
+    remoteSort:false,
+    frozenColumns:[[
+     {field:'ck',checkbox:true}
+    ]],
+    columns:viceCardColumns,
+    pagination:true,
+    rownumbers:true,
+    AllowPaging:true
+   });
+// 设置分页控件  
+	var p = $('#viceCardTable').datagrid('getPager');
+	$(p).pagination({
+		 onSelectPage:function(pageNumber,pageSize){  
+		 	searchData(pageNumber, pageSize);
+		 }  
+	});
+  
+  $(p).pagination({  
+      pageSize: 20,//每页显示的记录条数，默认为10  
+      pageList: [20],//可以设置每页记录条数的列表  
+      beforePageText: '第',//页数文本框前显示的汉字  
+      afterPageText: '页    共 {pages} 页',  
+      displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
+  }); 
+
+ });
+
+$(document).ready(function(){
+	$('#read_card').click(function(){
+		alert("readCard");
+		document.getElementById("search_card").disabled=false;
+	});
+	$('#search_card').click(function(){
+		var mainCardNo=$("#mainCardNo").val();
+		var guestNo=$("#guestNo").val();
+		if(mainCardNo=='' && guestNo==''){
+			$.messager.alert('错误','至少填一项!');
+			return;
+		}
+		searchData();	
+		
+	});
+	
+});
+function searchData(pageNumber, pageSize){
+	document.getElementById("mainCardNo").disabled=false;
+	var yz = $.ajax({
+		type : 'post',
+		url : server_context+'/transferAccounts/showViceCardsRecords',
+		data : {
+			"transferAccountsBean.mainCardNo" : $("#mainCardNo").val(),
+			"transferAccountsBean.guestNo" : $("#guestNo").val(),
+			"transferAccountsBean.pageNumber" : pageNumber,
+			"transferAccountsBean.pageSize" : pageSize
+			},
+		cache : false,
+		dataType : 'json',
+		success : function(loaddata) {
+			gridData = loaddata.jsonData;
+			if(gridData == null){
+				$('#viceCardTable').datagrid('loadData',{total:0,rows:[]});
+			}
+			var data = $.parseJSON(gridData);    
+			$('#viceCardTable').datagrid('loadData', data);
+		},
+		error : function() {
+		}
+	});
+}
+var viceCardColumns = [[ 
+                        {field:'viceCardGuestName',title:'姓名',width:120, align:'left'},
+                        {field:'viceCardNo',title:'卡号',width:180, align:'left'},
+                        {field:'viceCardStatus',title:'卡状态',width:150,formatter: function(value,row,index){
+                  			var key = "option[value='" + value + "']";
+                  			var text = $("#cardStatus").find(key).text();
+                  			return text;
+            			},align:'left'},
+            			{field:'guestNo',title:'客户编号',width:150,align:'left'},
+            			{field:'viceCardProvisionAccount',title:'备付账户余额',width:120,align:'left'},
+            			{field:'viceCardBalance',title:'卡内余额',width:120,align:'left'},
+            			{field:'viceCardPoint',title:'积分余额',width:120,align:'left'},
+            			{field:'viceCardDepName',title:'所属部门',width:150,align:'left'}
+                       ]];

@@ -1,0 +1,80 @@
+/**
+ * this js works for applyCardStorage.jsp
+ * 
+ * author:hjq
+ */
+
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	
+	$(document).ready(function(){
+		$("#card_apply").click(function(){
+			$('#applyCardIFrame')[0].src= server_context + '/view/card/card/applyCardStorage.jsp';
+			$('#applyCardDialog').form('clear');
+			 $('#applyCardDialog').dialog({
+				 	closed : false,
+	                title : '申请领取',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '保存',
+	                    iconCls : 'icon-save',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	
+	                    	var rDocument = document.getElementById("applyCardIFrame").contentWindow.document;
+	                    	var flag =  validateFieldValue(rDocument);
+	                    	var applyCardListform = rDocument.getElementsByTagName('form');
+	                    	if(flag){
+	                    		$.ajax({
+	                    			data:$(applyCardListform).serialize(),
+	                    			url:encodeURI("cardStorage/saveCardOrder"),type:'POST',timeout:3000,dataType:'html',
+		                			success:function(data){
+		    	        				$("#applyCardDialog").dialog("close");
+		    	        				$.messager.alert('成功','恭喜你保存成功!');
+		    	        			},
+		    	        			error:function(){
+		    	        				$.messager.alert('错误','保存失败，请重试!');
+		    	        			}
+		            		});
+	                    	}
+	                    }
+	                }, {
+	                    text : '取消',
+	                    id : 'cBtn',
+	                    handler : function() {
+	                        $('#applyCardDialog').dialog("close");
+	                    }
+	                }]
+				 
+			 });
+		});
+	});
+	function validateFieldValue(rDocument){
+		var cardSum = rDocument.getElementById('cardAcount');
+		
+		var supplier = rDocument.getElementById('supplier');
+		
+		if(check(cardSum)){
+			alert("数量不能为空！");
+			return false;
+		}
+		if(check(supplier)){
+			alert("供货方不能为空！");
+			return false;
+		}
+		alert("true");
+		return true;
+	}
+	// 表单验证
+	var check = function (input) {
+	    if (input.value == '') {
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	    };
+	};

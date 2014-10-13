@@ -1,0 +1,102 @@
+package com.fr.station.component.card.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.CardDetailBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.service.CardDetailService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * 卡片明细的action，用于处理得到卡片明细的数据
+ * 
+ * @author yy
+ */
+@Namespace("/cardDetail")
+@ParentPackage("custom-default")
+public class CardDetailAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	protected static Logger log = Logger.getLogger(CardDetailAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	@Autowired
+	protected CardDetailService cardDetailService;
+
+	public CardDetailAction() {
+		super();
+	}
+
+	protected CardDetailBean cardDetailBean = new CardDetailBean();
+
+	private List<CardDetailBean> cardDetailList = new ArrayList<CardDetailBean>();
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	public CardDetailBean getCardDetailBean() {
+		return this.cardDetailBean;
+	}
+
+	public void setCardDetailBean(CardDetailBean cardDetailBean) {
+		this.cardDetailBean = cardDetailBean;
+	}
+
+	/**
+	 * 
+	 * 卡片详细初始化
+	 */
+	@Action(value = "cardDetailInit", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cardDetail.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardDetailInit() {
+		try {
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 显示卡片详细信息
+	 */
+	@Action(value = "showCardDetail", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cardDetail.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String showCardDetail() {
+		log.info("Starting to search for card detail data");
+		boolean flag = false;
+		try {
+			this.cardDetailList = this.cardDetailService.getCardDetail(this.cardDetailBean);
+			if (this.cardDetailList.size() > 0) {
+				this.cardDetailBean = this.cardDetailList.get(0);
+				log.info("Successfully find card detail data");
+			} else {
+				log.info("Can not find coresponding card detail data from database based on the input criteria.");
+				this.cardDetailBean = null;
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("search for card detail data error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+
+	}
+
+}

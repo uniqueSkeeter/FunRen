@@ -1,0 +1,218 @@
+package com.fr.station.component.card.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.card.UpdateCardInfoBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.base.BaseEntity;
+import com.fr.station.common.entity.card.CardEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.card.dao.CardInfoDAO;
+import com.fr.station.component.card.service.CardInfoService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询卡片明细
+ * 
+ * @author yy
+ */
+@Service
+public class CardInfoServiceImpl extends AbstractBaseService<BaseEntity> implements CardInfoService {
+
+	protected static Logger log = Logger.getLogger(CardInfoServiceImpl.class);
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private CardInfoDAO cardInfosDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardInfoServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 通过条件查找并挂失卡片，，实现
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<UpdateCardInfoBean> getCardDetail(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		CommonUtility.countPaginationNumber(updateCardInfoBean);
+		if (updateCardInfoBean == null) {
+			return new ArrayList<UpdateCardInfoBean>();
+		}
+		List<UpdateCardInfoBean> cardDetailList = this.cardInfosDaoImpl.getCardDetailInfo(updateCardInfoBean);
+		return cardDetailList;
+	}
+
+	/**
+	 * 通过条件查找卡片，，实现
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public UpdateCardInfoBean getCardInfo(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		CommonUtility.countPaginationNumber(updateCardInfoBean);
+		return this.cardInfosDaoImpl.getCardInfo(updateCardInfoBean);
+	}
+
+	/**
+	 * 更改卡片信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveCardInfo(UpdateCardInfoBean updateCardInfoBean) {
+		log.info("Persist updateCardInfoBean entity begain");
+		// 将data转换为entity
+		CardEntity cardEntity = this.convertDataToCardEntity(updateCardInfoBean);
+		// 更新卡片信息
+		this.merge(cardEntity);
+
+		log.info("Succefully cardInfo entity into DB");
+	}
+
+	/**
+	 * 根据页面获得查询条件，查询主卡下的所有副卡记录
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<UpdateCardInfoBean> findViceCardsRecordsByCriteria(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		CommonUtility.countPaginationNumber(updateCardInfoBean);
+		return this.cardInfosDaoImpl.getViceCardsRecordsByCriteria(updateCardInfoBean);
+
+	}
+
+	/**
+	 * 查找司机卡信息
+	 * 
+	 */
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public UpdateCardInfoBean getDriverCardInfo(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		CommonUtility.countPaginationNumber(updateCardInfoBean);
+		return this.cardInfosDaoImpl.getDriverCardInfo(updateCardInfoBean);
+	}
+
+	@Override
+	@Autowired
+	public void setCardInfoDAO(CardInfoDAO reportCardInfoDaoImpl) {
+		super.setBaseDao(reportCardInfoDaoImpl);
+		this.cardInfosDaoImpl = reportCardInfoDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	private CardEntity convertDataToCardEntity(UpdateCardInfoBean updateCardInfoBean) {
+		CardEntity fktCardEntity = ApplicationContext.getInstance().getCardEntity();
+		// 姓名
+		if (StringUtils.isNotBlank(updateCardInfoBean.getGuestName())) {
+			fktCardEntity.setGuestname(updateCardInfoBean.getGuestName());
+		}
+		// 证件类型
+		if (StringUtils.isNotBlank(updateCardInfoBean.getGuestType())) {
+			fktCardEntity.setGuesttype(updateCardInfoBean.getGuestType());
+		}
+		// 证件号码
+		if (StringUtils.isNotBlank(updateCardInfoBean.getGuestNum())) {
+			fktCardEntity.setGuestnum(updateCardInfoBean.getGuestNum());
+		}
+		// 电话
+		if (StringUtils.isNotBlank(updateCardInfoBean.getGuestTel())) {
+			fktCardEntity.setGuesttel(updateCardInfoBean.getGuestTel());
+		}
+		// 性别
+		if (StringUtils.isNotBlank(updateCardInfoBean.getGender())) {
+			fktCardEntity.setGender(updateCardInfoBean.getGender());
+		}
+		// 电子邮箱
+		if (StringUtils.isNotBlank(updateCardInfoBean.getEmail())) {
+			fktCardEntity.setEmail(updateCardInfoBean.getEmail());
+		}
+		// 邮政编码
+		if (StringUtils.isNotBlank(updateCardInfoBean.getZipCode())) {
+			fktCardEntity.setGuestpost(updateCardInfoBean.getZipCode());
+		}
+		// 联系地址
+		if (StringUtils.isNotBlank(updateCardInfoBean.getCustomerAddr())) {
+			fktCardEntity.setGuestadd(updateCardInfoBean.getCustomerAddr());
+		}
+		// 备注
+		if (StringUtils.isNotBlank(updateCardInfoBean.getRemark())) {
+			fktCardEntity.setBz(updateCardInfoBean.getRemark());
+		}
+		// 卡密码标志
+		if (StringUtils.isNotBlank(updateCardInfoBean.getPassFlag())) {
+			if (updateCardInfoBean.getPassFlag().equals("Y")) {
+				fktCardEntity.setPassFlag(true);
+			} else {
+				fktCardEntity.setPassFlag(false);
+			}
+		}
+		// 车牌号
+		if (StringUtils.isNotBlank(updateCardInfoBean.getCarNoConstr())) {
+			fktCardEntity.setXcarno(updateCardInfoBean.getCarNoConstr());
+		}
+		// 每天加油次数
+		if (StringUtils.isNotBlank(updateCardInfoBean.getRefuelTimes())) {
+			fktCardEntity.setXcount(updateCardInfoBean.getRefuelTimes());
+		}
+		// 每天消费金额
+		if (StringUtils.isNotBlank(updateCardInfoBean.getConsumeAmount())) {
+			fktCardEntity.setXamn(updateCardInfoBean.getConsumeAmount());
+		}
+		// 每次加油限量
+		if (StringUtils.isNotBlank(updateCardInfoBean.getRefuelLimit())) {
+			fktCardEntity.setXvol(updateCardInfoBean.getRefuelLimit());
+		}
+
+		// 油品限制
+		if (StringUtils.isNotBlank(updateCardInfoBean.getOilTypeLimit())) {
+			fktCardEntity.setXoil(updateCardInfoBean.getOilTypeLimit());
+		}
+		// 开票类型
+		if (StringUtils.isNotBlank(updateCardInfoBean.getBillType())) {
+			fktCardEntity.setBillType(updateCardInfoBean.getBillType());
+		}
+		// 限制区站
+		if (updateCardInfoBean.getStationInfoLimit() != null && updateCardInfoBean.getStationInfoLimit().size() != 0) {
+			fktCardEntity.setXeare(listToString(updateCardInfoBean.getStationInfoLimit()));
+		}
+		// update update time for this record
+		fktCardEntity.setUpdateDate(DateUtil.currentTimestamp());
+		return fktCardEntity;
+	}
+
+	public static String listToString(List<String> stringList) {
+		if (stringList == null) {
+			return null;
+		}
+		StringBuilder result = new StringBuilder();
+		boolean flag = false;
+		for (String string : stringList) {
+			if (flag) {
+				result.append(", ");
+			} else {
+				flag = true;
+			}
+			result.append(string);
+		}
+		return result.toString();
+	}
+}

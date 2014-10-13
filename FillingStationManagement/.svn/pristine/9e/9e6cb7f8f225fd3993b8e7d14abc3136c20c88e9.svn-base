@@ -1,0 +1,85 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	var readFlag = false;
+	$(document).ready(function(){
+		$("#driver_add").click(function(){
+			alert("增加司机ss");
+			readFlag = false;
+		$('#addDriverIFrame')[0].src= server_context + '/view/card/customer/saleMultiUserCard/driverAdd.jsp'; 
+        	$('#addDriverDialog').form('clear');
+            $('#addDriverDialog').dialog({
+                closed : false,
+                title : '增加司机',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '读卡',
+                    id : 'readBtn',
+                    handler:function(){
+                    	alert("读卡");
+                    	readFlag = true;
+                    }
+                }, {
+                    text : '售卡',
+                    id : 'saleBtn',
+                    handler : function() {
+                    	alert("售卡");
+                    	alert("readFlag is "+readFlag);
+                    	if(readFlag){
+                    	var dDocument = document.getElementById("addDriverIFrame").contentWindow.document;
+                    	var valideFlag = true;
+                    	var driverForm = dDocument.getElementsByTagName('form');
+                    	alert("表单数据为"+$(driverForm).serialize());
+                    	alert("valideFlag is "+valideFlag);
+                    	if(valideFlag){
+                    		alert("验证通过!");
+                    		$.ajax({
+                    			data:$(driverForm).serialize(),
+                    			url:encodeURI("saveCustomer"),type:'POST',timeout:3000,dataType:'html',
+	                			success:function(data){
+	    	        				$("#addDriverDialog").dialog("close");
+	    	        				$.messager.alert('成功','恭喜你保存成功!');
+	    	        				$('#printCardIFrame')[0].src= server_context+'/view/card/customer/saleMultiUserCard/printMultiUserSonCard.jsp';
+	    	        				$('#printCardDialog').dialog({
+	    	       					 closed : false,
+	    	       		                title : '单位卡打印',
+	    	       		                shadow : true,
+	    	       		                modal : true,
+	    	       		                collapsible : true,
+	    	       		                buttons : [{
+	    	       		                	text : '返回',
+	    	       		                    id : 'returnBtn',
+	    	       		                    handler:function(){
+	    	       		                    	alert("返回");
+	    	       		                    	$("#printCardDialog").dialog("close");
+	    	       		                    }
+	    	       		                }]
+	    	       				});
+	    	        			},
+	    	        			error:function(){
+	    	        				$.messager.alert('错误','保存失败，请重试!');
+	    	        			}
+	            		});
+                    	}
+                    	}
+                    }
+                },{
+                    text : '重置',
+                    id : 'resetBtn',
+                    handler : function() {
+                    	alert("重置");
+                    	$('#addDriverDialog').form('clear');
+                        $('#addDriverDialog').dialog('close');
+                    }
+                }]
+        });
+	
+	});
+	});
+
+	function validateDriverField(rDocument){
+		alert(" in validateDriverField");
+	}

@@ -1,0 +1,549 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.customer.TransferAccountsBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.PreAllocatedDetailEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.common.utility.StringUtil;
+import com.fr.station.component.customer.dao.TransferAccountsDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+@Repository
+public class TransferAccountsDaoImpl extends AbstractBaseDAO<PreAllocatedDetailEntity> implements TransferAccountsDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(TransferAccountsDaoImpl.class);
+
+	// 获得主卡下所有副卡信息
+
+	private final String selectViceCardsListSql = "select card.guestName, card.cardNo, card.cardStatus,guest.guestNo,cardTZ.pre,card.depno,guest.cardno as mainCardno,cardTZ.cardbal,cardTZ.score,"
+			+ "(SELECT guestdep.depName from FK_T_GUESTDEP guestdep where guestdep.depno = card.depno) as depName from FK_T_GUEST guest, FK_T_CARD card, FK_T_CardTZ cardTZ where ";
+
+	// 获得副卡数量
+	private final String selectAllCountViceCardsListSql = "select count(*) from FK_T_GUEST guest, FK_T_CARD card, FK_T_CardTZ cardTZ where ";
+
+	// 获得主副卡账户信息
+	private final String selectAccountInfoSql = "select master.guestName as mainGuestName,master.idcard_num as mainIDNum,master.guestStatus as mainGuestStatus,master.cardStatus as mainCardStatus,master.cardbal as mainCalBal,master.cardno as mainCardNo,master.guestno as mainCardGuestNo,master.point as mainCardPoint, "
+			+ "vice.cardNo as viceCardNo,vice.guestName as viceGuestName,vice.depName as viceDepName,vice.cardbal as viceCardBal,vice.cardStatus as viceCardStatus,vice.cardType as viceCardType,vice.IDNum as viceIDNum,vice.balance as viceCardBalance,vice.effectiveDate as viceCardEffectiveDate,vice.point as viceCardPoint from ";
+
+	// 获得主卡账户信息
+	private final String selectMainCardInfoSql = "(SELECT guest.guestName AS guestName, guest.idcard_num AS idcard_num,guest.stats AS guestStatus,card.cardStatus AS cardStatus,guestacc.bal AS cardbal, card.cardno AS cardno, card.guestno AS guestno, guestacc.score as point FROM FK_T_GUEST guest, FK_T_CARD card, FK_T_GUESTACC guestacc WHERE ";
+
+	// 获得副卡账户信息
+	private final String selectViceCardInfoSql = "(select card.cardNo as cardNo, card.guestName as guestName, cardTZ.pre as cardbal, cardTZ.cardbal as balance,card.cardStatus as cardStatus,card.cardtype as cardType,card.guestnum as IDNum, CONVERT(varchar(10), card.endDate, 21) effectiveDate,cardTZ.score as point,(SELECT guestdep.depName from FK_T_GUESTDEP guestdep where guestdep.depno = card.depno) as depName from FK_T_CARD card, FK_T_CardTZ cardTZ where ";
+
+	// 获得班结号
+	private final String selectShiftChangeNumSql = "SELECT co.create_date, ci.MaxNo, co.id FROM (SELECT MAX (class_no) AS MaxNo FROM [dbo].[CLASS_INFO]) ci INNER JOIN CLASS_INFO co ON co.class_no = ci.MaxNo";
+
+	// 更新客户账户信息表
+	private final String updateGuestAccountSql = "update FK_T_GUESTACC set ";
+
+	// 更新卡帐信息
+	private final String updateCardTZSql = "update FK_T_CardTZ set ";
+
+	// 查询单据编号
+	private final String selectBillNoSql = "SELECT attriValue FROM stationParameter WHERE attriName = 'billNo' ";
+
+	// 查询卡交易序号
+	private final String selectCardTradeNoSql = "SELECT attriValue FROM stationParameter WHERE attriName = 'cardTradeNo' ";
+
+	// 更新，编号自增
+	private final String updateSysParameterAttriValueSql = "UPDATE stationParameter SET attriValue = attriValue + '1'  WHERE attriName = ? ";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+	public TransferAccountsDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * Inherited java doc
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TransferAccountsBean> getViceCardsRecordsByCriteria(TransferAccountsBean transferAccountsBean) {
+		List<TransferAccountsBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteria(transferAccountsBean);
+
+			builder.append("\n order by card.cardno");
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.selectViceCardsListSql);
+
+			builder = this.validateInputCriteria(transferAccountsBean);
+
+			// get total records by specified sql.
+			int totalSize = this.getTotalCount(builder, this.selectAllCountViceCardsListSql);
+
+			// this is for pagination.
+			this.setPaginationNumber(transferAccountsBean, query);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TransferAccountsBean> getAccountsInfoByCriteria(TransferAccountsBean transferAccountsBean) {
+		List<TransferAccountsBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteriaForAccountsInfo(transferAccountsBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder,
+					new StringBuilder().append(this.selectAccountInfoSql).append(this.selectMainCardInfoSql).toString());
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBeanForAccounts(result);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@Override
+	public Object[] getClassNum() {
+		Object[] resultArray = null;
+		try {
+			List<?> resultList = this.findBySql(this.selectShiftChangeNumSql);
+			if (resultList.size() > 0) {
+				resultArray = (Object[]) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultArray;
+
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@Override
+	public void updateAccounts(TransferAccountsBean transferAccountsBean) {
+		// 构建更新FK_T_GUESTACC表的sql语句,将账上余额减去分配数，已分配金额加上分配数
+		StringBuilder updateValueForGuestAcc = new StringBuilder();
+		if (transferAccountsBean.getAllocateAmount() != null) {
+			if (transferAccountsBean.getAllocateType().equals("0")) {
+				updateValueForGuestAcc.append("bal").append(SqlConsts.EQUAL).append("bal - ");
+				updateValueForGuestAcc.append(transferAccountsBean.getAllocateAmount());
+				updateValueForGuestAcc.append(SqlConsts.COMMA).append("inuse").append(SqlConsts.EQUAL).append("inuse + ");
+				updateValueForGuestAcc.append(transferAccountsBean.getAllocateAmount());
+			} else if (transferAccountsBean.getAllocateType().equals("1")) {
+				updateValueForGuestAcc.append("score").append(SqlConsts.EQUAL).append("score - ")
+						.append(transferAccountsBean.getAllocateAmount());
+			}
+		}
+		StringBuilder builder = this.validateInputCriteriaForUpdateGuestAcc(transferAccountsBean);
+		StringBuilder updateSql = new StringBuilder();
+		updateSql.append(this.updateGuestAccountSql).append(updateValueForGuestAcc).append(builder);
+
+		// 构建更新FK_T_CardTZ表的sql语句，将预分配金额加上分配数
+		StringBuilder updateValueForCardTZ = new StringBuilder();
+
+		if (transferAccountsBean.getAllocateAmount() != null) {
+			if (transferAccountsBean.getAllocateType().equals("0")) {
+				updateValueForCardTZ.append("pre").append(SqlConsts.EQUAL).append("pre + ");
+				updateValueForCardTZ.append(transferAccountsBean.getAllocateAmount());
+			} else if (transferAccountsBean.getAllocateType().equals("1")) {
+				updateValueForCardTZ.append("score").append(SqlConsts.EQUAL).append("score + ")
+						.append(transferAccountsBean.getAllocateAmount());
+			}
+		}
+		StringBuilder builders = this.validateInputCriteriaForUpdateCardTZ(transferAccountsBean);
+		StringBuilder updateSqls = new StringBuilder();
+		updateSqls.append(this.updateCardTZSql).append(updateValueForCardTZ).append(builders);
+
+		// 更新FK_T_GUESTACC
+		this.upateBySql(updateSql.toString());
+		// 更新FK_T_CardTZ
+		this.upateBySql(updateSqls.toString());
+		return;
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@Override
+	public void updateAccountsForGather(TransferAccountsBean transferAccountsBean) {
+		if (transferAccountsBean.getAllocateType().equals("0")) {
+			// 构建更新FK_T_GUESTACC表的sql语句,将账上余额加上分配数
+			StringBuilder updateValueForGuestAcc = new StringBuilder();
+			updateValueForGuestAcc.append("bal").append(SqlConsts.EQUAL).append("bal + ");
+			if (transferAccountsBean.getGatherAmount() != null) {
+				updateValueForGuestAcc.append(transferAccountsBean.getGatherAmount());
+			}
+
+			StringBuilder builder = this.validateInputCriteriaForUpdateGuestAcc(transferAccountsBean);
+			StringBuilder updateSql = new StringBuilder();
+			updateSql.append(this.updateGuestAccountSql).append(updateValueForGuestAcc).append(builder);
+
+			// 构建更新FK_T_CardTZ表的sql语句，将预分配金额减去分配数
+			StringBuilder updateValueForCardTZ = new StringBuilder();
+			updateValueForCardTZ.append("pre").append(SqlConsts.EQUAL).append("pre - ");
+			if (transferAccountsBean.getGatherAmount() != null) {
+				updateValueForCardTZ.append(transferAccountsBean.getGatherAmount());
+			}
+			StringBuilder builders = this.validateInputCriteriaForUpdateCardTZ(transferAccountsBean);
+			StringBuilder updateSqls = new StringBuilder();
+			updateSqls.append(this.updateCardTZSql).append(updateValueForCardTZ).append(builders);
+
+			// 更新FK_T_GUESTACC
+			this.upateBySql(updateSql.toString());
+			// 更新FK_T_CardTZ
+			this.upateBySql(updateSqls.toString());
+		} else {
+			StringBuilder updateValueForGuestAcc = new StringBuilder();
+			updateValueForGuestAcc.append("score").append(SqlConsts.EQUAL).append("score + ");
+			if (transferAccountsBean.getGatherAmount() != null) {
+				updateValueForGuestAcc.append(transferAccountsBean.getGatherAmount());
+			}
+
+			StringBuilder builder = this.validateInputCriteriaForUpdateGuestAcc(transferAccountsBean);
+			StringBuilder updateSql = new StringBuilder();
+			updateSql.append(this.updateGuestAccountSql).append(updateValueForGuestAcc).append(builder);
+
+			// 构建更新FK_T_CardTZ表的sql语句，将预分配金额减去分配数
+			StringBuilder updateValueForCardTZ = new StringBuilder();
+			updateValueForCardTZ.append("score").append(SqlConsts.EQUAL).append("score - ");
+			if (transferAccountsBean.getGatherAmount() != null) {
+				updateValueForCardTZ.append(transferAccountsBean.getGatherAmount());
+			}
+			StringBuilder builders = this.validateInputCriteriaForUpdateCardTZ(transferAccountsBean);
+			StringBuilder updateSqls = new StringBuilder();
+			updateSqls.append(this.updateCardTZSql).append(updateValueForCardTZ).append(builders);
+
+			// 更新FK_T_GUESTACC
+			this.upateBySql(updateSql.toString());
+			// 更新FK_T_CardTZ
+			this.upateBySql(updateSqls.toString());
+		}
+		return;
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@Override
+	public void updateAccountsForCreditForLoad(TransferAccountsBean transferAccountsBean) {
+		// 构建更新FK_T_CardTZ表的sql语句，将预分配金额减去分配数
+		StringBuilder updateValueForCardTZ = new StringBuilder();
+		updateValueForCardTZ.append("pre").append(SqlConsts.EQUAL).append("pre - ");
+		if (transferAccountsBean.getGatherAmount() != null) {
+			updateValueForCardTZ.append(transferAccountsBean.getGatherAmount());
+		}
+		updateValueForCardTZ.append(SqlConsts.COMMA).append("cardbal").append(SqlConsts.EQUAL).append("cardbal + ");
+		if (transferAccountsBean.getGatherAmount() != null) {
+			updateValueForCardTZ.append(transferAccountsBean.getGatherAmount());
+		}
+		StringBuilder builders = this.validateInputCriteriaForUpdateCardTZ(transferAccountsBean);
+		StringBuilder updateSqls = new StringBuilder();
+		updateSqls.append(this.updateCardTZSql).append(updateValueForCardTZ).append(builders);
+
+		// 更新FK_T_CardTZ
+		this.upateBySql(updateSqls.toString());
+		return;
+	}
+
+	/**
+	 * @Inherited doc 取得分配时的单据编号
+	 */
+	@Override
+	public Integer getBillNo() {
+		Integer billNo = 0;
+		try {
+			List<?> resultList = this.findBySql(this.selectBillNoSql);
+			if (resultList.size() > 0) {
+				billNo = (Integer) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return billNo;
+	}
+
+	/**
+	 * @Inherited doc 单据号自增
+	 */
+	@Override
+	public void updateBillNo() {
+		Object[] args = { "billNo" };
+		// 执行SQL
+		this.upateBySql(this.updateSysParameterAttriValueSql, args);
+	}
+
+	/**
+	 * @Inherited doc 取得汇总时的交易序号
+	 */
+	@Override
+	public Integer getTradeNo() {
+		Integer tradeNo = 0;
+		try {
+			List<?> resultList = this.findBySql(this.selectCardTradeNoSql);
+			if (resultList.size() > 0) {
+				tradeNo = (Integer) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return tradeNo;
+	}
+
+	/**
+	 * @Inherited doc 交易序号自增
+	 */
+	@Override
+	public void updateTradeNo() {
+		Object[] args = { "cardTradeNo" };
+		// 执行SQL
+		this.upateBySql(this.updateSysParameterAttriValueSql, args);
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	/**
+	 * 
+	 * 将查询到的主副卡账户信息放入javabean中
+	 * 
+	 * @param dataResult
+	 * @return TransferAccountsBean 的 List
+	 */
+	private List<TransferAccountsBean> convertDataToBeanForAccounts(List<Object[]> dataResult) {
+		List<TransferAccountsBean> transferAccountsBeanList = new ArrayList<TransferAccountsBean>();
+		TransferAccountsBean transferAccountsBean = null;
+		for (Object[] dataRow : dataResult) {
+			transferAccountsBean = new TransferAccountsBean();
+			transferAccountsBean.setMainCardGuestName(String.valueOf(dataRow[0]));
+			transferAccountsBean.setMainCardIDNum(String.valueOf(dataRow[1]));
+			transferAccountsBean.setMainCardGuestStatus(String.valueOf(dataRow[2]));
+			transferAccountsBean.setMainCardStatus(String.valueOf(dataRow[3]));
+			transferAccountsBean.setMainCardProvisionAccount(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[4]))));
+			transferAccountsBean.setMainCardNo(String.valueOf(dataRow[5]));
+			transferAccountsBean.setGuestNo(String.valueOf(dataRow[6]));
+			if (dataRow[7] == null) {
+				transferAccountsBean.setMainCardPoint(BigDecimal.valueOf(0));
+			} else {
+				transferAccountsBean.setMainCardPoint(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[7]))));
+			}
+			transferAccountsBean.setViceCardNo(String.valueOf(dataRow[8]));
+			transferAccountsBean.setViceCardGuestName(String.valueOf(dataRow[9]));
+			if (dataRow[10] == null) {
+				transferAccountsBean.setViceCardDepName("");
+			} else {
+				transferAccountsBean.setViceCardDepName(String.valueOf(dataRow[10]));
+			}
+			transferAccountsBean.setViceCardProvisionAccount(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[11]))));
+			transferAccountsBean.setViceCardStatus(String.valueOf(dataRow[12]));
+			transferAccountsBean.setViceCardType(String.valueOf(dataRow[13]));
+			transferAccountsBean.setViceCardIDNum(String.valueOf(dataRow[14]));
+			transferAccountsBean.setViceCardBalance(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[15]))));
+			transferAccountsBean.setViceCardEffectiveDate(DateUtil.formatDateYYYY_MM_DD((String) (dataRow[16])));
+			transferAccountsBean.setViceCardPoint(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[17]))));
+			transferAccountsBean.setPayType("14");
+			transferAccountsBeanList.add(transferAccountsBean);
+		}
+		return transferAccountsBeanList;
+	}
+
+	/**
+	 * 
+	 * 将查询到的副卡信息放入javabean中
+	 * 
+	 * @param dataResult
+	 * @return TransferAccountsBean 的 List
+	 */
+
+	private List<TransferAccountsBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<TransferAccountsBean> transferAccountsBeanList = new ArrayList<TransferAccountsBean>();
+		TransferAccountsBean transferAccountsBean = null;
+		for (Object[] dataRow : dataResult) {
+			transferAccountsBean = new TransferAccountsBean();
+			transferAccountsBean.setViceCardGuestName(String.valueOf(dataRow[0]));
+			transferAccountsBean.setViceCardNo(String.valueOf(dataRow[1]));
+			transferAccountsBean.setViceCardStatus(String.valueOf(dataRow[2]));
+			transferAccountsBean.setGuestNo(String.valueOf(dataRow[3]));
+			transferAccountsBean.setViceCardProvisionAccount(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[4]))));
+			transferAccountsBean.setMainCardNo(String.valueOf(dataRow[6]));
+			transferAccountsBean.setViceCardBalance(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[7]))));
+			if (dataRow[8] == null) {
+				transferAccountsBean.setViceCardPoint(BigDecimal.valueOf(0));
+			} else {
+				transferAccountsBean.setViceCardPoint(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[8]))));
+			}
+			if (dataRow[9] == null) {
+				transferAccountsBean.setViceCardDepName(" ");
+			} else {
+				transferAccountsBean.setViceCardDepName(String.valueOf(dataRow[9]));
+			}
+			transferAccountsBean.setTotalData(totalAccount);
+			transferAccountsBeanList.add(transferAccountsBean);
+		}
+		return transferAccountsBeanList;
+	}
+
+	/**
+	 * 
+	 * 为更新FK_T_CardTZ构建where条件
+	 * 
+	 * @param TransferAccountsBean transferAccountsBean
+	 * @return StringBuilder
+	 */
+
+	private StringBuilder validateInputCriteriaForUpdateCardTZ(TransferAccountsBean transferAccountsBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(SqlConsts.WHERE);
+		if (StringUtil.isNotEmpty(transferAccountsBean.getViceCardNo())) {
+			builder.append(" cardno ").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getViceCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 
+	 * 为更新FK_T_GUESTACC构建where条件
+	 * 
+	 * @param TransferAccountsBean transferAccountsBean
+	 * @return StringBuilder
+	 */
+
+	private StringBuilder validateInputCriteriaForUpdateGuestAcc(TransferAccountsBean transferAccountsBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(SqlConsts.WHERE);
+		if (StringUtil.isNotEmpty(transferAccountsBean.getGuestNo())) {
+			builder.append(" guestno ").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getGuestNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 
+	 * 为获得主副卡信息构建where条件
+	 * 
+	 * @param TransferAccountsBean transferAccountsBean
+	 * @return StringBuilder
+	 */
+	private StringBuilder validateInputCriteriaForAccountsInfo(TransferAccountsBean transferAccountsBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("guest.stationNo").append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		if (StringUtil.isNotEmpty(transferAccountsBean.getMainCardNo())) {
+			builder.append(SqlConsts.ADD).append("card.cardNo").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getMainCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		builder.append(SqlConsts.ADD).append("card.guestNo").append(SqlConsts.EQUAL).append("guest.guestno");
+		builder.append(SqlConsts.ADD).append("card.guestNo").append(SqlConsts.EQUAL).append("guestacc.guestNo");
+		builder.append(")master, \n");
+		builder.append(this.selectViceCardInfoSql);
+		// builder.append("card.stationNo").append(SqlConsts.EQUAL)
+		// .append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		builder.append("card.cardflag").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES).append("N")
+				.append(SqlConsts.SINGLE_QUOTES);
+		if (StringUtil.isNotEmpty(transferAccountsBean.getViceCardNo())) {
+			builder.append(SqlConsts.ADD).append("card.cardNo").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getViceCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		builder.append(SqlConsts.ADD).append("card.cardno").append(SqlConsts.EQUAL).append("cardTZ.cardno");
+		builder.append(")vice \n");
+
+		return builder;
+	}
+
+	/**
+	 * 
+	 * 为获得副卡信息构建where条件
+	 * 
+	 * @param TransferAccountsBean transferAccountsBean
+	 * @return StringBuilder
+	 */
+
+	private StringBuilder validateInputCriteria(TransferAccountsBean transferAccountsBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("guest.stationNo").append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		if (StringUtil.isNotEmpty(transferAccountsBean.getMainCardNo())) {
+			builder.append(SqlConsts.ADD).append("guest.cardno").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getMainCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		if (StringUtil.isNotEmpty(transferAccountsBean.getGuestNo())) {
+			builder.append(SqlConsts.ADD).append("guest.guestno").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(transferAccountsBean.getGuestNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		builder.append(SqlConsts.ADD).append("guest.guestno").append(SqlConsts.EQUAL).append("card.guestno");
+		builder.append(SqlConsts.ADD).append("card.cardno").append(SqlConsts.EQUAL).append("cardTZ.cardno");
+		builder.append(SqlConsts.ADD).append("card.cardFlag").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+				.append("N").append(SqlConsts.SINGLE_QUOTES);
+		return builder;
+	}
+
+	private void setPaginationNumber(TransferAccountsBean transferAccountsBean, Query query) {
+		query.setFirstResult(transferAccountsBean.getStartNumber());
+		query.setMaxResults(transferAccountsBean.getTotalNumber());
+	}
+
+	private int getTotalCount(StringBuilder builder, String sql) throws Exception {
+		List<?> dataResultList = this.findBySql(new StringBuilder().append(sql).append(builder).toString());
+		if (dataResultList.size() > 0) {
+			return (int) dataResultList.toArray()[0];
+		}
+		return 0;
+	}
+
+	private Query createSpecifiedQuery(StringBuilder builder, String sql) throws Exception {
+		return this.getQueryByCriteria(new StringBuilder().append(sql).append(builder).toString());
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

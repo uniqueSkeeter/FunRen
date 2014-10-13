@@ -1,0 +1,75 @@
+package com.fr.station.component.system.constants;
+
+import org.apache.log4j.Logger;
+
+import com.fr.station.component.system.action.UserLoginAction;
+
+public interface SystemConstants {
+
+	public static final String USERTYPE = "userType";
+
+	public static Logger log = Logger.getLogger(UserLoginAction.class);
+
+	public static final String LOGINFAILURE = "login.error";
+
+	public static final String CHECKCODEFAILURE = "checkCode.error";
+
+	public static final String USERID = "userId";
+
+	public static final String RAND = "rand";
+
+	// for employee initial
+	public static final String SHIFTSTATUS = "shiftStatus";
+
+	public static final String SHIFTTYPE = "shiftType";
+
+	public static final String LOGINSTATUS = "loginStatus";
+
+	public static final String POLITICALSTATUS = "politicalStatus";
+
+	public static final String BANKTYPE = "bankType";
+
+	public static final String EDUCATION = "education";
+
+	// for diagram report
+	public static final String GAS_OIL_TYPE = "oilType";
+
+	public static final String STATION_NUM = "stationNo";
+
+	// for refuel report
+	public static final String OPERA_TRATE_TYPE = "operTradeType";
+
+	public static final String OPERA_PAY_TYPE = "operPayType";
+
+	// for card register customer
+	public static final String CARD_TYPE = "cardType";
+
+	public static final String GUEST_TYPE = "guestType";
+
+	public static final String OIL_TYPE_LIMIT = "oilTypeLimit";
+
+	public static final String CARD_STATUS = "cardStatus";
+
+	public static final String BILL_TYPE = "billType";
+
+	public static final String GUEST_STATUS = "guestStatus";
+
+	// for card trade
+	public static final String CARD_CATEGORY = "cardCategory";
+
+	public static final String RECEIPT_TYPE = "receiptType";
+
+	public static final String RECEIPT_STATUS = "receiptStatus";
+
+	// for station info
+	public static final String STATION_NAME = "stationName";
+
+	public static final String DIICREDTYPE = "dicCredType";
+
+	public static final String OPERATORNUM = "operatorNo";
+
+	// for report
+
+	public static final String CLASS_STATUS = "classStatus";
+
+}

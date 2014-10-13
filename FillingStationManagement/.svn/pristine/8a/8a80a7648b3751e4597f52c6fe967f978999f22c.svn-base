@@ -1,0 +1,59 @@
+package com.fr.station.common.data;
+
+public class ApplicationContext {
+
+	public static ApplicationContext instance;
+
+	private ApplicationContext() {
+
+	}
+
+	private String stationNum;
+	
+	private String stationName;
+
+	private String userName;
+
+	private String roleName;
+	
+	public static ApplicationContext getInstance() {
+		if (instance == null) {
+			instance = new ApplicationContext();
+		}
+		return instance;
+	}
+
+	public String getStationNum() {
+		return stationNum;
+	}
+
+	public void setStationNum(String stationNum) {
+		this.stationNum = stationNum;
+	}
+
+	public String getUserName() {
+		return this.userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getRoleName() {
+		return this.roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+	
+	public String getStationName() {
+		return this.stationName;
+	}
+
+	public void setStationName(String stationName) {
+		this.stationName = stationName;
+	}
+	
+
+}

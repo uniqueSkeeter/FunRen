@@ -1,0 +1,421 @@
+package com.fr.station.component.customer.action;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONObject;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.customer.CustomerDeleteBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.exception.CustomerException;
+import com.fr.station.component.customer.service.CustomerDeleteService;
+import com.fr.station.component.system.action.AbstractAction;
+import com.opensymphony.xwork2.ActionContext;
+
+/**
+ * The action for delete customer and card
+ * 
+ * @author WR
+ */
+@Namespace("/customerDelete")
+@ParentPackage("custom-default")
+public class CustomerDeleteAction extends AbstractAction implements ServletRequestAware {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(CustomerDeleteAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected CustomerDeleteService customerDeleteServiceImpl;
+
+	protected CustomerDeleteBean customerDeleteBean;
+
+	protected List<CustomerDeleteBean> customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+
+	private String jsonData;
+
+	private HttpServletRequest request;
+
+	private final String RESULTCUSTOMERBEAN = "resultCustomerBean";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CustomerDeleteAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * action for link to displayCustomerDeleteList.jsp
+	 */
+	@Action(value = "customerDeleteInit", results = {
+			@Result(name = "success", location = "/view/card/customer/customCancel/displayCustomerDeleteList.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String customerDeleteInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to displayCustomDeleteList.jsp
+	 */
+	@Action(value = "customDeleteInit", results = {
+			@Result(name = "success", location = "/view/card/customer/customCancel/displayCustomDeleteList.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String customDeleteInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to displayCardDeleteList.jsp
+	 */
+	@Action(value = "cardDeleteInit", results = {
+			@Result(name = "success", location = "/view/card/customer/customCancel/displayCardDeleteList.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardDeleteInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to displayDriverDeleteList.jsp
+	 */
+	@Action(value = "driverDeleteInit", results = {
+			@Result(name = "success", location = "/view/card/customer/customCancel/displayDriverDeleteList.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String driverDeleteInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for click search button to display customer info in displayCustomerDeleteList.jsp
+	 */
+	@Action(value = "showCustomerInfo", results = { @Result(name = "success", location = "/view/card/customer/customCancel/displayCustomerDeleteList.jsp") })
+	public String showCustomerInfo() {
+		log.info("Start to show customer info");
+		boolean flag = false;
+		try {
+			this.customerDeleteBeanList = this.customerDeleteServiceImpl.findCustomerRecordsByCriteria(this.customerDeleteBean);
+			if (this.customerDeleteBeanList.size() > 0) {
+				this.customerDeleteBean = this.customerDeleteBeanList.get(0);
+				log.info("Successfully get a customer record");
+			} else {
+				this.customerDeleteBean = null;
+				log.info("can not find  a customer record");
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute findCustomerRecordsByCriteria occured error , please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click allCardDelete button to display all customer card info to displayAllCardList.jsp in
+	 * displayCustomDeleteList.jsp
+	 */
+	@Action(value = "showAllCardInfo", results = { @Result(name = "success", location = "/view/card/customer/customCancel/displayAllCardList.jsp") })
+	public String showAllCardInfo() {
+		log.info("Starting to show customer's all card info");
+		boolean flag = false;
+		try {
+			this.customerDeleteBean = this.customerDeleteServiceImpl.findAllCardRecordsByCriteria(this.customerDeleteBean);
+			ActionContext actionContext = ActionContext.getContext();
+			Map<String, Object> map = actionContext.getSession();
+			map.put(this.RESULTCUSTOMERBEAN, this.customerDeleteBean);
+			this.request.setAttribute("customerDeleteBean", this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute findAllCardRecordsByCriteria occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click search button to display personal card info in displayCardDeleteList.jsp
+	 */
+	@Action(value = "showCardInfo", results = { @Result(name = "success", location = "/view/card/customer/customCancel/displayCardDeleteList.jsp") })
+	public String showCardInfo() {
+		log.info("Starting to show card info");
+		boolean flag = false;
+		try {
+			this.customerDeleteBeanList = this.customerDeleteServiceImpl.findCardRecordsByCriteria(this.customerDeleteBean);
+			if (this.customerDeleteBeanList.size() > 0) {
+				this.customerDeleteBean = this.customerDeleteBeanList.get(0);
+				log.info("Successfully get a personal card record");
+			} else {
+				this.customerDeleteBean = null;
+				log.info("can not find a personal card record");
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute findCardRecordsByCriteria occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click search button in displayDriverDeleteList.jsp to display the driver card info
+	 */
+	@Action(value = "showDriverInfo", results = { @Result(name = "success", type = "json"), })
+	public String showDriverInfo() {
+		log.info("Starting to show driver card info");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<CustomerDeleteBean> customerDeleteBeanList = null;
+		try {
+			customerDeleteBeanList = this.customerDeleteServiceImpl.findDriverRecordsByCriteria(this.customerDeleteBean);
+			if (!customerDeleteBeanList.isEmpty()) {
+				map.put(TOTAL, customerDeleteBeanList.get(0).getTotalData());
+				map.put(ROWS, customerDeleteBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("successful convert search records to json object");
+			} else {
+				map.clear();
+				log.info("can not find a driver record");
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("execute findDriverRecordsByCriteria occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 单位有卡销户
+	 */
+	@Action(value = "deleteMultiCustomer", results = { @Result(name = "success", type = "json"), })
+	public String deleteMultiCustomer() {
+		log.info("Starting to delete customer and all son card");
+		boolean flag = false;
+		try {
+			this.customerDeleteServiceImpl.updateMultiCustomer(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updateMultiCustomer occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete customer and all son card ");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 单位无卡销户
+	 * 
+	 * @throws CustomerException
+	 */
+	@Action(value = "deleteMultiCustomerNoCard", results = { @Result(name = "success", type = "json"), })
+	public String deleteMultiCustomerNoCard() throws CustomerException {
+		log.info("Starting to delete customer and all son card when not have card");
+		boolean flag = false;
+		boolean timeFlag = this.customerDeleteServiceImpl.judgeAllBlackCardTime(this.customerDeleteBean);
+		if (!timeFlag) {
+			log.info("at least a card lost time can not fit 48 hours");
+			throw new CustomerException("time flag is false and at least a card lost time can not fit 48 hours");
+		}
+		try {
+			this.customerDeleteServiceImpl.updateMultiCustomer(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updateMultiCustomer occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete customer and all son card when not have card");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 单用户卡有卡销户
+	 */
+	@Action(value = "deletePersonalCard", results = { @Result(name = "success", type = "json"),
+			@Result(name = "error", type = "json") })
+	public String deletePersonalCard() {
+		log.info("Starting to delete personal card");
+		boolean flag = false;
+		try {
+			this.customerDeleteServiceImpl.updatePersonalCard(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updatePersonalCard occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete personal card ");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 单用户卡无卡销户
+	 * 
+	 * @throws CustomerException
+	 */
+	@Action(value = "deletePersonalCardNoCard", results = { @Result(name = "success", type = "json"),
+			@Result(name = "error", type = "json") })
+	public String deletePersonalCardNoCard() throws CustomerException {
+		log.info("Starting to delete personal card when not have card");
+		boolean flag = false;
+		boolean timeFlag = this.customerDeleteServiceImpl.judgeBlackCardTime(this.customerDeleteBean);
+		if (!timeFlag) {
+			log.info("card lost time can not fit 48 hours");
+			throw new CustomerException("time flag is false card lost time can not fit 48 hours");
+		}
+		try {
+			this.customerDeleteServiceImpl.updatePersonalCard(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updatePersonalCard occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete personal card when not have card");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 司机卡有卡销户
+	 */
+	@Action(value = "deleteDriverCard", results = { @Result(name = "success", type = "json"),
+			@Result(name = "error", type = "json") })
+	public String deleteDriverCard() {
+		log.info("Starting to delete driver card");
+		boolean flag = false;
+		try {
+			this.customerDeleteServiceImpl.updateDriverCard(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updateDriverCard occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete driver card ");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 司机卡无卡销户
+	 * 
+	 * @throws CustomerException
+	 */
+	@Action(value = "deleteDriverCardNoCard", results = { @Result(name = "success", type = "json"),
+			@Result(name = "error", type = "json") })
+	public String deleteDriverCardNoCard() throws CustomerException {
+		log.info("Starting to delete driver card when not have card");
+		boolean flag = false;
+		boolean timeFlag = this.customerDeleteServiceImpl.judgeBlackCardTime(this.customerDeleteBean);
+		if (!timeFlag) {
+			log.info("card lost time can not fit 48 hours");
+			throw new CustomerException("time flag is false card lost time can not fit 48 hours");
+		}
+		try {
+			this.customerDeleteServiceImpl.updateDriverCard(this.customerDeleteBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute updateDriverCard occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("successfully to delete driver card when not have card");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public CustomerDeleteBean getCustomerDeleteBean() {
+		return this.customerDeleteBean;
+	}
+
+	public void setCustomerDeleteBean(CustomerDeleteBean customerDeleteBean) {
+		this.customerDeleteBean = customerDeleteBean;
+	}
+
+	public List<CustomerDeleteBean> getCustomerDeleteBeanList() {
+		return this.customerDeleteBeanList;
+	}
+
+	public void setCustomerDeleteBeanList(List<CustomerDeleteBean> customerDeleteBeanList) {
+		this.customerDeleteBeanList = customerDeleteBeanList;
+	}
+
+	public String getJsonData() {
+		return this.jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	@Override
+	public void setServletRequest(HttpServletRequest request) {
+		this.request = request;
+
+	}
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

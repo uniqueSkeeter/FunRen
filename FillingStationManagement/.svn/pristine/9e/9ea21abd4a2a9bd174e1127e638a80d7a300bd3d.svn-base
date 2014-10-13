@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+		<Or>
+			<Class name="jp.co.nttcom.navitan.framework.common.service.AIDLDatabaseControllor" />
+			<Class name="~jp\.co\.nttcom\.navitan\..*\.BuildConfig.*" />
+			<Class name="~jp\.co\.nttcom\.navitan\..*\.Manifest.*" />
+			<Class name="~jp\.co\.nttcom\.navitan\..*\.R.*" />
+		</Or>
+    </Match>
+</FindBugsFilter>

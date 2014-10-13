@@ -1,0 +1,631 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CustomerDeleteBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.CustomerDeleteDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The customerDeleteDaoImpl for delete customer
+ * 
+ * @author WR
+ */
+@Repository
+public class CustomerDeleteDaoImpl extends AbstractBaseDAO<FkTCardEntity> implements CustomerDeleteDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CustomerDeleteDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	/**
+	 * 查询单位卡主卡客户信息的SQL
+	 */
+	private final String customerInfoSQL = "SELECT card.cardNo, card.cardStatus, card.cardFlag, card.cardType, card.deposit, card.bz, "
+			+ "card.guestName, card.guestType, card.guestNum, card.guestNo, guest.stats, guest.beizhu, "
+			+ "cardAcc.cardBal, cardAcc.pre, cardAcc.score, guestAcc.bal, guestAcc.inuse,guestAcc.score "
+			+ "FROM FK_T_CARD card, FK_T_GUEST guest, FK_T_CARDTZ cardAcc, FK_T_GUESTACC guestAcc "
+			+ "WHERE guest.guestNo = guestAcc.guestNo AND guest.guestNo = card.guestNo AND card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 查询单位下所有卡和单位的信息的SQL
+	 */
+	private final String allCardInfoSQL = "SELECT guestAcc.bal, guestAcc.score gScore, guest.guestName gName, guest.stats, card.guestNo, card.guestName cName, "
+			+ "card.cardNo, card.cardType, card.cardStatus, card.deposit, card.cardFlag, cardAcc.cardBal, cardAcc.pre, cardAcc.score cScore, "
+			+ "totalCard.balSum, totalCard.preSum, totalCard.scoreSum "
+			+ "FROM FK_T_CARD card, FK_T_GUEST guest, FK_T_CARDTZ cardAcc, FK_T_GUESTACC guestAcc ";
+
+	private final String allCardInfoSonSQL = ",( SELECT SUM (cardAcc.cardBal) AS balSum, SUM (cardAcc.pre) AS preSum, SUM (cardAcc.score) AS scoreSum "
+			+ " FROM FK_T_CARD card, FK_T_GUEST guest, FK_T_CARDTZ cardAcc, FK_T_GUESTACC guestAcc "
+			+ " WHERE guest.guestNo = guestAcc.guestNo AND guest.guestNo = card.guestNo AND card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 查询单用户卡客户信息的SQL
+	 */
+	private final String cardInfoSQL = "SELECT card.cardNo, card.cardStatus, card.cardFlag, card.cardType, card.deposit, "
+			+ "card.guestName, card.guestType, card.guestNum, card.guestNo, cardAcc.cardBal, cardAcc.pre, cardAcc.score "
+			+ "FROM FK_T_CARD card, FK_T_CARDTZ cardAcc WHERE card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 查询司机卡客户信息的SQL
+	 */
+	private final String driverInfoSQL = "SELECT card.guestNo, card.guestName, card.cardNo, card.cardType, card.cardStatus, "
+			+ "card.deposit, card.cardFlag, cardAcc.cardBal, cardAcc.pre, cardAcc.score "
+			+ "FROM FK_T_CARD card, FK_T_CARDTZ cardAcc WHERE card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 统计查询司机卡客户信息的SQL
+	 */
+	private final String countDriverInfoSQL = "SELECT count(*) FROM FK_T_CARD card, FK_T_CARDTZ cardAcc WHERE card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 查询卡挂失时间SQL
+	 */
+	private final String cardLostTimeSQL = "SELECT create_date FROM blackcard WHERE ";
+
+	/**
+	 * 改变客户状态SQL
+	 */
+	private final String updateGuestStatusSQL = "UPDATE FK_T_GUEST SET stats = ? WHERE guestNo = ? ";
+
+	/**
+	 * 通过客户编号改变卡状态SQL
+	 */
+	private final String updateCardStatusSQL = "UPDATE FK_T_CARD SET cardStatus = ? WHERE guestNo = ? ";
+
+	/**
+	 * 通过卡号改变卡状态SQL
+	 */
+	private final String updateCardStatusByCardNoSQL = "UPDATE FK_T_CARD SET cardStatus = ? WHERE cardNo = ? ";
+
+	/**
+	 * 调用存储过程,把卡的余额，卡的积分转到单位客户账户
+	 */
+	private final String updateGuestAccountSQL = "EXEC updateGusetAccount2 ? , ?";
+
+	/**
+	 * 调用存储过程,把单位卡子卡的余额，卡的积分转到单位客户账户,然后将子卡账户清零
+	 */
+	private final String updateCardAccountSQL = "EXEC updateCardAccount ? , ? , ?";
+
+	// ------- Constructors ----------------------------------------------------
+	public CustomerDeleteDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * @Inherited doc 查询销户时间
+	 */
+	@Override
+	public Date getBlackCardTime(CustomerDeleteBean customerDeleteBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.cardLostTimeSQL);
+		builder.append(" cardId = '").append(customerDeleteBean.getCardNo()).append("' ");
+		Date cardTime = null;
+		try {
+			List<?> resultList = this.findBySql(builder.toString());
+			if (resultList.size() > 0) {
+				cardTime = (Date) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return cardTime;
+	}
+
+	/**
+	 * @Inherited doc 查询所有单位卡的挂失时间
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Date> getAllBlackCardTime(CustomerDeleteBean customerDeleteBean) {
+		StringBuilder builder = new StringBuilder();
+		// 传送SQL
+		builder.append(this.cardLostTimeSQL);
+		// 传送查询条件
+		builder.append(" cardId IN ( SELECT cardNo FROM FK_T_CARD WHERE cardStatus = '2' AND guestNo = '")
+				.append(customerDeleteBean.getGuestNo()).append("' )");
+		Query query = null;
+		try {
+			// 执行SQL查询
+			query = this.getQueryByCriteria(builder.toString());
+		} catch (Exception e) {
+			log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		List<Object> result = query.list();
+		List<Date> cardTimeList = new ArrayList<Date>();
+		Date cardTime;
+		// 循环把查询结果放入list
+		for (Object dataRow : result) {
+			cardTime = ((Date) (dataRow));
+			cardTimeList.add(cardTime);
+		}
+		return cardTimeList;
+	}
+
+	/**
+	 * @Inherited doc 改变客户状态为销户,在字典表中客户状态'销户'的key值为'13',结果改变一条记录
+	 */
+	@Override
+	public void updateGuestStatus(CustomerDeleteBean customerDeleteBean) {
+		Object[] args = { "13", customerDeleteBean.getGuestNo() };
+		// 执行SQL
+		this.upateBySql(this.updateGuestStatusSQL, args);
+	}
+
+	/**
+	 * @Inherited doc 改变卡状态为注销,在字典表中卡状态'注销'的key值为'4',结果改变多条记录(包括主卡和子卡)
+	 */
+	@Override
+	public void updateCardStatus(CustomerDeleteBean customerDeleteBean) {
+		Object[] args = { '4', customerDeleteBean.getGuestNo() };
+		// 执行SQL
+		this.upateBySql(this.updateCardStatusSQL, args);
+	}
+
+	/**
+	 * @Inherited doc 改变卡状态为注销,在字典表中卡状态'注销'的key值为'4',结果改变一条记录
+	 */
+	@Override
+	public void updateCardStatusByCardNo(CustomerDeleteBean customerDeleteBean) {
+		Object[] args = { '4', customerDeleteBean.getCardNo() };
+		// 执行SQL
+		this.upateBySql(this.updateCardStatusByCardNoSQL, args);
+	}
+
+	/**
+	 * @Inherited doc 根据客户编号,把所有卡的余额,积分,转到单位账户,并把所有卡账户清零
+	 */
+	@Override
+	public void updateGuestAccount(CustomerDeleteBean customerDeleteBean) {
+		Object[] args = { customerDeleteBean.getGuestNo(), ApplicationContext.getInstance().getStationNum() };
+		// 执行SQL
+		this.upateBySql(this.updateGuestAccountSQL, args);
+	}
+
+	/**
+	 * @Inherited doc 根据客户编号,把子卡的余额,积分,转到单位账户,并把子卡账户清零
+	 */
+	@Override
+	public void updateCardAccount(CustomerDeleteBean customerDeleteBean) {
+		Object[] args = { customerDeleteBean.getCardNo(), customerDeleteBean.getGuestNo(),
+				ApplicationContext.getInstance().getStationNum() };
+		// 执行SQL
+		this.upateBySql(this.updateCardAccountSQL, args);
+	}
+
+	/**
+	 * @Inherited doc 查询客户信息
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomerDeleteBean> getCustomerRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		List<CustomerDeleteBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		// 传送查询客户账户信息的SQL
+		builder.append(this.customerInfoSQL);
+		try {
+			// 传送查询条件 (卡号或者客户编号)
+			StringBuilder req = this.validateCustomerInfoInput(customerDeleteBean);
+			builder.append(req);
+			Query query = null;
+			try {
+				// 执行SQL
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n"
+						+ ErrorLogUtil.printInfo(e));
+			}
+			List<Object[]> result = query.list();
+			// 把查询结果覆盖到bean
+			resultList = this.convertCustomInfoToBean(result);
+
+		} catch (QueryException e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * @Inherited doc 查询单位客户和下属所有卡片信息
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public CustomerDeleteBean getAllCardRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		CustomerDeleteBean resultList = null;
+		StringBuilder builder = new StringBuilder();
+		// 传送SQL
+		builder.append(this.allCardInfoSQL);
+		try {
+			StringBuilder req = this.validateAllCardInfoInput(customerDeleteBean);
+			// 传送SQL查询条件
+			builder.append(req);
+			Query query = null;
+			try {
+				// 执行SQL
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n"
+						+ ErrorLogUtil.printInfo(e));
+			}
+			List<Object[]> result = query.list();
+			// 把查询结果覆盖到bean
+			resultList = this.convertAllCardInfoToBean(result);
+		} catch (QueryException e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * @Inherited doc 查询单用户卡客户信息
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomerDeleteBean> getCardRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		List<CustomerDeleteBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		// 传送查询客户账户信息的SQL
+		builder.append(this.cardInfoSQL);
+		try {
+			// 传送查询条件 (卡号或者客户编号)
+			StringBuilder req = this.validateCustomerInfoInput(customerDeleteBean);
+			builder.append(req);
+			Query query = null;
+			try {
+				// 执行SQL
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n"
+						+ ErrorLogUtil.printInfo(e));
+			}
+			List<Object[]> result = query.list();
+			// 把查询结果覆盖到bean
+			resultList = this.convertCardInfoToBean(result);
+
+		} catch (QueryException e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * @Inherited doc 查询司机卡信息
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomerDeleteBean> getDriverRecordsByCriteria(CustomerDeleteBean customerDeleteBean, int startPage, int number) {
+		List<CustomerDeleteBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		// 传送SQL
+		builderForPagination.append(this.driverInfoSQL);
+		// 传送SQL
+		builderForTotalResult.append(this.countDriverInfoSQL);
+		try {
+			StringBuilder builder = this.validateDriverInfoInput(customerDeleteBean);
+			// 传送查询条件
+			builderForPagination.append(builder);
+			// 传送查询条件
+			builderForTotalResult.append(builder);
+			// 执行SQL
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			// 执行SQL
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			// 把查询结果覆盖到bean
+			resultList = this.convertDriverInfoToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	/**
+	 * @Inherited doc 查询客户和客户下属所有卡片的信息SQL查询条件
+	 */
+	private StringBuilder validateAllCardInfoInput(CustomerDeleteBean customerDeleteBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.allCardInfoSonSQL);
+		if (StringUtils.isNotEmpty(ApplicationContext.getInstance().getStationNum())) {
+			builder.append(" AND card.stationNo = '").append(ApplicationContext.getInstance().getStationNum()).append("' ");
+		}
+		if (StringUtils.isNotEmpty(customerDeleteBean.getGuestNo())) {
+			builder.append(" AND ").append("card.guestNo = '").append(customerDeleteBean.getGuestNo()).append("'");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getCardNo())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.cardNo = '")
+					.append(customerDeleteBean.getCardNo()).append("' )");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getGuestName())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.guestName = '")
+					.append(customerDeleteBean.getGuestName()).append("' )");
+		}
+		builder.append(") totalCard ");
+		builder.append("WHERE guest.guestNo = guestAcc.guestNo AND guest.guestNo = card.guestNo AND card.cardNo = cardAcc.cardNo  ");
+		if (StringUtils.isNotEmpty(ApplicationContext.getInstance().getStationNum())) {
+			builder.append(" AND card.stationNo = '").append(ApplicationContext.getInstance().getStationNum()).append("' ");
+		}
+		if (StringUtils.isNotEmpty(customerDeleteBean.getGuestNo())) {
+			builder.append(" AND ").append("card.guestNo = '").append(customerDeleteBean.getGuestNo()).append("'");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getCardNo())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.cardNo = '")
+					.append(customerDeleteBean.getCardNo()).append("' )");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getGuestName())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.guestName = '")
+					.append(customerDeleteBean.getGuestName()).append("' ) ");
+		}
+		builder.append(" ORDER BY card.cardFlag DESC , card.cardNo ");
+		return builder;
+	}
+
+	/**
+	 * @Inherited doc 查询司机卡信息SQL语句查询条件
+	 */
+	private StringBuilder validateDriverInfoInput(CustomerDeleteBean customerDeleteBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(ApplicationContext.getInstance().getStationNum())) {
+			builder.append(" AND card.stationNo = '").append(ApplicationContext.getInstance().getStationNum()).append("' ");
+		}
+		if (StringUtils.isNotEmpty(customerDeleteBean.getGuestNo())) {
+			builder.append(" AND ").append("card.guestNo = '").append(customerDeleteBean.getGuestNo()).append("'");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getCardNo())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.cardNo = '")
+					.append(customerDeleteBean.getCardNo()).append("' )");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getGuestName())) {
+			builder.append(" AND ").append("card.guestNo IN ")
+					.append("( SELECT card2.guestNo FROM FK_T_CARD card2 WHERE card2.guestName = '")
+					.append(customerDeleteBean.getGuestName()).append("' )");
+		}
+		return builder;
+	}
+
+	/**
+	 * @Inherited doc 查询客户信息SQL语句查询条件
+	 */
+	private StringBuilder validateCustomerInfoInput(CustomerDeleteBean customerDeleteBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(customerDeleteBean.getCardNo())) {
+			builder.append(" AND ").append("card.cardNo = '").append(customerDeleteBean.getCardNo()).append("'");
+		} else if (StringUtils.isNotEmpty(customerDeleteBean.getGuestNo())) {
+			builder.append(" AND ").append("card.guestNo = '").append(customerDeleteBean.getGuestNo()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 把单位卡主卡客户信息覆盖到bean
+	 */
+	private List<CustomerDeleteBean> convertCustomInfoToBean(List<Object[]> dataResult) {
+		List<CustomerDeleteBean> customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+		CustomerDeleteBean customerDeleteBean;
+		for (Object[] dataRow : dataResult) {
+			customerDeleteBean = new CustomerDeleteBean();
+			// 卡号
+			customerDeleteBean.setCardNo(String.valueOf(dataRow[0]));
+			// 卡状态
+			customerDeleteBean.setCardStatus(String.valueOf(dataRow[1]));
+			// 是否主卡
+			if (String.valueOf(dataRow[2]).split(" ")[0].equals("Y")) {
+				customerDeleteBean.setMainCardFlag(true);
+			} else {
+				customerDeleteBean.setMainCardFlag(false);
+			}
+			// 卡片类型
+			customerDeleteBean.setCardType(String.valueOf(dataRow[3]));
+			// 押金
+			customerDeleteBean.setDeposit(((BigDecimal) (dataRow[4])));
+			// 卡表备注
+			customerDeleteBean.setCardRemark(String.valueOf(dataRow[5]));
+			// 客户名称
+			customerDeleteBean.setGuestName(String.valueOf(dataRow[6]));
+			// 证件类型
+			customerDeleteBean.setIdentityType(String.valueOf(dataRow[7]));
+			// 证件号
+			customerDeleteBean.setIdentityNum(String.valueOf(dataRow[8]));
+			// 客户编号
+			customerDeleteBean.setGuestNo(String.valueOf(dataRow[9]));
+			// 客户状态
+			customerDeleteBean.setGuestStatus(String.valueOf(dataRow[10]));
+			// 客户备注
+			customerDeleteBean.setGuestRemark(String.valueOf(dataRow[11]));
+			// 卡内余额
+			customerDeleteBean.setCardAccount(((BigDecimal) (dataRow[12])));
+			// 预分配金额
+			customerDeleteBean.setPreAccount(((BigDecimal) (dataRow[13])));
+			// 卡积分
+			customerDeleteBean.setCardScore(((BigDecimal) (dataRow[14])));
+			// 账上余额
+			customerDeleteBean.setSpareAccount(((BigDecimal) (dataRow[15])));
+			// 已分配金额
+			customerDeleteBean.setInuseAccount(((BigDecimal) (dataRow[16])));
+			// 客户积分
+			customerDeleteBean.setGuestScore(((BigDecimal) (dataRow[17])));
+			customerDeleteBeanList.add(customerDeleteBean);
+		}
+		return customerDeleteBeanList;
+	}
+
+	/**
+	 * 把单位下属的所有卡片信息和单位信息覆盖到bean
+	 */
+	private CustomerDeleteBean convertAllCardInfoToBean(List<Object[]> dataResult) {
+		CustomerDeleteBean resultCustomerBean = null;
+
+		// convert company user to bean
+		if (dataResult.get(0) != null) {
+			resultCustomerBean = this.convertDataToCustomerBean(dataResult.get(0));
+		}
+
+		for (Object[] dataRow : dataResult) {
+			CustomerDeleteBean subCustomerDeleteBean = this.convertDataToCustomerBean(dataRow);
+			resultCustomerBean.addCustomerDelete(subCustomerDeleteBean);
+		}
+		return resultCustomerBean;
+	}
+
+	private CustomerDeleteBean convertDataToCustomerBean(Object[] dataRow) {
+		CustomerDeleteBean customerDeleteBean = new CustomerDeleteBean();
+		// 单位账户余额
+		customerDeleteBean.setSpareAccount(((BigDecimal) (dataRow[0])));
+		// 单位客户积分
+		customerDeleteBean.setGuestScore(((BigDecimal) (dataRow[1])));
+		// 单位名称
+		customerDeleteBean.setCompanyName(String.valueOf(dataRow[2]));
+		// 客户状态
+		customerDeleteBean.setGuestStatus(String.valueOf(dataRow[3]));
+		// 客户编号
+		customerDeleteBean.setGuestNo(String.valueOf(dataRow[4]));
+		// 客户姓名
+		customerDeleteBean.setGuestName(String.valueOf(dataRow[5]));
+		// 卡号
+		customerDeleteBean.setCardNo(String.valueOf(dataRow[6]));
+		// 卡类型
+		customerDeleteBean.setCardType(String.valueOf(dataRow[7]));
+		// 卡状态
+		customerDeleteBean.setCardStatus(String.valueOf(dataRow[8]));
+		// 卡押金
+		customerDeleteBean.setDeposit(((BigDecimal) (dataRow[9])));
+		// 是否主卡
+		if (String.valueOf(dataRow[10]).split(" ")[0].equals("Y")) {
+			customerDeleteBean.setMainCardFlag(true);
+		} else {
+			customerDeleteBean.setMainCardFlag(false);
+		}
+		// 卡余额
+		customerDeleteBean.setCardAccount(((BigDecimal) (dataRow[11])));
+		// 卡备用金余额
+		customerDeleteBean.setPreAccount(((BigDecimal) (dataRow[12])));
+		// 卡积分
+		customerDeleteBean.setCardScore(((BigDecimal) (dataRow[13])));
+		// 卡余额总和
+		customerDeleteBean.setAccountSum(((BigDecimal) (dataRow[14])));
+		// 卡备用金总和
+		customerDeleteBean.setPreSum(((BigDecimal) (dataRow[15])));
+		// 卡积分总和
+		customerDeleteBean.setScoreSum(((BigDecimal) (dataRow[16])));
+		return customerDeleteBean;
+	}
+
+	/**
+	 * 把单用户卡客户信息覆盖到bean
+	 */
+	private List<CustomerDeleteBean> convertCardInfoToBean(List<Object[]> dataResult) {
+		List<CustomerDeleteBean> customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+		CustomerDeleteBean customerDeleteBean;
+		for (Object[] dataRow : dataResult) {
+			customerDeleteBean = new CustomerDeleteBean();
+			// 卡号
+			customerDeleteBean.setCardNo(String.valueOf(dataRow[0]));
+			// 卡状态
+			customerDeleteBean.setCardStatus(String.valueOf(dataRow[1]));
+			// 是否主卡
+			if (String.valueOf(dataRow[2]).split(" ")[0].equals("Y")) {
+				customerDeleteBean.setMainCardFlag(true);
+			} else {
+				customerDeleteBean.setMainCardFlag(false);
+			}
+			// 客户编号
+			customerDeleteBean.setGuestNo(String.valueOf(dataRow[8]));
+			// 卡片类型
+			customerDeleteBean.setCardType(String.valueOf(dataRow[3]));
+			// 押金
+			customerDeleteBean.setDeposit(((BigDecimal) (dataRow[4])));
+			// 客户名称
+			customerDeleteBean.setGuestName(String.valueOf(dataRow[5]));
+			// 证件类型
+			customerDeleteBean.setIdentityType(String.valueOf(dataRow[6]));
+			// 证件号
+			customerDeleteBean.setIdentityNum(String.valueOf(dataRow[7]));
+			// 卡内余额
+			customerDeleteBean.setCardAccount(((BigDecimal) (dataRow[9])));
+			// 预分配金额
+			customerDeleteBean.setPreAccount(((BigDecimal) (dataRow[10])));
+			// 卡积分
+			customerDeleteBean.setCardScore(((BigDecimal) (dataRow[11])));
+			customerDeleteBeanList.add(customerDeleteBean);
+		}
+		return customerDeleteBeanList;
+	}
+
+	/**
+	 * 把司机卡信息覆盖到bean
+	 */
+	private List<CustomerDeleteBean> convertDriverInfoToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CustomerDeleteBean> customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+		CustomerDeleteBean customerDeleteBean;
+		for (Object[] dataRow : dataResult) {
+			customerDeleteBean = new CustomerDeleteBean();
+			// 客户编号
+			customerDeleteBean.setGuestNo(String.valueOf(dataRow[0]));
+			// 客户名称
+			customerDeleteBean.setGuestName(String.valueOf(dataRow[1]));
+			// 卡号
+			customerDeleteBean.setCardNo(String.valueOf(dataRow[2]));
+			// 卡片类型
+			customerDeleteBean.setCardType(String.valueOf(dataRow[3]));
+			// 卡状态
+			customerDeleteBean.setCardStatus(String.valueOf(dataRow[4]));
+			// 卡押金
+			customerDeleteBean.setDeposit(((BigDecimal) (dataRow[5])));
+			// 是否主卡
+			if (String.valueOf(dataRow[6]).split(" ")[0].equals("Y")) {
+				customerDeleteBean.setMainCardFlag(true);
+			} else {
+				customerDeleteBean.setMainCardFlag(false);
+			}
+			// 卡内余额
+			customerDeleteBean.setCardAccount(((BigDecimal) (dataRow[7])));
+			// 备用金余额
+			customerDeleteBean.setPreAccount(((BigDecimal) (dataRow[8])));
+			// 卡积分
+			customerDeleteBean.setCardScore(((BigDecimal) (dataRow[9])));
+			// 记录条数
+			customerDeleteBean.setTotalData(totalAccount);
+			customerDeleteBeanList.add(customerDeleteBean);
+		}
+		return customerDeleteBeanList;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

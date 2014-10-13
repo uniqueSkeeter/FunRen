@@ -1,0 +1,351 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.card.CardStorageBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardInOutEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.dao.CardStorageDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ *
+ * @author hjq
+ */
+@Repository
+public class CardStorageDaoImpl extends AbstractBaseDAO<FkTCardInOutEntity> implements CardStorageDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardStorageDaoImpl.class);
+
+	private static final String ID = "id";
+
+	private static final String CARD_TYPE = "cio.cardgg";
+
+	private static final String RECEIPT_TYPE = "cio.stype";
+
+	private static final String RECEIPT_STATUS = "cio.sstatus";
+
+	private static final String APPLY_DATE = "cio.workdate";
+
+	private static final String STATIONNO = "cio.stationNo";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String selectCardStorageSql = "SELECT cio.inoutno, cio.cardgg, cio.cardsum, cio.outno,"
+			+ " CONVERT(varchar(10), cio.outdate, 21) outDate, cio.inno, CONVERT(varchar(10), cio.indate, 21) inDate, cio.sstatus, CONVERT(varchar(10), cio.workdate, 21) workdate, cio.userid,"
+			+ " inoutnote.no1,inoutnote.no2, cio.id FROM FK_T_CARDINOUT cio LEFT JOIN FK_T_INOUTNOTE inoutnote ON (cio.ID = inoutnote.inoutId) WHERE ";
+
+	private final String selectAllCountOperateLogViewSql = "SELECT count(*) FROM FK_T_CARDINOUT cio LEFT JOIN FK_T_INOUTNOTE inoutnote ON (cio.ID = inoutnote.inoutId) WHERE ";
+
+	private final String selectCardOrderSql = "SELECT cio.inoutno, cio.stype, CONVERT(varchar(10), cio.workdate, 21) workdate, cio.inno,"
+			+ " cio.outno, cio.cardgg, CONVERT(varchar(10), cio.outdate, 21) outDate, cio.cardsum, CONVERT(varchar(10), cio.indate, 21) inDate, cio.sstatus,"
+			+ " cio.id FROM FK_T_CARDINOUT cio WHERE ";
+
+	private final String selectShiftChangeNumSql = "SELECT co.create_date, ci.MaxNo, co.id FROM (SELECT MAX (class_no) AS MaxNo FROM [dbo].[CLASS_INFO]) ci INNER JOIN CLASS_INFO co ON co.class_no = ci.MaxNo";
+
+	private final String updateCardStorageSql = "update FK_T_Storage set ";
+
+	private final String selectCountOfRecordsSql = "select count(*) from FK_T_Storage where ";
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * inherited java doc.
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardStorageBean> getAllCardStorageRecords(CardStorageBean cardStorageBean) throws Exception {
+		List<CardStorageBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.selectCardOrderSql);
+		try {
+			StringBuilder req = this.validateInputCriteria(cardStorageBean);
+			builder.append(req);
+			Query query = this.getQueryByCriteria(builder.toString());
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result);
+
+		} catch (QueryException e) {
+			resultList = new ArrayList<CardStorageBean>();
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw, true));
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n" + sw.toString());
+			return resultList;
+		}
+		return resultList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardStorageBean> getCardStorageRecordsByCriteria(CardStorageBean cardStorageBean, int startPage, int number) {
+		List<CardStorageBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.selectCardStorageSql);
+		builderForTotalResult.append(this.selectAllCountOperateLogViewSql);
+
+		try {
+			StringBuilder builder = this.validateInputCriteria(cardStorageBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+
+	}
+
+	@Override
+	/**
+	 * Inherited java doc
+	 */
+	public Object[] getClassNum() {
+		Object[] resultArray = null;
+		try {
+			List<?> resultList = this.findBySql(this.selectShiftChangeNumSql);
+			if (resultList.size() > 0) {
+				resultArray = (Object[]) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultArray;
+
+	}
+
+	@Override
+	/**
+	 * Inherited java doc
+	 */
+	public int findRecordsInStorage(CardStorageBean cardStorageBean) {
+		int count = 0;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = new StringBuilder();
+			builder.append(this.selectCountOfRecordsSql);
+			builder.append("stationno").append(SqlConsts.EQUAL).append(ApplicationContext.getInstance().getStationNum());
+			Object[] resultAccount = null;
+			resultAccount = this.findBySql(builder.toString()).toArray();
+			if (resultAccount != null) {
+				count = (int) resultAccount[0];
+			}
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return count;
+	}
+
+	@Override
+	public void updateCardStorage(CardStorageBean cardStorageBean) {
+		StringBuilder updateValue = new StringBuilder();
+		if (cardStorageBean.getReceiver().equals(ApplicationContext.getInstance().getStationNum())
+				&& cardStorageBean.getReceiptType().equals("1") && cardStorageBean.getReceiptStatus().equals("2")) {
+			updateValue.append("insum").append(SqlConsts.EQUAL).append("insum + ").append(cardStorageBean.getCardSum());
+			updateValue.append(SqlConsts.COMMA).append("cardsum").append(SqlConsts.EQUAL).append("cardsum + ")
+					.append(cardStorageBean.getCardSum());
+		}
+		if (cardStorageBean.getSupplier().equals(ApplicationContext.getInstance().getStationNum())
+				&& cardStorageBean.getReceiptType().equals("1") && cardStorageBean.getReceiptStatus().equals("3")) {
+			updateValue.append("outsum").append(SqlConsts.EQUAL).append("outsum + ").append(cardStorageBean.getCardSum());
+			updateValue.append(SqlConsts.COMMA).append("cardsum").append(SqlConsts.EQUAL).append("cardsum - ")
+					.append(cardStorageBean.getCardSum());
+		}
+		if (cardStorageBean.getSupplier().equals(ApplicationContext.getInstance().getStationNum())
+				&& cardStorageBean.getReceiptType().equals("4") && cardStorageBean.getReceiptStatus().equals("3")) {
+			updateValue.append("chsum").append(SqlConsts.EQUAL).append("chsum + ").append(cardStorageBean.getCardSum());
+			updateValue.append(SqlConsts.COMMA).append("cardsum").append(SqlConsts.EQUAL).append("cardsum - ")
+					.append(cardStorageBean.getCardSum());
+		}
+		if ((cardStorageBean.getReceiver().equals(ApplicationContext.getInstance().getStationNum())
+				&& cardStorageBean.getReceiptType().equals("4") && cardStorageBean.getReceiptStatus().equals("2"))) {
+			updateValue.append("insum").append(SqlConsts.EQUAL).append("insum + ").append(cardStorageBean.getCardSum());
+			updateValue.append(SqlConsts.COMMA).append("cardsum").append(SqlConsts.EQUAL).append("cardsum + ")
+					.append(cardStorageBean.getCardSum());
+		}
+		StringBuilder builder = this.validateInputCriteriaForUpdateCardStorage(cardStorageBean);
+		StringBuilder updateSql = new StringBuilder();
+		updateSql.append(this.updateCardStorageSql).append(updateValue).append(builder);
+
+		this.upateBySql(updateSql.toString());
+		return;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+	private StringBuilder validateInputCriteriaForUpdateCardStorage(CardStorageBean cardStorageBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(SqlConsts.WHERE).append("stationno").append(SqlConsts.EQUAL)
+				.append(ApplicationContext.getInstance().getStationNum());
+		if (cardStorageBean.getCardType() != null) {
+			builder.append(SqlConsts.ADD).append("cardtype").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardStorageBean.getCardType()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	private StringBuilder validateInputCriteria(CardStorageBean cardStorageBean) {
+		StringBuilder builder = new StringBuilder();
+		if (cardStorageBean.getId() != null) {
+			builder.append(ID).append(" = ").append(cardStorageBean.getId());
+		}
+		if (cardStorageBean.getId() == null) {
+			builder.append(STATIONNO).append(" = ").append(ApplicationContext.getInstance().getStationNum());
+		}
+		if (StringUtils.isNotEmpty(cardStorageBean.getCardType())) {
+			builder.append(" AND ").append(CARD_TYPE).append(" = '").append(cardStorageBean.getCardType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardStorageBean.getReceiptType())) {
+			builder.append(" AND ").append(RECEIPT_TYPE).append(" = '").append(cardStorageBean.getReceiptType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardStorageBean.getReceiptStatus())) {
+			builder.append(" AND ").append(RECEIPT_STATUS).append(" = '").append(cardStorageBean.getReceiptStatus())
+					.append("'");
+		}
+		String startDate = cardStorageBean.getStartDate();
+		if (StringUtils.isNotEmpty(startDate)) {
+			builder.append(" AND ").append(APPLY_DATE).append(" > '").append(startDate).append("'");
+		}
+		String endDate = cardStorageBean.getEndDate();
+
+		if (StringUtils.isNotEmpty(endDate)) {
+			endDate = DateUtil.addDays(endDate, 1);
+			builder.append(" AND ").append(APPLY_DATE).append(" < '").append(endDate).append("'");
+		}
+
+		return builder;
+	}
+
+	private List<CardStorageBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardStorageBean> cardStorageBeanList = new ArrayList<CardStorageBean>();
+		CardStorageBean cardStorageBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardStorageBean = new CardStorageBean();
+			cardStorageBean.setReceiptNum(String.valueOf(dataRow[0]));
+			cardStorageBean.setCardType(String.valueOf(dataRow[1]));
+			cardStorageBean.setCardSum(Integer.valueOf(String.valueOf(dataRow[2])));
+			if (String.valueOf(dataRow[3]).equals(ApplicationContext.getInstance().getStationNum())) {
+				String stationName = ApplicationContext.getInstance().getStationName();
+				cardStorageBean.setSupplierName(stationName);
+			} else {
+				cardStorageBean.setSupplierName(String.valueOf(dataRow[3]));
+			}
+			cardStorageBean.setSupplier(String.valueOf(dataRow[3]));
+			cardStorageBean.setSupplyDate(String.valueOf(dataRow[4]));
+			if (String.valueOf(dataRow[5]).equals(ApplicationContext.getInstance().getStationNum())) {
+				String stationName = ApplicationContext.getInstance().getStationName();
+				cardStorageBean.setReceiverName(stationName);
+			} else {
+				cardStorageBean.setReceiverName(String.valueOf(dataRow[5]));
+			}
+			cardStorageBean.setReceiver(String.valueOf(dataRow[5]));
+			cardStorageBean.setReceiveDate(String.valueOf(dataRow[6]));
+			cardStorageBean.setReceiptStatus(String.valueOf(dataRow[7]));
+			cardStorageBean.setApplyDate(String.valueOf(dataRow[8]));
+			cardStorageBean.setUserId(String.valueOf(dataRow[9]));
+			cardStorageBean.setStartNo(String.valueOf(dataRow[10]));
+			cardStorageBean.setEndNo(String.valueOf(dataRow[11]));
+			cardStorageBean.setId(Integer.valueOf(String.valueOf(dataRow[12])));
+			cardStorageBean.setTotalData(totalAccount);
+			cardStorageBeanList.add(cardStorageBean);
+		}
+		return cardStorageBeanList;
+	}
+
+	private List<CardStorageBean> convertDataToBean(List<Object[]> dataResult) {
+		List<CardStorageBean> cardStorageBeanList = new ArrayList<CardStorageBean>();
+		CardStorageBean cardStorageBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardStorageBean = new CardStorageBean();
+			if (dataRow[0] != null) {
+				cardStorageBean.setReceiptNum(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardStorageBean.setReceiptType(String.valueOf(dataRow[1]));
+			}
+			if (dataRow[2] != null) {
+				cardStorageBean.setApplyDate(String.valueOf(dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				if (String.valueOf(dataRow[3]).equals(ApplicationContext.getInstance().getStationNum())) {
+					cardStorageBean.setReceiverName(ApplicationContext.getInstance().getStationName());
+				} else {
+					cardStorageBean.setReceiverName(String.valueOf(dataRow[3]));
+				}
+				cardStorageBean.setReceiver(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				if (String.valueOf(dataRow[4]).equals(ApplicationContext.getInstance().getStationNum())) {
+					cardStorageBean.setSupplierName(ApplicationContext.getInstance().getStationName());
+				} else {
+					cardStorageBean.setSupplierName(String.valueOf(dataRow[4]));
+				}
+				cardStorageBean.setSupplier(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardStorageBean.setCardType(String.valueOf(dataRow[5]));
+			}
+			if (dataRow[6] != null) {
+				cardStorageBean.setSupplyDate((String) dataRow[6]);
+			}
+			if (dataRow[7] != null) {
+				cardStorageBean.setCardSum(Integer.valueOf(String.valueOf(dataRow[7])));
+			}
+			if (dataRow[8] != null) {
+				cardStorageBean.setReceiveDate((String) (dataRow[8]));
+			}
+			if (dataRow[9] != null) {
+				cardStorageBean.setReceiptStatus(String.valueOf(dataRow[9]));
+			}
+			if (dataRow[10] != null) {
+				cardStorageBean.setId((int) (dataRow[10]));
+			}
+			cardStorageBeanList.add(cardStorageBean);
+		}
+		return cardStorageBeanList;
+	}
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

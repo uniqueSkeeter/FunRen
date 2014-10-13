@@ -1,0 +1,116 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%@include file="../../../common/common.jsp" %>
+<!-- css -->
+<!-- js -->
+<script type="text/javascript" src="<%=basePath%>js/card/customer/customCancel/displayCardDeleteList.js"></script>
+<html>
+<head>
+<title>卡注销</title>
+</head>
+<body>
+	<span class="pageFontStyle">卡信息</span>
+	<hr class="lineColor">
+	<TABLE style="width:100%;">
+	<TR>
+	<TD>
+		<s:form id="card_form" method="post" action="showCardInfo">
+		<table style="font-size: 12px; width: 100%; height: 40px; font-weight:bold;" >
+			<tr>
+				<td style="height: 30px; width: 90px; text-align: left;">卡号</td>
+				<td style="height: 30px; width: 150px">
+					<input name="customerDeleteBean.cardNo" id="cardNO" style="width:150px;" onkeyup="value=value.replace(/[^\d]/g,'')" value="${customerDeleteBean.cardNo}" maxlength="20">
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">客户编号</td>
+				<td style="height: 30px; width: 150px">
+					<input name="customerDeleteBean.guestNo" id="guestNO" onkeyup="value=value.replace(/[^\d]/g,'')" value="${customerDeleteBean.guestNo}" maxlength="7">
+				</td>
+				<td style="height: 30px; width: 90px">
+					<input type="button" id="readCard" value="读卡" style="width: 60px;">
+				</td>
+				<td style="height: 30px; width: 150px">
+					<input type="button" id="search" value="查询" style="width: 60px;">
+				</td>
+			</tr>
+		</table>
+		<span class="pageFontStyle">卡片信息</span>
+		<hr class="lineColor">
+		<table style="font-size: 12px; width: 100%; height: 40px; font-weight:bold;">
+			<tr>
+				<td style="height: 30px; width: 90px; text-align: left;">卡号</td>
+				<td style="height: 30px; width: 150px">
+					<span id="cardNo" style="width: 150px;">${customerDeleteBean.cardNo}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">卡状态</td>
+				<td style="height: 30px; width: 150px">
+					<span id="cardStatus" style="width: 150px;">${cardStatus[customerDeleteBean.cardStatus]}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">是否主卡</td>
+				<td style="height: 30px; width: 150px">
+					<span id="mainCardFlag" style="width: 150px;">${customerDeleteBean.mainCardFlag}</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 30px; width: 90px; text-align: left;">客户编号</td>
+				<td style="height: 30px; width: 150px">
+					<span id="guestNo" style="width: 150px;">${customerDeleteBean.guestNo}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">卡片类型</td>
+				<td style="height: 30px; width: 150px">
+					<span id="cardType" style="width: 150px;">${cardType[customerDeleteBean.cardType]}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">押金</td>
+				<td style="height: 30px; width: 150px">
+					<span id="deposit" style="width: 150px;">${customerDeleteBean.deposit}</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 30px; width: 90px; text-align: left;">持卡人</td>
+				<td style="height: 30px; width: 150px">
+					<span id="guestName" style="width: 150px;">${customerDeleteBean.guestName}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">证件类型</td>
+				<td style="height: 30px; width: 150px">
+					<span id="identityType" style="width: 150px;">${guestType[customerDeleteBean.identityType]}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">证件号</td>
+				<td style="height: 30px; width: 150px">
+					<span id="identityNum" style="width: 150px;">${customerDeleteBean.identityNum}</span>
+				</td>
+			</tr>
+		</table>
+		<span class="pageFontStyle">账户信息</span>
+		<hr class="lineColor">
+		<table style="font-size: 12px; width: 100%; height: 40px; font-weight:bold;">
+			<tr>
+				<td style="height: 30px; width: 90px; text-align: left;">卡内余额</td>
+				<td style="height: 30px; width: 150px">
+					<span id="cardAccount" style="width: 150px;">${customerDeleteBean.cardAccount}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">备付金额</td>
+				<td style="height: 30px; width: 150px">
+					<span id="preAccount" style="width: 150px;">${customerDeleteBean.preAccount}</span>
+				</td>
+				<td style="height: 30px; width: 90px; text-align: left;">卡积分</td>
+				<td style="height: 30px; width: 150px">
+					<span id="cardScore" style="width: 150px;">${customerDeleteBean.cardScore}</span>
+				</td>
+			</tr>
+		</table>
+		</s:form>
+		<div style="width: 100%; height: 40px; text-align:center;">
+			<input type="button" id="haveCardDelete" value="有卡销户">
+			<input type="button" id="notHaveCardDelete" value="无卡销户">
+		</div>
+	</TD>
+	</TR>
+	</TABLE>
+	<div id="printCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 850px; height: 450px;">
+		<iframe scrolling="auto" id='printCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	</div>
+</body>
+</html>

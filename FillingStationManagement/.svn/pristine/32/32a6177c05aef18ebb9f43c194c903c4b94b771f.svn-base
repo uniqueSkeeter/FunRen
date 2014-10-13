@@ -1,0 +1,457 @@
+﻿/*
+ * 交接班
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+
+
+package com.fr.station.common.entity.report;
+
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+
+/**
+ * 交结班表
+ *
+ * @version 1.0
+ * @authorguyj
+ */
+ @Entity
+ @Table(name = "FK_T_CARDRJBB")
+public class DayExchangeEntity implements StandardBean {
+
+
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ID
+     */
+     @Id
+     @Column(name = "`ID`")
+     @GeneratedValue
+    private Integer id;
+
+    /**
+     * 充值金额
+     */
+     @Column(name = "`CARDINC`")
+    private BigDecimal cardinc;
+
+    /**
+     * 退费金额
+     */
+     @Column(name = "`CARDDEC`")
+    private BigDecimal carddec;
+
+    /**
+     * 上交金额
+     */
+     @Column(name = "`CARDBAL`")
+    private BigDecimal cardbal;
+
+    /**
+     * 退押金
+     */
+     @Column(name = "`CARDBAL2`")
+    private BigDecimal cardbal2;
+
+    /**
+     * 收押金
+     */
+     @Column(name = "`CARDBAL1`")
+    private BigDecimal cardbal1;
+
+    /**
+     * 发卡数量
+     */
+     @Column(name = "`SENDCOUNT`")
+    private BigDecimal sendcount;
+
+    /**
+     * 回收数量
+     */
+     @Column(name = "`BADCOUNT`")
+    private BigDecimal badcount;
+
+    /**
+     * 库存数量
+     */
+     @Column(name = "`CARDCOUNT`")
+    private BigDecimal cardcount;
+
+    /**
+     * 日结号
+     */
+     @Column(name = "`RJID`")
+    private Integer rjid;
+
+    /**
+     * 日结时间
+     */
+     @Column(name = "`RJRQ`")
+    private Timestamp rjrq;
+
+    /**
+     * 班结号
+     */
+     @Column(name = "`BJID`")
+    private Integer bjid;
+
+    /**
+     * 班结时间
+     */
+     @Column(name = "`BJRQ`")
+    private Timestamp bjrq;
+
+    /**
+     * 备用
+     */
+     @Column(name = "`BZ`")
+    private String bz;
+
+    /**
+     * 创建时间
+     */
+     @Column(name = "`CREATE_DATE`")
+    private Timestamp createDate;
+
+    /**
+     * 操作员编号
+     */
+     @Column(name = "`USERID`")
+    private Integer userid;
+
+
+
+    /**
+     * ID的取得
+     *
+     * @return Integer ID
+     */
+    public Integer getId() {
+        return this.id;
+    }
+
+
+    /**
+     * 充值金额的取得
+     *
+     * @return BigDecimal 充值金额
+     */
+    public BigDecimal getCardinc() {
+        return this.cardinc;
+    }
+
+
+    /**
+     * 退费金额的取得
+     *
+     * @return BigDecimal 退费金额
+     */
+    public BigDecimal getCarddec() {
+        return this.carddec;
+    }
+
+
+    /**
+     * 上交金额的取得
+     *
+     * @return BigDecimal 上交金额
+     */
+    public BigDecimal getCardbal() {
+        return this.cardbal;
+    }
+
+
+    /**
+     * 退押金的取得
+     *
+     * @return BigDecimal 退押金
+     */
+    public BigDecimal getCardbal2() {
+        return this.cardbal2;
+    }
+
+
+    /**
+     * 收押金的取得
+     *
+     * @return BigDecimal 收押金
+     */
+    public BigDecimal getCardbal1() {
+        return this.cardbal1;
+    }
+
+
+    /**
+     * 发卡数量的取得
+     *
+     * @return BigDecimal 发卡数量
+     */
+    public BigDecimal getSendcount() {
+        return this.sendcount;
+    }
+
+
+    /**
+     * 回收数量的取得
+     *
+     * @return BigDecimal 回收数量
+     */
+    public BigDecimal getBadcount() {
+        return this.badcount;
+    }
+
+
+    /**
+     * 库存数量的取得
+     *
+     * @return BigDecimal 库存数量
+     */
+    public BigDecimal getCardcount() {
+        return this.cardcount;
+    }
+
+
+    /**
+     * 日结号的取得
+     *
+     * @return Integer 日结号
+     */
+    public Integer getRjid() {
+        return this.rjid;
+    }
+
+
+    /**
+     * 日结时间的取得
+     *
+     * @return Timestamp 日结时间
+     */
+    public Timestamp getRjrq() {
+        return this.rjrq;
+    }
+
+
+    /**
+     * 班结号的取得
+     *
+     * @return Integer 班结号
+     */
+    public Integer getBjid() {
+        return this.bjid;
+    }
+
+
+    /**
+     * 班结时间的取得
+     *
+     * @return Timestamp 班结时间
+     */
+    public Timestamp getBjrq() {
+        return this.bjrq;
+    }
+
+
+    /**
+     * 备用的取得
+     *
+     * @return String 备用
+     */
+    public String getBz() {
+        return this.bz;
+    }
+
+
+    /**
+     * 创建时间的取得
+     *
+     * @return Timestamp 创建时间
+     */
+    public Timestamp getCreateDate() {
+        return this.createDate;
+    }
+
+
+    /**
+     * 操作员编号的取得
+     *
+     * @return Integer 操作员编号
+     */
+    public Integer getUserid() {
+        return this.userid;
+    }
+
+
+    /**
+     * ID的设定
+     *
+     * @param newInteger ID
+     */
+    public void setId(Integer newId) {
+        this.id = newId;
+    }
+
+
+    /**
+     * 充值金额的设定
+     *
+     * @param newBigDecimal 充值金额
+     */
+    public void setCardinc(BigDecimal newCardinc) {
+        this.cardinc = newCardinc;
+    }
+
+
+    /**
+     * 退费金额的设定
+     *
+     * @param newBigDecimal 退费金额
+     */
+    public void setCarddec(BigDecimal newCarddec) {
+        this.carddec = newCarddec;
+    }
+
+
+    /**
+     * 上交金额的设定
+     *
+     * @param newBigDecimal 上交金额
+     */
+    public void setCardbal(BigDecimal newCardbal) {
+        this.cardbal = newCardbal;
+    }
+
+
+    /**
+     * 退押金的设定
+     *
+     * @param newBigDecimal 退押金
+     */
+    public void setCardbal2(BigDecimal newCardbal2) {
+        this.cardbal2 = newCardbal2;
+    }
+
+
+    /**
+     * 收押金的设定
+     *
+     * @param newBigDecimal 收押金
+     */
+    public void setCardbal1(BigDecimal newCardbal1) {
+        this.cardbal1 = newCardbal1;
+    }
+
+
+    /**
+     * 发卡数量的设定
+     *
+     * @param newBigDecimal 发卡数量
+     */
+    public void setSendcount(BigDecimal newSendcount) {
+        this.sendcount = newSendcount;
+    }
+
+
+    /**
+     * 回收数量的设定
+     *
+     * @param newBigDecimal 回收数量
+     */
+    public void setBadcount(BigDecimal newBadcount) {
+        this.badcount = newBadcount;
+    }
+
+
+    /**
+     * 库存数量的设定
+     *
+     * @param newBigDecimal 库存数量
+     */
+    public void setCardcount(BigDecimal newCardcount) {
+        this.cardcount = newCardcount;
+    }
+
+
+    /**
+     * 日结号的设定
+     *
+     * @param newInteger 日结号
+     */
+    public void setRjid(Integer newRjid) {
+        this.rjid = newRjid;
+    }
+
+
+    /**
+     * 日结时间的设定
+     *
+     * @param newTimestamp 日结时间
+     */
+    public void setRjrq(Timestamp newRjrq) {
+        this.rjrq = newRjrq;
+    }
+
+
+    /**
+     * 班结号的设定
+     *
+     * @param newInteger 班结号
+     */
+    public void setBjid(Integer newBjid) {
+        this.bjid = newBjid;
+    }
+
+
+    /**
+     * 班结时间的设定
+     *
+     * @param newTimestamp 班结时间
+     */
+    public void setBjrq(Timestamp newBjrq) {
+        this.bjrq = newBjrq;
+    }
+
+
+    /**
+     * 备用的设定
+     *
+     * @param newString 备用
+     */
+    public void setBz(String newBz) {
+        this.bz = newBz;
+    }
+
+
+    /**
+     * 创建时间的设定
+     *
+     * @param newTimestamp 创建时间
+     */
+    public void setCreateDate(Timestamp newCreateDate) {
+        this.createDate = newCreateDate;
+    }
+
+
+    /**
+     * 操作员编号的设定
+     *
+     * @param newInteger 操作员编号
+     */
+    public void setUserid(Integer newUserid) {
+        this.userid = newUserid;
+    }
+}

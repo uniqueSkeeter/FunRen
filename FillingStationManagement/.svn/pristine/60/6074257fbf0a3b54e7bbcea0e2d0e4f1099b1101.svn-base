@@ -1,0 +1,122 @@
+$(function(){
+		$('#confirmMaincard').window({
+			modal:true,
+			closed:true
+		});
+	   });
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	$(document).ready(function(){
+		$("#cardMaintain_lost").click(function(){
+			$('#addCardLostDialog').form('clear');
+			var cardMaintainBean = $('#card_dg').datagrid('getSelected');
+			  if (!cardMaintainBean){
+				  alert('请选择记录!');
+			  }else{
+				  $('#addCardLostIFrame')[0].src= server_context + '/cardMaintain/showCardLost?cardMaintainBean.id='+cardMaintainBean.id
+				  +'&cardMaintainBean.cardType='+cardMaintainBean.cardType;
+				  if(cardMaintainBean.cardType=="13"){
+					  alert('不记名卡不能挂失!');
+					  return ;
+				  }
+				  var iframe = document.getElementById("addCardLostIFrame").contentWindow;
+				  $('#addCardLostDialog').dialog({
+		        		closed : false,
+		                title : '员工挂失',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '挂失',
+		                    id : 'sBtn',
+		                    handler:function() {
+		                    	var rDocument = document.getElementById("addCardLostIFrame").contentWindow.document;
+		                    	var flag = validateFieldValue(rDocument);
+		                    }
+		                }, {
+		                    text : '取消',
+		                    id : 'cBtn',
+		                    handler : function() {
+		                        $('#addCardLostDialog').dialog('close');
+		                    }
+		                } ]
+		        });
+			  }
+		});
+		
+		function validateFieldValue(rDocument){
+			  var cardNo=rDocument.getElementById("cardNo").textContent;
+			  var guestType=rDocument.getElementById("guestType").value;
+			  var guestNum=rDocument.getElementById("guestNum").textContent;
+			  var cardStatus=rDocument.getElementById("cardStatus").value;
+			  var radio=rDocument.getElementsByName("cardMaintainBean.lostChoice");
+			  if(cardStatus=="2"){
+				  alert("该卡已经在挂失中！");
+				  return ;
+			  }
+			  if(radio[0].checked){
+				  if(cardNo==''){
+						alert('卡号必填!');
+						return false;
+						}
+				  if(guestNum==''){
+						alert('证件号必填!');
+						return false;
+						}
+				  lostCard(cardNo, guestType,guestNum,rDocument);
+				  return true;
+				  }
+				  if(radio[1].checked){
+					  $("#confirmMaincard").window('open');
+					  $("#cardLost_yes2").click(function(){
+						  $('#confirmMaincard').window('close');
+						  return ;
+					  });
+					  $("#cardLost_no2").click(function(){
+						  $('#confirmMaincard').window('close');
+						  return ;
+					  });
+				  }
+				  }
+	});
+		  
+		function lostCard(cardNo, guestType,guestNum,rDocument){
+			var yz = $.ajax({
+				url:encodeURI('cardLost'),type:'POST',timeout:3000,dataType:'html',
+				data : {
+					"cardMaintainBean.cardNo" : rDocument.getElementById('cardNo').textContent,
+					"cardMaintainBean.guestType" :rDocument.getElementById("guestType").value,
+					"cardMaintainBean.guestNum" :rDocument.getElementById("guestNum").textContent,
+					},
+				cache : false,
+				success : function(data) {
+					$("#addCardLostDialog").dialog("close");
+    				alert("挂失成功");
+    				$('#printCardLostIFrame')[0].src= server_context + '/view/card/cardMaintain/printCardLost.jsp?cardNo='+
+    				rDocument.getElementById('cardNo').textContent+'&guestName='+encodeURI(encodeURI(rDocument.getElementById('guestName').textContent))+
+    				'&guestNo='+rDocument.getElementById('guestNo').textContent+'&deposit='+rDocument.getElementById('deposit').value;
+    				$('#printCardLostDialog').dialog({
+    					 closed : false,
+    		                title : '挂失凭证',
+    		                shadow : true,
+    		                modal : true,
+    		                collapsible : true,
+    		                buttons : [{
+    		                	text : '返回',
+    		                    id : 'returnBtn',
+    		                    handler:function(){
+    		                    	$("#printCardLostDialog").dialog("close");
+    		                    }
+    		                }]
+    				});
+				},
+				error : function() {
+					alert('挂失失败，请重试!');
+				}
+			});
+		}
+		
+		 
+		

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"></constant>
+	<constant name="struts.configuration.xml.reload" value="true" /> 
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.ui.theme" value="simple" />
+	<constant name="struts.objectFactory" value="spring" />
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" /> 
+	
+	<package name="custom-default" extends="struts-default,json-default" namespace="">
+		
+		<!-- jtree support -->
+		<result-types>  
+    		<result-type name="chart" class="org.apache.struts2.dispatcher.ChartResult"/>  
+		</result-types> 
+		<!-- login interceptor support 
+		<interceptors>
+			<interceptor name="checkLogin" class="com.fr.station.component.system.action.UserLoginInterceptor" />
+			<interceptor-stack name="checkLoginStack">
+				<interceptor-ref name="checkLogin"></interceptor-ref>
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		-->
+		<!-- define default interceptor
+		<default-interceptor-ref name="checkLoginStack"></default-interceptor-ref>
+		 -->
+		<!-- global Result -->
+		<global-results>
+			<result name="login">/view/login.jsp</result>
+			<result name="error">/view/error.jsp</result>
+		</global-results>
+	</package>
+	
+	<include file="../config/card-struts.xml" />
+	<include file="../config/lng-struts.xml" />
+	<include file="../config/jfree-struts.xml" />
+</struts>

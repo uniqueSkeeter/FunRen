@@ -1,0 +1,308 @@
+package com.fr.station.component.card.service.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.card.BlackCardBean;
+import com.fr.station.common.bean.card.CardMaintainBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.BlackcardEntity;
+import com.fr.station.common.entity.card.FKTMaintain;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.component.card.dao.CardMaintainDAO;
+import com.fr.station.component.card.service.CardMaintainService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询卡维护信息，卡挂失信息，卡止挂信息，补卡信息，修改密码信息 以及以上操作的后台操作
+ * 
+ * @author yy
+ */
+@SuppressWarnings("rawtypes")
+@Service
+public class CardMaintainServiceImpl extends AbstractBaseService implements CardMaintainService {
+
+	protected static Logger log = Logger.getLogger(CardMaintainServiceImpl.class);
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CardMaintainDAO cardMainDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardMaintainServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 通过条件查找卡片维护界面的数据，，实现
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> findCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean) {
+		CommonUtility.countPaginationNumber(cardMaintainBean);
+		return this.cardMainDaoImpl.getCardMaintainRecordsByCriteria(cardMaintainBean);
+	}
+
+	/**
+	 * 卡片挂失
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateCardLost(CardMaintainBean cardMaintainBean) {
+		// update card table check the black card status
+		this.cardMainDaoImpl.updateCardLost(cardMaintainBean);
+
+		BlackCardBean blackCardBean = this.initialBlackBean(cardMaintainBean);
+
+		// add records in DB to indicate the card can not used anymore.
+		this.addBlackCardRecords(blackCardBean);
+	}
+
+	/**
+	 * 增加黑卡记录
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addBlackCardRecords(BlackCardBean blackCardBean) {
+		log.info("Persist blackcard entity begain...");
+		BlackcardEntity blackCardEntity = this.convertBlackCardDataToEntity(blackCardBean);
+		this.saveOrUpdate(blackCardEntity);
+		log.info("Succefully saved blackcard entity...");
+	}
+
+	/**
+	 * 卡片止挂
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateCancelLossCard(CardMaintainBean cardMaintainBean) {
+		this.cardMainDaoImpl.updateCancelLossCard(cardMaintainBean);
+		// 增加卡维护记录
+		cardMaintainBean.setNote("卡片止挂");
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		cardMaintainBean.setWorkDate(currentDate);
+		cardMaintainBean.setStationNo(cardMaintainBean.getStationNo());
+		this.addFkTMaintainRecords(cardMaintainBean);
+		// 删除黑卡记录
+		BlackCardBean blackCardBean = new BlackCardBean();
+		blackCardBean.setCardNo(Integer.valueOf(cardMaintainBean.getCardNo()));
+		blackCardBean.setStationNo(cardMaintainBean.getStationNo());
+		this.deleteBlackCardRecords(blackCardBean);
+	}
+
+	/**
+	 * 删除黑卡记录
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteBlackCardRecords(BlackCardBean blackCardBean) {
+		log.info("begin to delete the record in black card");
+		BlackcardEntity blackCardEntity = this.convertBlackCardDataToEntity(blackCardBean);
+		this.delete(blackCardEntity);
+		log.info("Succefully delete the record in black card");
+	}
+
+	/**
+	 * 更新密码
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateChangePass(CardMaintainBean cardMaintainBean, Object... args) {
+		// update password card table
+		this.cardMainDaoImpl.updateChangePass(cardMaintainBean, args);
+
+		this.createMainTainBean(cardMaintainBean);
+
+		// save change password operation log in the maintain table
+		this.addFkTMaintainRecords(cardMaintainBean);
+
+	}
+
+	/**
+	 * 得到所需修改密码的卡的信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> getChangePass(CardMaintainBean cardMaintainBean) throws Exception {
+		if (cardMaintainBean == null) {
+			return new ArrayList<CardMaintainBean>();
+		}
+		List<CardMaintainBean> changePassList = this.cardMainDaoImpl.getChangePassInfo(cardMaintainBean);
+		return changePassList;
+	}
+
+	/**
+	 * 查询密码
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> findPassRecodes(CardMaintainBean cardMaintainBean) {
+		return this.cardMainDaoImpl.getPassInfo(cardMaintainBean);
+	}
+
+	/**
+	 * 补卡记录
+	 * 
+	 */
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateReplaceCard(CardMaintainBean cardMaintainBean, Object... args) {
+		// update card information when customer need to change a new card.
+		this.cardMainDaoImpl.updateReplaceCard(cardMaintainBean, args);
+
+		this.intialCardMaintBeanForReplaceCard(cardMaintainBean);
+
+		// add new records in DB for replace old card.
+		this.addFkTMaintainRecords(cardMaintainBean);
+	}
+
+	/**
+	 * 得到挂失卡的信息
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> getCardLost(CardMaintainBean cardMaintainBean) throws Exception {
+		if (cardMaintainBean == null) {
+			return new ArrayList<CardMaintainBean>();
+		}
+		List<CardMaintainBean> cardLostList = this.cardMainDaoImpl.getCardLostInfo(cardMaintainBean);
+		return cardLostList;
+	}
+
+	/**
+	 * 得到止挂卡的信息
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> getCancelLossCard(CardMaintainBean cardMaintainBean) throws Exception {
+		if (cardMaintainBean == null) {
+			return new ArrayList<CardMaintainBean>();
+		}
+		List<CardMaintainBean> cancelLossCardList = this.cardMainDaoImpl.getCancelLossCardInfo(cardMaintainBean);
+		return cancelLossCardList;
+	}
+
+	/**
+	 * 通过条件查找旧卡
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> getExistCard(CardMaintainBean cardMaintainBean) throws Exception {
+		if (cardMaintainBean == null) {
+			return new ArrayList<CardMaintainBean>();
+		}
+		List<CardMaintainBean> existCardList = this.cardMainDaoImpl.getExistCardInfo(cardMaintainBean);
+		return existCardList;
+	}
+
+	@Override
+	@Autowired
+	public void setCardMaintainDAO(CardMaintainDAO reportRecordsDaoImpl) {
+		super.setBaseDao(reportRecordsDaoImpl);
+		this.cardMainDaoImpl = reportRecordsDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// 增加卡信息维护记录，将data转换为entity
+	private FKTMaintain convertDataToEntity(CardMaintainBean fkTMaintainBean) {
+
+		final FKTMaintain fKTMaintain = new FKTMaintain();
+		if (StringUtils.isNotBlank(fkTMaintainBean.getCardNo())) {
+			fKTMaintain.setCardNo(fkTMaintainBean.getCardNo());
+		}
+		if (StringUtils.isNotBlank(fkTMaintainBean.getNote())) {
+			fKTMaintain.setNote(fkTMaintainBean.getNote());
+		}
+		if (StringUtils.isNotBlank(fkTMaintainBean.getNote2())) {
+			fKTMaintain.setNote2(fkTMaintainBean.getNote2());
+		}
+		if (StringUtils.isNotBlank(fkTMaintainBean.getStationNo())) {
+			fKTMaintain.setStationNo(fkTMaintainBean.getStationNo());
+		}
+		if (StringUtils.isNotBlank(String.valueOf(fkTMaintainBean.getWorkDate()))) {
+			fKTMaintain.setCreateDate(fkTMaintainBean.getWorkDate());
+		}
+
+		return fKTMaintain;
+	}
+
+	// 增加黑卡记录，将data转换为entity
+	private BlackcardEntity convertBlackCardDataToEntity(BlackCardBean blackCardBean) {
+
+		final BlackcardEntity blackCardEntity = new BlackcardEntity();
+		if (StringUtils.isNotBlank(String.valueOf(blackCardBean.getCardNo()))) {
+			blackCardEntity.setCardid(String.valueOf(blackCardBean.getCardNo()));
+		}
+		if (StringUtils.isNotBlank(blackCardBean.getStationNo())) {
+			blackCardEntity.setStationno(Integer.valueOf(blackCardBean.getStationNo()));
+		}
+		if (StringUtils.isNotBlank(blackCardBean.getCreateDate())) {
+			blackCardEntity.setCreateDate(Timestamp.valueOf(blackCardBean.getCreateDate()));
+		}
+
+		return blackCardEntity;
+	}
+
+	private void createMainTainBean(CardMaintainBean cardMaintainBean) {
+		cardMaintainBean.setCardNo(cardMaintainBean.getCardNo());
+		cardMaintainBean.setNote("修改密码");
+		cardMaintainBean.setStationNo(String.valueOf(ApplicationContext.getInstance().getStationNum()));
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		cardMaintainBean.setWorkDate(currentDate);
+	}
+
+	private BlackCardBean initialBlackBean(CardMaintainBean cardMaintainBean) {
+		BlackCardBean blackCardBean;
+		blackCardBean = new BlackCardBean();
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		blackCardBean.setCardNo(Integer.valueOf(cardMaintainBean.getCardNo()));
+		blackCardBean.setStationNo(String.valueOf(ApplicationContext.getInstance().getStationNum()));
+		blackCardBean.setCreateDate(String.valueOf(currentDate));
+		return blackCardBean;
+	}
+
+	private void intialCardMaintBeanForReplaceCard(CardMaintainBean cardMaintainBean) {
+		cardMaintainBean.setCardNo(cardMaintainBean.getCardNo());
+		cardMaintainBean.setNote("补卡");
+		cardMaintainBean.setNote2("新卡号:" + cardMaintainBean.getNewCardNo());
+		cardMaintainBean.setStationNo(String.valueOf(ApplicationContext.getInstance().getStationNum()));
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		cardMaintainBean.setWorkDate(currentDate);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addFkTMaintainRecords(CardMaintainBean cardMaintainBean) {
+		log.info("Persist fktmaintain entity begain...");
+		final FKTMaintain fktEntity = this.convertDataToEntity(cardMaintainBean);
+		this.saveOrUpdate(fktEntity);
+		log.info("Succefully saved fktmaintain entity...");
+	}
+}

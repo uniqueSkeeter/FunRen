@@ -1,0 +1,129 @@
+﻿/*
+ * 角色功能表
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+package com.fr.station.common.entity.system;
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+/**
+ * 角色功能表
+ * 
+ * @version 1.0
+ * _wsq
+ */
+@Entity
+@Table(name = "ROLE_FUNCTION")
+public class RoleFunctionInfoEntity implements StandardBean {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * id
+	 */
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue
+	private int id;
+
+	/**
+	 * 角色ID
+	 */
+	
+	@ManyToOne
+	@JoinColumn(name="roleId")
+	private RoleInfoEntity roleId;
+	
+	@ManyToOne
+	@JoinColumn(name="funcId")
+	private FunctionInfoEntity functionId;
+
+	/**
+	 * 创建时间
+	 */
+	@Column(name = "CREATE_DATE")
+	private Timestamp createDate;
+
+	/**
+	 * 更新时间
+	 */
+	@Column(name = "UPDATE_DATE")
+	private Timestamp updateDate;
+
+	/**
+	 * 操作员编号
+	 */
+	@Column(name = "operId")
+	private int userid;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public RoleInfoEntity getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(RoleInfoEntity roleId) {
+		this.roleId = roleId;
+	}
+
+	public FunctionInfoEntity getFunctionId() {
+		return functionId;
+	}
+
+	public void setFunctionId(FunctionInfoEntity functionId) {
+		this.functionId = functionId;
+	}
+
+	public Timestamp getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Timestamp createDate) {
+		this.createDate = createDate;
+	}
+
+	public Timestamp getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Timestamp updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public int getUserid() {
+		return userid;
+	}
+
+	public void setUserid(int userid) {
+		this.userid = userid;
+	}
+
+	@Override
+	public String toString() {
+		return "RoleFunctionInfoEntity [id=" + id + ", roleId=" + roleId
+				+ ", functionId=" + functionId + ", createDate=" + createDate
+				+ ", updateDate=" + updateDate + ", userid=" + userid + "]";
+	}
+
+	
+}

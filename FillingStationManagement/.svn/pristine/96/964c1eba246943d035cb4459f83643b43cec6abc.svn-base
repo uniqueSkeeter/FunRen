@@ -1,0 +1,272 @@
+package com.fr.station.common.bean;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
+
+
+/**
+ * @author wangshuqing
+ *
+ */
+public class ShiftChangeBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public ShiftChangeBean() {
+		super();
+	}
+
+	/**
+	 * display records data
+	 */
+	private Integer oilGunNum;
+	private String oilName;
+	private BigDecimal oilPrice;
+	
+	private BigDecimal startOilAmount;
+	private BigDecimal currentOilAccount;
+	private BigDecimal endOilAmount;
+	
+	private BigDecimal cashAmount;
+	private BigDecimal cashMoney;
+	
+	private BigDecimal bankConsum;
+	private BigDecimal bankMoney;
+	
+	private BigDecimal icCard;
+	private BigDecimal icConsum;
+	
+	private BigDecimal tinBack;
+	private BigDecimal tinBackMoney;
+	
+	/**
+	 * search criteria, for oil records
+	 */
+	private Date shiftDate;
+	private String shiftChageNum;
+	private String classNum;
+	private String stationNum;
+	private Date startDate;
+	private Date endDate;
+	
+	/**
+	 * search criteria, for diagram
+	 */
+	private String reportType;
+	private Boolean displayFlag;
+	private String oilCode;
+	/**
+	 * result, for diagram
+	 */
+	private BigDecimal totalNum;
+	private Date tradeDate;
+	private String displayDate;
+	
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+	private int pageSize;
+	private int totalData;
+
+	public Integer getOilGunNum() {
+		return oilGunNum;
+	}
+	public void setOilGunNum(Integer oilGunNum) {
+		this.oilGunNum = oilGunNum;
+	}
+	public String getOilName() {
+		return oilName;
+	}
+	public void setOilName(String oilName) {
+		this.oilName = oilName;
+	}
+	public BigDecimal getOilPrice() {
+		return oilPrice;
+	}
+	public void setOilPrice(BigDecimal oilPrice) {
+		this.oilPrice = oilPrice;
+	}
+	public BigDecimal getStartOilAmount() {
+		return startOilAmount;
+	}
+	public int getPageNumber() {
+		return pageNumber;
+	}
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	
+	public int getTotalData() {
+		return totalData;
+	}
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+	public void setStartOilAmount(BigDecimal startOilAmount) {
+		this.startOilAmount = startOilAmount;
+	}
+	public BigDecimal getCurrentOilAccount() {
+		return currentOilAccount;
+	}
+	public void setCurrentOilAccount(BigDecimal currentOilAccount) {
+		this.currentOilAccount = currentOilAccount;
+	}
+	public String getOilCode() {
+		return oilCode;
+	}
+	public void setOilCode(String oilCode) {
+		this.oilCode = oilCode;
+	}
+	public BigDecimal getEndOilAmount() {
+		return endOilAmount;
+	}
+	public void setEndOilAmount(BigDecimal endOilAmount) {
+		this.endOilAmount = endOilAmount;
+	}
+	public BigDecimal getCashAmount() {
+		return cashAmount;
+	}
+	public void setCashAmount(BigDecimal cashAmount) {
+		this.cashAmount = cashAmount;
+	}
+	public BigDecimal getCashMoney() {
+		return cashMoney;
+	}
+	public Date getShiftDate() {
+		return shiftDate;
+	}
+	public void setShiftDate(Date shiftDate) {
+		this.shiftDate = shiftDate;
+	}
+	public String getReportType() {
+		return reportType;
+	}
+	public void setReportType(String reportType) {
+		this.reportType = reportType;
+	}
+	public void setCashMoney(BigDecimal cashMoney) {
+		this.cashMoney = cashMoney;
+	}
+	public BigDecimal getBankConsum() {
+		return bankConsum;
+	}
+	public void setBankConsum(BigDecimal bankConsum) {
+		this.bankConsum = bankConsum;
+	}
+	public BigDecimal getBankMoney() {
+		return bankMoney;
+	}
+	public void setBankMoney(BigDecimal bankMoney) {
+		this.bankMoney = bankMoney;
+	}
+	public BigDecimal getIcCard() {
+		return icCard;
+	}
+	public void setIcCard(BigDecimal icCard) {
+		this.icCard = icCard;
+	}
+	public BigDecimal getIcConsum() {
+		return icConsum;
+	}
+	public void setIcConsum(BigDecimal icConsum) {
+		this.icConsum = icConsum;
+	}
+	public BigDecimal getTinBack() {
+		return tinBack;
+	}
+	public void setTinBack(BigDecimal tinBack) {
+		this.tinBack = tinBack;
+	}
+	public BigDecimal getTinBackMoney() {
+		return tinBackMoney;
+	}
+	public void setTinBackMoney(BigDecimal tinBackMoney) {
+		this.tinBackMoney = tinBackMoney;
+	}
+	public String getDisplayDate() {
+		return displayDate;
+	}
+	public void setDisplayDate(String displayDate) {
+		this.displayDate = displayDate;
+	}
+	public String getShiftChageNum() {
+		return shiftChageNum;
+	}
+	public void setShiftChageNum(String shiftChageNum) {
+		this.shiftChageNum = shiftChageNum;
+	}
+	public String getClassNum() {
+		return classNum;
+	}
+	public void setClassNum(String classNum) {
+		this.classNum = classNum;
+	}
+	
+	public Boolean getDisplayFlag() {
+		return displayFlag;
+	}
+	public void setDisplayFlag(Boolean displayFlag) {
+		this.displayFlag = displayFlag;
+	}
+	public String getStationNum() {
+		return stationNum;
+	}
+	public void setStationNum(String stationNum) {
+		this.stationNum = stationNum;
+	}
+	
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	
+	public BigDecimal getTotalNum() {
+		return totalNum;
+	}
+	public void setTotalNum(BigDecimal totalNum) {
+		this.totalNum = totalNum;
+	}
+
+	public Date getTradeDate() {
+		return tradeDate;
+	}
+	public void setTradeDate(Date tradeDate) {
+		this.tradeDate = tradeDate;
+	}
+	@Override
+	public String toString() {
+		return "ShiftChangeBean [oilGunNum=" + oilGunNum + ", oilName="
+				+ oilName + ", oilPrice=" + oilPrice + ", startOilAmount="
+				+ startOilAmount + ", currentOilAccount=" + currentOilAccount
+				+ ", endOilAmount=" + endOilAmount + ", cashAmount="
+				+ cashAmount + ", cashMoney=" + cashMoney + ", bankConsum="
+				+ bankConsum + ", bankMoney=" + bankMoney + ", icCard="
+				+ icCard + ", icConsum=" + icConsum + ", tinBack=" + tinBack
+				+ ", tinBackMoney=" + tinBackMoney + ", shiftDate=" + shiftDate
+				+ ", shiftChageNum=" + shiftChageNum + ", classNum=" + classNum
+				+ ", stationNum=" + stationNum + ", startDate=" + startDate
+				+ ", endDate=" + endDate + ", reportType=" + reportType
+				+ ", displayFlag=" + displayFlag + ", oilCode=" + oilCode
+				+ ", totalNum=" + totalNum + ", tradeDate=" + tradeDate
+				+ ", displayDate=" + displayDate + ", pageNumber=" + pageNumber
+				+ ", pageSize=" + pageSize + ", totalData=" + totalData
+				+ "]";
+	}
+
+}

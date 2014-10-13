@@ -1,0 +1,175 @@
+package com.fr.station.common.bean;
+
+/**
+ * @author WR
+ * 
+ */
+public class RegisterCustomerBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public RegisterCustomerBean() {
+		super();
+	}
+
+	/**
+	 * display records data
+	 */
+	private String guestName;
+
+	private String guestNo;
+
+	private String cardNo;
+
+	private String cardStatus;
+
+	private String guestType;
+
+	private String guestNum;
+
+	private String guestTel;
+
+	private String create_date;
+
+	private String stationNo;
+
+	/**
+	 * search criteria, for guest records
+	 */
+	// private String cardNo;
+	// private String guestName;
+	private String cardExno;
+
+	private String cardType;
+
+	// private String guestType;
+	// private String guestNum;
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	public String getGuestName() {
+		return guestName;
+	}
+
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	public String getGuestNO() {
+		return guestNo;
+	}
+
+	public void setGuestNO(String guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	public String getCardNo() {
+		return cardNo;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public String getCardStatus() {
+		return cardStatus;
+	}
+
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	public String getGuestType() {
+		return guestType;
+	}
+
+	public void setGuestType(String guestType) {
+		this.guestType = guestType;
+	}
+
+	public String getGuestNum() {
+		return guestNum;
+	}
+
+	public void setGuestNum(String guestNum) {
+		this.guestNum = guestNum;
+	}
+
+	public String getGuestTel() {
+		return guestTel;
+	}
+
+	public void setGuestTel(String guestTel) {
+		this.guestTel = guestTel;
+	}
+
+	public String getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
+	}
+
+	public String getStationNo() {
+		return stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getCardExno() {
+		return cardExno;
+	}
+
+	public void setCardExno(String cardExno) {
+		this.cardExno = cardExno;
+	}
+
+	public String getCardType() {
+		return cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalData() {
+		return totalData;
+	}
+
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	@Override
+	public String toString() {
+		return "RegisterCustomerBean [guestName=" + guestName + ", guestNo=" + guestNo + ", cardNo=" + cardNo + ", cardStatus="
+				+ cardStatus + ", guestType=" + guestType + ", guestNum=" + guestNum + ", guestTel=" + guestTel
+				+ ", create_date=" + create_date + ", stationNo=" + stationNo + "]";
+	}
+
+}

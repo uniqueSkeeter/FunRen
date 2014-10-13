@@ -1,0 +1,85 @@
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+var readFlag = false;
+$(document).ready(function(){
+	readFlag = false;
+	$("#readCard").click(function(){
+		alert("读卡111");
+		readFlag = true;
+	});
+	$("#saleCard").click(function(){
+		alert("售卡");
+		alert("readFlag is "+readFlag);
+		if(readFlag){
+		var valideFlag = valideCardAndGuestInput();
+		var customerAdd_form = document.getElementsByTagName("form");
+		alert($(customerAdd_form).serialize());
+		alert("valideFlag is "+valideFlag);
+		if(valideFlag){
+			alert("验证通过");
+			$.ajax({
+    			data:$(customerAdd_form).serialize(),
+    			url:encodeURI("saveCustomer"),type:'POST',timeout:3000,dataType:'html',
+    			success:function(data){
+    				$.messager.alert('正确','单位客户信息保存成功!');
+    				$('#printCardIFrame')[0].src= server_context+'/view/card/customer/saleMultiUserCard/printMultiUserMainCard.jsp?cardNo='
+    				+document.getElementById("cardNo").value+'&deposit='+document.getElementById("deposit").value+'&guestName='
+    				+encodeURI(encodeURI(document.getElementById("guestName").value))+'&guestType='+encodeURI(encodeURI($("#guestType").find("option:selected").text()))+'&guestNum='
+    				+document.getElementById("guestNum").value+'&bankType='+encodeURI(encodeURI($("#bankType").find("option:selected").text()))+'&bankAcc='
+    				+document.getElementById("bankAcc").value+'&guestTel='+document.getElementById("guestTel").value;
+    				$('#printCardDialog').dialog({
+   					 closed : false,
+   		                title : '单位卡打印',
+   		                shadow : true,
+   		                modal : true,
+   		                collapsible : true,
+   		                buttons : [{
+   		                	text : '返回',
+   		                    id : 'returnBtn',
+   		                    handler:function(){
+   		                    	alert("返回");
+   		                    	$("#printCardDialog").dialog("close");
+   		                    }
+   		                }]
+   				});
+    			},
+    			error:function(){
+    				$.messager.alert('错误','单位客户信息保存失败，请重试!');
+    			}
+		});
+		}
+		}
+	});
+	$("#reset").click(function(){
+		alert("重置");
+	});
+	$("#returnBack").click(function(){
+		alert("返回");
+		window.location.href=basePath+"/registMultiCustomer/registMultiCustomerInit";
+	});
+});
+function valideCardAndGuestInput(){
+	alert("in valideCardAndGuestInput");
+	var cardNo = document.getElementById("cardNo");
+	var cardType = document.getElementById("cardType");
+	var deposit = document.getElementById("deposit");
+	var guestName = document.getElementById("guestName");
+	var guestType = document.getElementById("guestType");
+	var guestNum = document.getElementById("guestNum");
+	var contactName = document.getElementById("contactName");
+	var contactTel = document.getElementById("contactTel");
+	var guestTel = document.getElementById("guestTel");
+	var contactType = document.getElementById("contactType");
+	var contactNum = document.getElementById("contactNum");
+	var bankType = document.getElementById("bankType");
+	var bankAcc = document.getElementById("bankAcc");
+	if(check(cardNo)||check(cardType)||check(deposit)||check(guestName)||check(guestType)||check(guestNum)
+			||check(contactName)||check(contactTel)||check(guestTel)||check(contactType)||check(contactNum)
+			||check(bankType)||check(bankAcc)){
+		return false;
+	}else{
+		return true;
+	}
+}

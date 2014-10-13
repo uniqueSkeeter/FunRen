@@ -1,0 +1,241 @@
+package com.fr.station.component.card.service.impl;
+
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.card.CardStorageBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardInOutEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.card.dao.CardStorageDAO;
+import com.fr.station.component.card.service.CardStorageService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询所有卡片进出库记录
+ * 
+ * Mainly responsible to handle different scenario search
+ * 
+ * @author hjq
+ */
+@Service
+public class CardStorageServiceImpl extends AbstractBaseService<FkTCardInOutEntity> implements CardStorageService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private static Logger log = Logger.getLogger(CardStorageServiceImpl.class);
+
+	private CardStorageDAO cardStorageDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * inherited java doc.
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	@Override
+	public List<FkTCardInOutEntity> findAllShiftChangeRecords() throws Exception {
+		List<FkTCardInOutEntity> fktCardInOutEntity = this.findAll();
+		return fktCardInOutEntity;
+	}
+
+	/**
+	 * inherited java doc.
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardStorageBean> findCardStorageRecordsByCriteria(CardStorageBean cardStorageBean) {
+		int pageNumber = cardStorageBean.getPageNumber();
+		int pageSize = cardStorageBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return this.cardStorageDaoImpl.getCardStorageRecordsByCriteria(cardStorageBean, start, number);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addCardOrder(CardStorageBean cardStorageBean) {
+
+		log.info("Persist cardStorage entity begain...");
+		FkTCardInOutEntity fktCardInOutEntity = this.converDataToEntity(cardStorageBean);
+
+		Object[] resultArray = this.cardStorageDaoImpl.getClassNum();
+		this.initializeClassInfoData(fktCardInOutEntity, resultArray);
+
+		this.saveOrUpdate(fktCardInOutEntity);
+
+		// temporary keep the card in out entity for saving the card detail entity
+		ApplicationContext.getInstance().setCardInoutEntity(fktCardInOutEntity);
+
+		if ((cardStorageBean.getReceiver().equals(ApplicationContext.getInstance().getStationNum())
+				&& cardStorageBean.getReceiptType().equals("1") && cardStorageBean.getReceiptStatus().equals("2"))
+				|| (cardStorageBean.getSupplier().equals(ApplicationContext.getInstance().getStationNum())
+						&& cardStorageBean.getReceiptType().equals("1") && cardStorageBean.getReceiptStatus().equals("3"))
+				|| (cardStorageBean.getSupplier().equals(ApplicationContext.getInstance().getStationNum())
+						&& cardStorageBean.getReceiptType().equals("4") && cardStorageBean.getReceiptStatus().equals("3"))
+				|| (cardStorageBean.getReceiver().equals(ApplicationContext.getInstance().getStationNum())
+						&& cardStorageBean.getReceiptType().equals("4") && cardStorageBean.getReceiptStatus().equals("2"))) {
+			this.cardStorageDaoImpl.updateCardStorage(cardStorageBean);
+		}
+
+		log.info("Succefully saved cardStorage entity...");
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardStorageBean> getCardByFormCondition(CardStorageBean cardStorageBean) throws Exception {
+		if (cardStorageBean == null) {
+			return null;
+		}
+		List<CardStorageBean> cardList = this.cardStorageDaoImpl.getAllCardStorageRecords(cardStorageBean);
+		return cardList;
+	}
+
+	@Autowired
+	public void setCardStorageDAO(CardStorageDAO cardStorageDaoImpl) {
+		super.setBaseDao(cardStorageDaoImpl);
+		this.cardStorageDaoImpl = cardStorageDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private void initializeClassInfoData(FkTCardInOutEntity fktCardInOutEntity, Object[] resultArray) {
+		// TODO Auto-generated method stub
+		if (resultArray != null && resultArray.length == 3) {
+			// fktCardInOutEntity.setClassDate(DateUtil.toDate((String) resultArray[0], DateUtil.DATE_PATTERN_8));
+			fktCardInOutEntity.setClassDate(DateUtil.formatDate((Timestamp) resultArray[0], DateUtil.DATE_PATTERN_8));
+			fktCardInOutEntity.setClassNo((String) resultArray[1]);
+		}
+	}
+
+	private FkTCardInOutEntity converDataToEntity(CardStorageBean cardStorageBean) {
+
+		FkTCardInOutEntity fktEntity = new FkTCardInOutEntity();
+
+		// List<CardStorageDetailEntity> cardStorageDetailList = ApplicationContext.getInstance().getCardDetailList();
+		// fktEntity.setCardStorDetEntity(new HashSet<CardStorageDetailEntity>(cardStorageDetailList));
+
+		/*
+		 * for (CardStorageDetailEntity cardStorageDetail : fktEntity.getCardStorDetEntity()) {
+		 * cardStorageDetail.setCardInOutEntity(fktEntity); }
+		 */
+
+		if (cardStorageBean.getId() != null) {
+			fktEntity.setId(cardStorageBean.getId());
+		}
+
+		if (cardStorageBean.getReceiptNum() != null) {
+			fktEntity.setInOutNo(String.valueOf(cardStorageBean.getReceiptNum()));
+		}
+
+		if (StringUtils.isNotBlank(cardStorageBean.getReceiptType())) {
+			fktEntity.setReceiptType(cardStorageBean.getReceiptType());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getCardType())) {
+			fktEntity.setCardType(cardStorageBean.getCardType());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getReceiverName())) {
+			fktEntity.setReceiver(cardStorageBean.getReceiverName());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getSupplierName())) {
+			fktEntity.setSupplier(cardStorageBean.getSupplierName());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getReceiver())) {
+			fktEntity.setReceiver(cardStorageBean.getReceiver());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getSupplier())) {
+			fktEntity.setSupplier(cardStorageBean.getSupplier());
+		}
+
+		if (StringUtils.isNotBlank(cardStorageBean.getApplyDate())) {
+			Date applyDate = DateUtil.toDate(cardStorageBean.getApplyDate(), DateUtil.DATE_PATTERN_17);
+			fktEntity.setWorkdate(applyDate);
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getSupplyDate())) {
+			Date supplyDate = DateUtil.toDate(cardStorageBean.getSupplyDate(), DateUtil.DATE_PATTERN_17);
+			fktEntity.setLeftStorageDate(supplyDate);
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getReceiveDate())) {
+			Date receiveDate = DateUtil.toDate(cardStorageBean.getReceiveDate(), DateUtil.DATE_PATTERN_17);
+			fktEntity.setPutInStorageDate(receiveDate);
+		}
+
+		if (cardStorageBean.getCardSum() != null) {
+			fktEntity.setCardAcount(cardStorageBean.getCardSum());
+		}
+		/*
+		 * if (StringUtils.isNotBlank(cardStorageBean.getStationNum())) {
+		 * fktEntity.setStationNo(cardStorageBean.getStationNum()); }
+		 */
+		if (StringUtils.isNotBlank(cardStorageBean.getNote())) {
+			fktEntity.setNote(cardStorageBean.getNote());
+		}
+		if (StringUtils.isNotBlank(cardStorageBean.getReceiptStatus())) {
+			fktEntity.setReceiptStatus(cardStorageBean.getReceiptStatus());
+		}
+		fktEntity.setOperatorId(ApplicationContext.getInstance().getOperatorNo());
+		// add current stationNum
+		fktEntity.setStationNo(ApplicationContext.getInstance().getStationNum());
+
+		if (fktEntity.getSupplier().equals(ApplicationContext.getInstance().getStationName())) {
+			fktEntity.setSupplier(ApplicationContext.getInstance().getStationNum());
+		}
+		if (fktEntity.getReceiver().equals(ApplicationContext.getInstance().getStationName())) {
+			fktEntity.setReceiver(ApplicationContext.getInstance().getStationNum());
+		}
+		fktEntity.setOperatorId(ApplicationContext.getInstance().getOperatorNo());
+		// fktEntity.setReceiver(ApplicationContext.getInstance().getStationNum());
+		// 如果当前网点号为供货方
+		if (ApplicationContext.getInstance().getStationNum().equals(fktEntity.getSupplier())) {
+			if (fktEntity.getReceiptType().equals("1")) {
+				fktEntity.setStationNo(fktEntity.getReceiver());
+			} else if (fktEntity.getReceiptType().equals("4")) {
+				if (fktEntity.getReceiptStatus().equals("1")) {
+					fktEntity.setStationNo(fktEntity.getSupplier());
+				} else if (fktEntity.getReceiptStatus().equals("3")) {
+					fktEntity.setStationNo(fktEntity.getReceiver());
+				}
+			}
+		}
+		if (ApplicationContext.getInstance().getStationNum().equals(fktEntity.getReceiver())) {
+			if (fktEntity.getReceiptType().equals("1")) {
+				if (fktEntity.getReceiptStatus().equals("1")) {
+					fktEntity.setStationNo(fktEntity.getSupplier());
+				} else if (fktEntity.getReceiptStatus().equals("2")) {
+					fktEntity.setStationNo(fktEntity.getReceiver());
+				}
+			} else if (fktEntity.getReceiptType().equals("4")) {
+				fktEntity.setStationNo(fktEntity.getReceiver());
+			}
+		}
+		return fktEntity;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

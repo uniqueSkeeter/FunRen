@@ -1,0 +1,198 @@
+	$(document).ready(function(){
+		$("#readCard").click(function(){
+			alert("读卡");
+		});
+		$("#search").click(function(){
+			alert("查询");
+			var cardNo = $("#cardNO").val();
+			var guestNo = $("#guestNO").val();
+			if( cardNo == '' && guestNo == ''){
+				$.messager.alert('错误', '卡号和客户编号不能都为空');
+				return;
+			}
+			alert("通过检查");
+			document.card_form.submit();
+		});
+		$("#haveCardDelete").click(function(){
+			alert("有卡销户");
+			//检查卡号,客户编号是否为空
+			var cardNo = $("#cardNo").text();
+			var guestNo = $("#guestNo").text();
+			alert('$'+cardNo+'$');
+			alert('$'+guestNo+'$');
+			if(cardNo == '' || guestNo == ''){
+				$.messager.alert('错误', '卡号和客户编号不能为空');
+				return;
+			}
+			//检查卡片是否已经注销
+			var cardStatus = $("#cardStatus").text();
+			if(cardStatus != '启用'){
+				$.messager.alert('错误', '卡状态必须是启用');
+				return;
+			}
+			//主卡标志是否是false
+			var mainCardFlag = $("#mainCardFlag").text();
+			if(mainCardFlag != 'false'){
+				$.messager.alert('错误', '主卡标志必须为false');
+				return;
+			}
+			var cardType = $("#cardType").text();
+			alert('$'+cardType+'$');
+			if(cardType == '单用户'){
+				deleteCard(cardNo,guestNo);
+			}else{
+				$.messager.alert('错误', '卡片类型必须是单用户');
+			}
+			
+		});
+		$("#notHaveCardDelete").click(function(){
+			alert("无卡销户");
+			if(confirm('无卡销户必须要先挂失,确定已经挂失经过48小时?')){
+				//检查卡号,客户编号是否为空
+				var cardNo = $("#cardNo").text();
+				var guestNo = $("#guestNo").text();
+				alert('$'+cardNo+'$');
+				alert('$'+guestNo+'$');
+				if(cardNo == '' || guestNo == ''){
+					$.messager.alert('错误', '卡号和客户编号不能为空');
+					return;
+				}
+				//检查卡片是否已经注销
+				var cardStatus = $("#cardStatus").text();
+				if(cardStatus != '挂失'){
+					$.messager.alert('错误', '卡状态必须是挂失');
+					return;
+				}
+				//检查主卡标志是否是false
+				var mainCardFlag = $("#mainCardFlag").text();
+				if( mainCardFlag != 'false'){
+					$.messager.alert('错误', '主卡标志必须为false');
+					return;
+				}
+				var cardType = $("#cardType").text();
+				alert('$'+cardType+'$');
+				if(cardType == '单用户'){
+					deleteCardNoCard(cardNo,guestNo);
+				}else{
+					$.messager.alert('错误', '卡片类型必须是单用户');
+				}
+				
+			}else{
+				if(confirm('要进行挂失吗?')){
+					alert("挂失");
+					var cardNo = $("#cardNo").text();
+					alert('$'+cardNo+'$');
+					cardLost(cardNo);
+				}else{
+					alert("结束");
+				}
+			}
+		});
+	});
+	//单用户卡有卡注销
+	function deleteCard(cardNo,guestNo){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerDelete/deletePersonalCard',
+			data : {
+				"customerDeleteBean.cardNo" : cardNo,
+				"customerDeleteBean.guestNo" : guestNo
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '单用户卡有卡卡注销成功!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/customCancel/printCardDelete.jsp'
+				+'?cardNo='+$("#cardNo").text()
+				+'&cardType='+encodeURI(encodeURI($("#cardType").text()))
+				+'&deposit='+$("#deposit").text()
+				+'&guestNo='+$("#guestNo").text()
+				+'&guestName='+encodeURI(encodeURI($("#guestName").text()))
+				+'&cardScore='+$("#cardScore").text()
+				+'&cardAccount='+$("#cardAccount").text()
+				+'&preAccount='+$("#preAccount").text()
+				+'&refundAmount='+(parseFloat($("#deposit").text())+parseFloat($("#cardAccount").text())+parseFloat($("#preAccount").text()));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '卡注销凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	document.card_form.submit();
+		                    }
+		                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '单用户卡有卡卡注销失败!');
+			}
+		});
+	}
+	//单用户卡无卡注销
+	function deleteCardNoCard(cardNo,guestNo){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerDelete/deletePersonalCardNoCard',
+			data : {
+				"customerDeleteBean.cardNo" : cardNo,
+				"customerDeleteBean.guestNo" : guestNo
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '单用户卡无卡注销成功!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/customCancel/printCardDelete.jsp'
+				+'?cardNo='+$("#cardNo").text()
+				+'&cardType='+encodeURI(encodeURI($("#cardType").text()))
+				+'&deposit='+$("#deposit").text()
+				+'&guestNo='+$("#guestNo").text()
+				+'&guestName='+encodeURI(encodeURI($("#guestName").text()))
+				+'&cardScore='+$("#cardScore").text()
+				+'&cardAccount='+$("#cardAccount").text()
+				+'&preAccount='+$("#preAccount").text()
+				+'&refundAmount='+(parseFloat($("#cardAccount").text())+parseFloat($("#preAccount").text()));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '卡注销凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	document.card_form.submit();
+		                    }
+		                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '单用户卡无卡注销失败!');
+			}
+		});
+	}
+	//卡挂失
+	function cardLost(cardNo){
+		$.ajax({
+			url:encodeURI(server_context+'/cardMaintain/cardLost'),type:'POST',timeout:3000,dataType:'html',
+			data : {
+				"cardMaintainBean.cardNo" : cardNo
+				},
+			cache : false,
+			success : function() {
+				$.messager.alert('成功', '卡挂失成功!');
+				document.card_form.submit();
+			},
+			error : function() {
+				$.messager.alert('失败', '卡挂失失败!');
+			}
+		});
+	}

@@ -1,0 +1,293 @@
+package com.fr.station.component.customer.action;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.utility.DateJsonValueProcessor;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.service.RegistMultiCustomerService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for saleMultiUserCard
+ */
+@Namespace("/registMultiCustomer")
+@ParentPackage("custom-default")
+public class RegistMultiCustomerAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(RegistMultiCustomerAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	@Autowired
+	protected RegistMultiCustomerService registMultiCustomerServiceImpl;
+
+	protected RegisterCustomerBean registerCustomerBean;
+
+	private List<RegisterCustomerBean> departmentList = new ArrayList<RegisterCustomerBean>();
+
+	private String jsonData;
+
+	// ------- Constructors ----------------------------------------------------
+	public RegistMultiCustomerAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * action for link to saleMultiUserCard.jsp
+	 */
+	@Action(value = "registMultiCustomerInit", results = { @Result(name = "success", location = "/view/card/customer/saleMultiUserCard/saleMultiUserCard.jsp") })
+	public String registerCustomerInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to customerAdd.jsp
+	 */
+	@Action(value = "customerAdd", results = { @Result(name = "success", location = "/view/card/customer/saleMultiUserCard/customerAdd.jsp") })
+	public String customerAdd() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to depMaintain.jsp
+	 */
+	@Action(value = "depMaintain", results = { @Result(name = "success", location = "/view/card/customer/saleMultiUserCard/depMaintain.jsp") })
+	public String depMaintain() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for link to departmentAdd.jsp when click departmentEdit button
+	 */
+	@Action(value = "refreshDepAdd", results = { @Result(name = "success", location = "/view/card/customer/saleMultiUserCard/departmentAdd.jsp"), })
+	public String refreshUserData() {
+		log.info("Starting to transfer employee data");
+		boolean flag = false;
+		try {
+			this.departmentList = this.registMultiCustomerServiceImpl.getDepByFormCondition(this.getRegisterCustomerBean());
+			if (this.departmentList.size() > 0) {
+				this.registerCustomerBean = this.departmentList.get(0);
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("transfer RegisterCustomerBean data occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully transfer c data");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click search button in saleMultiUserCard.jsp to display the search results
+	 */
+	@Action(value = "showDriverList", results = { @Result(name = "success", type = "json"), })
+	public String showDriverList() {
+		log.info("Starting to load driver info from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<RegisterCustomerBean> registerCustomerBeanList = null;
+		try {
+			registerCustomerBeanList = this.registMultiCustomerServiceImpl
+					.findDriverRecordsByCriteria(this.registerCustomerBean);
+			if (!registerCustomerBeanList.isEmpty()) {
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(DateUtil.DATE_PATTERN_2));
+				map.put(this.TOTAL, registerCustomerBeanList.get(0).getTotalData());
+				map.put(this.ROWS, registerCustomerBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+			} else {
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading driver data from DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully load driver records from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click search button in depMaintain.jsp to display the search results
+	 */
+	@Action(value = "showDepartmentList", results = { @Result(name = "success", type = "json"), })
+	public String showDepartmentList() {
+		log.info("Starting to load department info from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<RegisterCustomerBean> registerCustomerBeanList = null;
+		try {
+			registerCustomerBeanList = this.registMultiCustomerServiceImpl.findDepRecordsByCriteria(this.registerCustomerBean);
+			if (!registerCustomerBeanList.isEmpty()) {
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(DateUtil.DATE_PATTERN_2));
+				map.put(this.TOTAL, registerCustomerBeanList.get(0).getTotalData());
+				map.put(this.ROWS, registerCustomerBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+			} else {
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading department data from DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully load department records from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click saleCard button in customerAdd.jsp 2014-7-25
+	 */
+	@Action(value = "saveCustomer", results = { @Result(name = "success", type = "json"), })
+	public String saveCustomer() {
+		log.info("Starting to save Card(mainCard) infomation into DB");
+		boolean flag = false;
+		try {
+			this.registMultiCustomerServiceImpl.addCustomer(this.registerCustomerBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("save card data into DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully save Card(mainCard) data into DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click departmentAdd button in departmentAdd.jsp 2014-7-28
+	 */
+	@Action(value = "saveDepartment", results = { @Result(name = "success", type = "json"), })
+	public String saveDepartment() {
+		log.info("Starting to save department infomation into DB");
+		boolean flag = false;
+		try {
+			this.registMultiCustomerServiceImpl.addDepartment(this.registerCustomerBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("save department data into DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully save department data into DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click departmentAdd button in departmentAdd.jsp 2014-7-28
+	 */
+	@Action(value = "updateDepartment", results = { @Result(name = "success", type = "json"), })
+	public String updateDepartment() {
+		log.info("Starting to update department infomation into DB");
+		boolean flag = false;
+		try {
+			this.registMultiCustomerServiceImpl.updateDepartment(this.registerCustomerBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("update department data into DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully update department data into DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click departmentDelete button in depMaintain.jsp
+	 */
+	@Action(value = "deleteDepartment", results = { @Result(name = "success", type = "json"), })
+	public String deleteDepartment() {
+		log.info("Starting to delete department infomation into DB");
+		boolean flag = false;
+		try {
+			this.registMultiCustomerServiceImpl.deleteDepartment(this.registerCustomerBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("delete department data into DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully delete department data into DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public RegisterCustomerBean getRegisterCustomerBean() {
+		return this.registerCustomerBean;
+	}
+
+	public void setRegisterCustomerBean(RegisterCustomerBean registerCustomerBean) {
+		this.registerCustomerBean = registerCustomerBean;
+	}
+
+	public String getJsonData() {
+		return this.jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

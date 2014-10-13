@@ -1,0 +1,473 @@
+/*
+ * 网点信息 Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.system;
+
+import java.sql.Timestamp;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+@Entity
+@Table(name = "STATIONINFO")
+public class StationEntity implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue
+	private int id;
+
+	@OneToMany(mappedBy = "stationId")
+	private Set<EmployeeEntity> emplEntity;
+
+	/**
+	 * 网点号
+	 */
+	@Column(name = "STATIONNum")
+	private String stationNum;
+
+	/**
+	 * 网点名称
+	 */
+	@Column(name = "NAME")
+	private String name;
+
+	/**
+	 * 电话
+	 */
+	@Column(name = "TELEPHONE")
+	private String telephone;
+
+	/**
+	 * 传真
+	 */
+	@Column(name = "FAX")
+	private String fax;
+
+	/**
+	 * 邮编
+	 */
+	@Column(name = "POST")
+	private String zipCode;
+
+	/**
+	 * 地址
+	 */
+	@Column(name = "ADDR")
+	private String address;
+
+	/**
+	 * 税号
+	 */
+	@Column(name = "TAXCODE")
+	private String taxCode;
+
+	/**
+	 * 银行号
+	 */
+	@Column(name = "BANKACCNO")
+	private String backNum;
+
+	/**
+	 * 运行方式
+	 */
+	@Column(name = "RUNTYPE")
+	private int runType;
+
+	/**
+	 * 打印方式
+	 */
+	@Column(name = "PRINTTYPE")
+	private int printType;
+
+	/**
+	 * 出库单据号
+	 */
+	@Column(name = "CKDH")
+	private String outOrderNum;
+
+	/**
+	 * 入库单据号
+	 */
+	@Column(name = "RKDH")
+	private String inOrderNum;
+
+	/**
+	 * 其它单据号1
+	 */
+	@Column(name = "QTDH1")
+	private String otherOrderNum;
+
+	/**
+	 * 其它单据号2
+	 */
+	@Column(name = "QTDH2")
+	private String otherOrderNum2;
+
+	/**
+	 * 负责人
+	 */
+	@Column(name = "MANGER")
+	private String manger;
+
+	/**
+	 * 上级单位
+	 */
+	@Column(name = "UP_COMPANY")
+	private String upCompany;
+
+	/**
+	 * 创建时间
+	 */
+	@Column(name = "CREATE_DATE")
+	private Timestamp createDate;
+
+	/**
+	 * 网点类型
+	 */
+	@Column(name = "stationType")
+	private String stationType;
+
+	public int getId() {
+		return this.id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Set<EmployeeEntity> getEmplEntity() {
+		return this.emplEntity;
+	}
+
+	public void setEmplEntity(Set<EmployeeEntity> emplEntity) {
+		this.emplEntity = emplEntity;
+	}
+
+	public String getStationNum() {
+		return this.stationNum;
+	}
+
+	public void setStationNum(String stationNum) {
+		this.stationNum = stationNum;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getTelephone() {
+		return this.telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	public String getFax() {
+		return this.fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
+
+	public String getZipCode() {
+		return this.zipCode;
+	}
+
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getTaxCode() {
+		return this.taxCode;
+	}
+
+	public void setTaxCode(String taxCode) {
+		this.taxCode = taxCode;
+	}
+
+	public String getBackNum() {
+		return this.backNum;
+	}
+
+	public void setBackNum(String backNum) {
+		this.backNum = backNum;
+	}
+
+	public int getRunType() {
+		return this.runType;
+	}
+
+	public void setRunType(int runType) {
+		this.runType = runType;
+	}
+
+	public int getPrintType() {
+		return this.printType;
+	}
+
+	public void setPrintType(int printType) {
+		this.printType = printType;
+	}
+
+	public String getOutOrderNum() {
+		return this.outOrderNum;
+	}
+
+	public void setOutOrderNum(String outOrderNum) {
+		this.outOrderNum = outOrderNum;
+	}
+
+	public String getInOrderNum() {
+		return this.inOrderNum;
+	}
+
+	public void setInOrderNum(String inOrderNum) {
+		this.inOrderNum = inOrderNum;
+	}
+
+	public String getOtherOrderNum() {
+		return this.otherOrderNum;
+	}
+
+	public void setOtherOrderNum(String otherOrderNum) {
+		this.otherOrderNum = otherOrderNum;
+	}
+
+	public String getOtherOrderNum2() {
+		return this.otherOrderNum2;
+	}
+
+	public void setOtherOrderNum2(String otherOrderNum2) {
+		this.otherOrderNum2 = otherOrderNum2;
+	}
+
+	public String getManger() {
+		return this.manger;
+	}
+
+	public void setManger(String manger) {
+		this.manger = manger;
+	}
+
+	public String getUpCompany() {
+		return this.upCompany;
+	}
+
+	public void setUpCompany(String upCompany) {
+		this.upCompany = upCompany;
+	}
+
+	public Timestamp getCreateDate() {
+		return this.createDate;
+	}
+
+	public void setCreateDate(Timestamp createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getStationType() {
+		return this.stationType;
+	}
+
+	public void setStationType(String stationType) {
+		this.stationType = stationType;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.address == null) ? 0 : this.address.hashCode());
+		result = prime * result + ((this.backNum == null) ? 0 : this.backNum.hashCode());
+		result = prime * result + ((this.createDate == null) ? 0 : this.createDate.hashCode());
+		result = prime * result + ((this.emplEntity == null) ? 0 : this.emplEntity.hashCode());
+		result = prime * result + ((this.fax == null) ? 0 : this.fax.hashCode());
+		result = prime * result + this.id;
+		result = prime * result + ((this.inOrderNum == null) ? 0 : this.inOrderNum.hashCode());
+		result = prime * result + ((this.manger == null) ? 0 : this.manger.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + ((this.otherOrderNum == null) ? 0 : this.otherOrderNum.hashCode());
+		result = prime * result + ((this.otherOrderNum2 == null) ? 0 : this.otherOrderNum2.hashCode());
+		result = prime * result + ((this.outOrderNum == null) ? 0 : this.outOrderNum.hashCode());
+		result = prime * result + this.printType;
+		result = prime * result + this.runType;
+		result = prime * result + ((this.stationNum == null) ? 0 : this.stationNum.hashCode());
+		result = prime * result + ((this.taxCode == null) ? 0 : this.taxCode.hashCode());
+		result = prime * result + ((this.telephone == null) ? 0 : this.telephone.hashCode());
+		result = prime * result + ((this.upCompany == null) ? 0 : this.upCompany.hashCode());
+		result = prime * result + ((this.zipCode == null) ? 0 : this.zipCode.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final StationEntity other = (StationEntity) obj;
+		if (this.address == null) {
+			if (other.address != null) {
+				return false;
+			}
+		} else if (!this.address.equals(other.address)) {
+			return false;
+		}
+		if (this.backNum == null) {
+			if (other.backNum != null) {
+				return false;
+			}
+		} else if (!this.backNum.equals(other.backNum)) {
+			return false;
+		}
+		if (this.createDate == null) {
+			if (other.createDate != null) {
+				return false;
+			}
+		} else if (!this.createDate.equals(other.createDate)) {
+			return false;
+		}
+		if (this.emplEntity == null) {
+			if (other.emplEntity != null) {
+				return false;
+			}
+		} else if (!this.emplEntity.equals(other.emplEntity)) {
+			return false;
+		}
+		if (this.fax == null) {
+			if (other.fax != null) {
+				return false;
+			}
+		} else if (!this.fax.equals(other.fax)) {
+			return false;
+		}
+		if (this.id != other.id) {
+			return false;
+		}
+		if (this.inOrderNum == null) {
+			if (other.inOrderNum != null) {
+				return false;
+			}
+		} else if (!this.inOrderNum.equals(other.inOrderNum)) {
+			return false;
+		}
+		if (this.manger == null) {
+			if (other.manger != null) {
+				return false;
+			}
+		} else if (!this.manger.equals(other.manger)) {
+			return false;
+		}
+		if (this.name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
+		if (this.otherOrderNum == null) {
+			if (other.otherOrderNum != null) {
+				return false;
+			}
+		} else if (!this.otherOrderNum.equals(other.otherOrderNum)) {
+			return false;
+		}
+		if (this.otherOrderNum2 == null) {
+			if (other.otherOrderNum2 != null) {
+				return false;
+			}
+		} else if (!this.otherOrderNum2.equals(other.otherOrderNum2)) {
+			return false;
+		}
+		if (this.outOrderNum == null) {
+			if (other.outOrderNum != null) {
+				return false;
+			}
+		} else if (!this.outOrderNum.equals(other.outOrderNum)) {
+			return false;
+		}
+		if (this.printType != other.printType) {
+			return false;
+		}
+		if (this.runType != other.runType) {
+			return false;
+		}
+		if (this.stationNum == null) {
+			if (other.stationNum != null) {
+				return false;
+			}
+		} else if (!this.stationNum.equals(other.stationNum)) {
+			return false;
+		}
+		if (this.taxCode == null) {
+			if (other.taxCode != null) {
+				return false;
+			}
+		} else if (!this.taxCode.equals(other.taxCode)) {
+			return false;
+		}
+		if (this.telephone == null) {
+			if (other.telephone != null) {
+				return false;
+			}
+		} else if (!this.telephone.equals(other.telephone)) {
+			return false;
+		}
+		if (this.upCompany == null) {
+			if (other.upCompany != null) {
+				return false;
+			}
+		} else if (!this.upCompany.equals(other.upCompany)) {
+			return false;
+		}
+		if (this.zipCode == null) {
+			if (other.zipCode != null) {
+				return false;
+			}
+		} else if (!this.zipCode.equals(other.zipCode)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "StationEntity [id=" + this.id + ", emplEntity=" + this.emplEntity + ", stationNum=" + this.stationNum
+				+ ", name=" + this.name + ", telephone=" + this.telephone + ", fax=" + this.fax + ", zipCode=" + this.zipCode
+				+ ", address=" + this.address + ", taxCode=" + this.taxCode + ", backNum=" + this.backNum + ", runType="
+				+ this.runType + ", printType=" + this.printType + ", outOrderNum=" + this.outOrderNum + ", inOrderNum="
+				+ this.inOrderNum + ", otherOrderNum=" + this.otherOrderNum + ", otherOrderNum2=" + this.otherOrderNum2
+				+ ", manger=" + this.manger + ", upCompany=" + this.upCompany + ", createDate=" + this.createDate + "]";
+	}
+
+}

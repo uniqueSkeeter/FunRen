@@ -1,0 +1,91 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path
+			+ "/";
+%>
+<html>
+<head>
+<!-- common css -->
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>css/demo.css">
+<!-- common js -->
+<script type="text/javascript" src="<%=basePath%>js/system/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/locale/easyui-lang-zh_CN.js"></script>
+<!-- css -->
+<!-- js -->
+<script type="text/javascript" src="<%=basePath%>js/card/customer/saleMultiUserCard/saleMultiUserCard.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/card/customer/saleMultiUserCard/driverAdd.js"></script>
+<title>单位卡售卡</title>
+</head>
+<body id="saleMultiUserCard_body">
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 100%; height: 70%">
+	<TR>
+	<TD width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+	<div class="title">单位卡售卡</div>
+	<hr>
+	<table>
+		<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">主卡卡号</td>
+		<td>
+			<input name="registerCustomerBean.mainCardNo" id="mainCardNo">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">卡片类型</td>
+		<td>
+			<input name="registerCustomerBean.cardType" id="cardType" value="多用户" readonly="readonly">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">主卡编号</td>
+		<td>
+			<input name="registerCustomerBean.guestNo" id="guestNo">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="readCard" value="读卡" style="width:60px;height:20px;" onclick = "alert('读卡');">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="searchDriver" value="查询" style="width:60px;height:20px;">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="corpGuestAdd" value="新建单位客户" style="width:100px;height:20px;"
+			onclick="window.location.href='<%=basePath%>registMultiCustomer/customerAdd';">
+		</td>
+	</tr>
+	</table>
+	<hr>
+	<table>
+	<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="driver_add" value="增加司机">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="driver_edit" value="编辑司机" onclick="alert('编辑司机');">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="driver_import" value="导入司机" onclick="alert('导入司机');">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">
+			<input type="button" id="dep_maintain" value="部门维护"
+			onclick="window.location.href='<%=basePath%>registMultiCustomer/depMaintain';">
+		</td>
+	</tr>
+	</table>
+	<hr>
+	<table id="dg" title="司机信息一览" style="width:auto; height: auto;">
+	</table>
+	</TD>
+	</TR>
+	</TABLE>
+	<div id="addDriverDialog" class="easyui-window" closed="true" modal="true" style="width:900px;height:500px;"> 
+    	<iframe scrolling="auto" id='addDriverIFrame' frameborder="0"  src="" style="width:100%;height:100%;"></iframe> 
+	</div>
+	 <div id="printCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 850px; height: 450px;">
+		<iframe scrolling="auto" id='printCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	</div>
+</body>
+</html>

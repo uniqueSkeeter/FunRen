@@ -1,0 +1,987 @@
+﻿/*
+ * 卡信息 <--- >发卡信息（Delphi） 
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+
+
+package com.fr.station.common.entity.card;
+
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+
+/**
+ * 卡信息
+ * 
+ * @version 1.0
+ * @authorguyj
+ */
+ @Entity
+ @Table(name = "FK_T_CARD")
+public class FkTCardEntity implements StandardBean {
+
+
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ID
+     */
+     @Id
+     @Column(name = "`ID`")
+     @GeneratedValue
+    private Integer id;
+
+    /**
+     * 印刷号
+     */
+     @Column(name = "`CARDEXNO`")
+    private String cardexno;
+
+    /**
+     * 卡号
+     */
+     @Column(name = "`CARDNO`")
+    private String cardno;
+
+    /**
+     * 卡状态
+     */
+     @Column(name = "`CARDSTATUS`")
+    private String cardstatus;
+
+    /**
+     * 卡类型
+     */
+     @Column(name = "`CARDTYPE`")
+    private String cardtype;
+
+    /**
+     * 持卡人
+     */
+     @Column(name = "`GUESTNAME`")
+    private String guestname;
+
+    /**
+     * 证件类型 
+     */
+     @Column(name = "`GUESTTYPE`")
+    private String guesttype;
+
+    /**
+     * 证件号
+     */
+     @Column(name = "`GUESTNUM`")
+    private String guestnum;
+
+    /**
+     * 邮编
+     */
+     @Column(name = "`GUESTPOST`")
+    private String guestpost;
+
+    /**
+     * 地址
+     */
+     @Column(name = "`GUESTADD`")
+    private String guestadd;
+
+    /**
+     * 电话
+     */
+     @Column(name = "`GUESTTEL`")
+    private String guesttel;
+
+    /**
+     * 邮件地址
+     */
+     @Column(name = "`EMAIL`")
+    private String email;
+
+    /**
+     * 单位编号
+     */
+     @Column(name = "`GUESTNO`")
+    private String guestno;
+
+    /**
+     * 钱包账户
+(账户余额)
+     */
+     @Column(name = "`CARDBAL`")
+    private BigDecimal cardbal;
+
+    /**
+     * 充值金额
+     */
+     @Column(name = "`CARDINC`")
+    private BigDecimal cardinc;
+
+    /**
+     * 消费金额
+     */
+     @Column(name = "`CARDDEC`")
+    private BigDecimal carddec;
+
+    /**
+     * 启用日期
+     */
+     @Column(name = "`BEGDATE`")
+    private Timestamp begdate;
+
+    /**
+     * 有效日期 
+     */
+     @Column(name = "`ENDDATE`")
+    private Timestamp enddate;
+
+    /**
+     * 押金
+     */
+     @Column(name = "`DEPOSIT`")
+    private BigDecimal deposit;
+
+    /**
+     * 气瓶编号
+     */
+     @Column(name = "`CYLINDERS_NO`")
+    private String cylindersNo;
+
+    /**
+     * 备注2
+     */
+     @Column(name = "`BEIZHU`")
+    private String beizhu;
+
+    /**
+     * 网点
+     */
+     @Column(name = "`STATIONNO`")
+    private String stationno;
+
+    /**
+     * 限制油品
+     */
+     @Column(name = "`XOIL`")
+    private String xoil;
+
+    /**
+     * 限制区站标识
+     */
+     @Column(name = "`XEAREFLAG`")
+    private String xeareflag;
+
+    /**
+     * 限制区站
+     */
+     @Column(name = "`XEARE`")
+    private String xeare;
+
+    /**
+     * 限每次加油量
+     */
+     @Column(name = "`XVOL`")
+    private String xvol;
+
+    /**
+     * 限每天加油次数
+     */
+     @Column(name = "`XCOUNT`")
+    private String xcount;
+
+    /**
+     * 限每天加油金额
+     */
+     @Column(name = "`XAMN`")
+    private String xamn;
+
+    /**
+     * 限车号
+     */
+     @Column(name = "`XCARNO`")
+    private String xcarno;
+
+    /**
+     * 密码
+     */
+     @Column(name = "`PASSWORD`")
+    private String password;
+
+    /**
+     * 记录标识
+     */
+     @Column(name = "`LOSTFLAG`")
+    private String lostflag;
+
+    /**
+     * 备用
+     */
+     @Column(name = "`BZ`")
+    private String bz;
+
+    /**
+     * 预分配金额
+     */
+     @Column(name = "`PRE`")
+    private BigDecimal pre;
+
+    /**
+     * 创建日期
+（日期）
+     */
+     @Column(name = "`CREATE_DATE`")
+    private Timestamp createDate;
+
+    /**
+     * 更新时间
+     */
+     @Column(name = "`UPDATE_DATE`")
+    private Timestamp updateDate;
+
+    /**
+     * 操作员编号
+     */
+     @Column(name = "`USERID`")
+    private Integer userid;
+
+
+
+    /**
+     * ID的取得
+     *
+     * @return Integer ID
+     */
+    public Integer getId() {
+        return id;
+    }
+
+
+    /**
+     * 印刷号的取得
+     *
+     * @return String 印刷号
+     */
+    public String getCardexno() {
+        return cardexno;
+    }
+
+
+    /**
+     * 卡号的取得
+     *
+     * @return String 卡号
+     */
+    public String getCardno() {
+        return cardno;
+    }
+
+
+    /**
+     * 卡状态的取得
+     *
+     * @return String 卡状态
+     */
+    public String getCardstatus() {
+        return cardstatus;
+    }
+
+
+    /**
+     * 卡类型的取得
+     *
+     * @return String 卡类型
+     */
+    public String getCardtype() {
+        return cardtype;
+    }
+
+
+    /**
+     * 持卡人的取得
+     *
+     * @return String 持卡人
+     */
+    public String getGuestname() {
+        return guestname;
+    }
+
+
+    /**
+     * 证件类型 的取得
+     *
+     * @return String 证件类型 
+     */
+    public String getGuesttype() {
+        return guesttype;
+    }
+
+
+    /**
+     * 证件号的取得
+     *
+     * @return String 证件号
+     */
+    public String getGuestnum() {
+        return guestnum;
+    }
+
+
+    /**
+     * 邮编的取得
+     *
+     * @return String 邮编
+     */
+    public String getGuestpost() {
+        return guestpost;
+    }
+
+
+    /**
+     * 地址的取得
+     *
+     * @return String 地址
+     */
+    public String getGuestadd() {
+        return guestadd;
+    }
+
+
+    /**
+     * 电话的取得
+     *
+     * @return String 电话
+     */
+    public String getGuesttel() {
+        return guesttel;
+    }
+
+
+    /**
+     * 邮件地址的取得
+     *
+     * @return String 邮件地址
+     */
+    public String getEmail() {
+        return email;
+    }
+
+
+    /**
+     * 单位编号的取得
+     *
+     * @return String 单位编号
+     */
+    public String getGuestno() {
+        return guestno;
+    }
+
+
+    /**
+     * 钱包账户
+(账户余额)的取得
+     *
+     * @return BigDecimal 钱包账户
+(账户余额)
+     */
+    public BigDecimal getCardbal() {
+        return cardbal;
+    }
+
+
+    /**
+     * 充值金额的取得
+     *
+     * @return BigDecimal 充值金额
+     */
+    public BigDecimal getCardinc() {
+        return cardinc;
+    }
+
+
+    /**
+     * 消费金额的取得
+     *
+     * @return BigDecimal 消费金额
+     */
+    public BigDecimal getCarddec() {
+        return carddec;
+    }
+
+
+    /**
+     * 启用日期的取得
+     *
+     * @return Timestamp 启用日期
+     */
+    public Timestamp getBegdate() {
+        return begdate;
+    }
+
+
+    /**
+     * 有效日期 的取得
+     *
+     * @return Timestamp 有效日期 
+     */
+    public Timestamp getEnddate() {
+        return enddate;
+    }
+
+
+    /**
+     * 押金的取得
+     *
+     * @return BigDecimal 押金
+     */
+    public BigDecimal getDeposit() {
+        return deposit;
+    }
+
+
+    /**
+     * 气瓶编号的取得
+     *
+     * @return String 气瓶编号
+     */
+    public String getCylindersNo() {
+        return cylindersNo;
+    }
+
+
+    /**
+     * 备注2的取得
+     *
+     * @return String 备注2
+     */
+    public String getBeizhu() {
+        return beizhu;
+    }
+
+
+    /**
+     * 网点的取得
+     *
+     * @return String 网点
+     */
+    public String getStationno() {
+        return stationno;
+    }
+
+
+    /**
+     * 限制油品的取得
+     *
+     * @return String 限制油品
+     */
+    public String getXoil() {
+        return xoil;
+    }
+
+
+    /**
+     * 限制区站标识的取得
+     *
+     * @return String 限制区站标识
+     */
+    public String getXeareflag() {
+        return xeareflag;
+    }
+
+
+    /**
+     * 限制区站的取得
+     *
+     * @return String 限制区站
+     */
+    public String getXeare() {
+        return xeare;
+    }
+
+
+    /**
+     * 限每次加油量的取得
+     *
+     * @return String 限每次加油量
+     */
+    public String getXvol() {
+        return xvol;
+    }
+
+
+    /**
+     * 限每天加油次数的取得
+     *
+     * @return String 限每天加油次数
+     */
+    public String getXcount() {
+        return xcount;
+    }
+
+
+    /**
+     * 限每天加油金额的取得
+     *
+     * @return String 限每天加油金额
+     */
+    public String getXamn() {
+        return xamn;
+    }
+
+
+    /**
+     * 限车号的取得
+     *
+     * @return String 限车号
+     */
+    public String getXcarno() {
+        return xcarno;
+    }
+
+
+    /**
+     * 密码的取得
+     *
+     * @return String 密码
+     */
+    public String getPassword() {
+        return password;
+    }
+
+
+    /**
+     * 记录标识的取得
+     *
+     * @return String 记录标识
+     */
+    public String getLostflag() {
+        return lostflag;
+    }
+
+
+    /**
+     * 备用的取得
+     *
+     * @return String 备用
+     */
+    public String getBz() {
+        return bz;
+    }
+
+
+    /**
+     * 预分配金额的取得
+     *
+     * @return BigDecimal 预分配金额
+     */
+    public BigDecimal getPre() {
+        return pre;
+    }
+
+
+    /**
+     * 创建日期
+（日期）的取得
+     *
+     * @return Timestamp 创建日期
+（日期）
+     */
+    public Timestamp getCreateDate() {
+        return createDate;
+    }
+
+
+    /**
+     * 更新时间的取得
+     *
+     * @return Timestamp 更新时间
+     */
+    public Timestamp getUpdateDate() {
+        return updateDate;
+    }
+
+
+    /**
+     * 操作员编号的取得
+     *
+     * @return Integer 操作员编号
+     */
+    public Integer getUserid() {
+        return userid;
+    }
+
+
+    /**
+     * ID的设定
+     *
+     * @param newInteger ID
+     */
+    public void setId(Integer newId) {
+        this.id = newId;
+    }
+
+
+    /**
+     * 印刷号的设定
+     *
+     * @param newString 印刷号
+     */
+    public void setCardexno(String newCardexno) {
+        this.cardexno = newCardexno;
+    }
+
+
+    /**
+     * 卡号的设定
+     *
+     * @param newString 卡号
+     */
+    public void setCardno(String newCardno) {
+        this.cardno = newCardno;
+    }
+
+
+    /**
+     * 卡状态的设定
+     *
+     * @param newString 卡状态
+     */
+    public void setCardstatus(String newCardstatus) {
+        this.cardstatus = newCardstatus;
+    }
+
+
+    /**
+     * 卡类型的设定
+     *
+     * @param newString 卡类型
+     */
+    public void setCardtype(String newCardtype) {
+        this.cardtype = newCardtype;
+    }
+
+
+    /**
+     * 持卡人的设定
+     *
+     * @param newString 持卡人
+     */
+    public void setGuestname(String newGuestname) {
+        this.guestname = newGuestname;
+    }
+
+
+    /**
+     * 证件类型 的设定
+     *
+     * @param newString 证件类型 
+     */
+    public void setGuesttype(String newGuesttype) {
+        this.guesttype = newGuesttype;
+    }
+
+
+    /**
+     * 证件号的设定
+     *
+     * @param newString 证件号
+     */
+    public void setGuestnum(String newGuestnum) {
+        this.guestnum = newGuestnum;
+    }
+
+
+    /**
+     * 邮编的设定
+     *
+     * @param newString 邮编
+     */
+    public void setGuestpost(String newGuestpost) {
+        this.guestpost = newGuestpost;
+    }
+
+
+    /**
+     * 地址的设定
+     *
+     * @param newString 地址
+     */
+    public void setGuestadd(String newGuestadd) {
+        this.guestadd = newGuestadd;
+    }
+
+
+    /**
+     * 电话的设定
+     *
+     * @param newString 电话
+     */
+    public void setGuesttel(String newGuesttel) {
+        this.guesttel = newGuesttel;
+    }
+
+
+    /**
+     * 邮件地址的设定
+     *
+     * @param newString 邮件地址
+     */
+    public void setEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
+
+    /**
+     * 单位编号的设定
+     *
+     * @param newString 单位编号
+     */
+    public void setGuestno(String newGuestno) {
+        this.guestno = newGuestno;
+    }
+
+
+    /**
+     * 钱包账户
+(账户余额)的设定
+     *
+     * @param newBigDecimal 钱包账户
+(账户余额)
+     */
+    public void setCardbal(BigDecimal newCardbal) {
+        this.cardbal = newCardbal;
+    }
+
+
+    /**
+     * 充值金额的设定
+     *
+     * @param newBigDecimal 充值金额
+     */
+    public void setCardinc(BigDecimal newCardinc) {
+        this.cardinc = newCardinc;
+    }
+
+
+    /**
+     * 消费金额的设定
+     *
+     * @param newBigDecimal 消费金额
+     */
+    public void setCarddec(BigDecimal newCarddec) {
+        this.carddec = newCarddec;
+    }
+
+
+    /**
+     * 启用日期的设定
+     *
+     * @param newTimestamp 启用日期
+     */
+    public void setBegdate(Timestamp newBegdate) {
+        this.begdate = newBegdate;
+    }
+
+
+    /**
+     * 有效日期 的设定
+     *
+     * @param newTimestamp 有效日期 
+     */
+    public void setEnddate(Timestamp newEnddate) {
+        this.enddate = newEnddate;
+    }
+
+
+    /**
+     * 押金的设定
+     *
+     * @param newBigDecimal 押金
+     */
+    public void setDeposit(BigDecimal newDeposit) {
+        this.deposit = newDeposit;
+    }
+
+
+    /**
+     * 气瓶编号的设定
+     *
+     * @param newString 气瓶编号
+     */
+    public void setCylindersNo(String newCylindersNo) {
+        this.cylindersNo = newCylindersNo;
+    }
+
+
+    /**
+     * 备注2的设定
+     *
+     * @param newString 备注2
+     */
+    public void setBeizhu(String newBeizhu) {
+        this.beizhu = newBeizhu;
+    }
+
+
+    /**
+     * 网点的设定
+     *
+     * @param newString 网点
+     */
+    public void setStationno(String newStationno) {
+        this.stationno = newStationno;
+    }
+
+
+    /**
+     * 限制油品的设定
+     *
+     * @param newString 限制油品
+     */
+    public void setXoil(String newXoil) {
+        this.xoil = newXoil;
+    }
+
+
+    /**
+     * 限制区站标识的设定
+     *
+     * @param newString 限制区站标识
+     */
+    public void setXeareflag(String newXeareflag) {
+        this.xeareflag = newXeareflag;
+    }
+
+
+    /**
+     * 限制区站的设定
+     *
+     * @param newString 限制区站
+     */
+    public void setXeare(String newXeare) {
+        this.xeare = newXeare;
+    }
+
+
+    /**
+     * 限每次加油量的设定
+     *
+     * @param newString 限每次加油量
+     */
+    public void setXvol(String newXvol) {
+        this.xvol = newXvol;
+    }
+
+
+    /**
+     * 限每天加油次数的设定
+     *
+     * @param newString 限每天加油次数
+     */
+    public void setXcount(String newXcount) {
+        this.xcount = newXcount;
+    }
+
+
+    /**
+     * 限每天加油金额的设定
+     *
+     * @param newString 限每天加油金额
+     */
+    public void setXamn(String newXamn) {
+        this.xamn = newXamn;
+    }
+
+
+    /**
+     * 限车号的设定
+     *
+     * @param newString 限车号
+     */
+    public void setXcarno(String newXcarno) {
+        this.xcarno = newXcarno;
+    }
+
+
+    /**
+     * 密码的设定
+     *
+     * @param newString 密码
+     */
+    public void setPassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+
+    /**
+     * 记录标识的设定
+     *
+     * @param newString 记录标识
+     */
+    public void setLostflag(String newLostflag) {
+        this.lostflag = newLostflag;
+    }
+
+
+    /**
+     * 备用的设定
+     *
+     * @param newString 备用
+     */
+    public void setBz(String newBz) {
+        this.bz = newBz;
+    }
+
+
+    /**
+     * 预分配金额的设定
+     *
+     * @param newBigDecimal 预分配金额
+     */
+    public void setPre(BigDecimal newPre) {
+        this.pre = newPre;
+    }
+
+
+    /**
+     * 创建日期
+（日期）的设定
+     *
+     * @param newTimestamp 创建日期
+（日期）
+     */
+    public void setCreateDate(Timestamp newCreateDate) {
+        this.createDate = newCreateDate;
+    }
+
+
+    /**
+     * 更新时间的设定
+     *
+     * @param newTimestamp 更新时间
+     */
+    public void setUpdateDate(Timestamp newUpdateDate) {
+        this.updateDate = newUpdateDate;
+    }
+
+
+    /**
+     * 操作员编号的设定
+     *
+     * @param newInteger 操作员编号
+     */
+    public void setUserid(Integer newUserid) {
+        this.userid = newUserid;
+    }
+}

@@ -1,0 +1,122 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%@ page import="com.fr.station.common.data.ApplicationContext"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path
+			+ "/";
+%>
+<!-- common css -->
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=basePath%>css/demo.css">
+<!-- common js -->
+<script type="text/javascript" src="<%=basePath%>js/system/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/system/locale/easyui-lang-zh_CN.js"></script>
+<html>
+<head>
+<title>不记名售卡</title>
+<link rel="shortcut icon" type="image/x-icon" href="<%=basePath%>images/favicon.ico" />
+<!-- css -->
+<link href="css/common.css" rel="stylesheet" type="text/css" />
+<link href="css/commonDialog.css" rel="stylesheet" type="text/css" />
+<!-- js -->
+</head>
+<body id="saleAnonymousCard_body">
+	<p style="color: #2874ff; font-size: 14px; text-align: right">
+	当前站点:<span>${stationName}</span>
+	当前班次 :<span>???</span>
+	</p>
+	<hr color="#ff8000">
+	<form id="saleAnonymousCard_form" method="post" action="saveCardInfo">
+		<table style="font-size: 12px; widht: 100px; height: 50px;">
+			<tr>
+				<td style="height: 3px; width: 85px; text-align: center;">卡号<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.cardNo" id="cardNo">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">卡片类型<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.cardType" id="cardType" value="不记名用户卡" readonly="readonly">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">押金<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.deposit" id="deposit">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 40px; width: 85px; text-align: center;">卡内金额<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.cardAmount" id="cardAmount">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">生效日期<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.effectiveDate" class="easyui-datebox" id="effectiveDate" style="width: 130px;">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">失效日期<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.disEffectiveDate" class="easyui-datebox" id="disEffectiveDate" style="width: 130px;">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 40px; width: 85px; text-align: center;">每天加油数量无效</td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.refuelAcount" id="refuelAcount">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">每次加油限量</td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.refuelLimit" id="refuelLimit">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">每天加油次数</td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.refuelTimes" id="refuelTimes">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 40px; width: 85px; text-align: center;">每天消费金额</td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.consumeAmount" id="consumeAmount">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">网点号<span style="color:red;">*</span></td>
+				<td style="height: 30px; width: 50px">
+					<input name="registerCustomerBean.stationNo" id="stationNo" value=<%=ApplicationContext.getInstance().getStationNum()%> readonly="readonly">
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">卡密码</td>
+				<td style="height: 30px; width: 50px">
+					启用<input name="registerCustomerBean.passFlag" type=radio id="passEnable" value="1">
+					&nbsp;&nbsp;&nbsp;
+					停用<input name="registerCustomerBean.PassFlag" type=radio id="passDisenable" value="0" checked="checked">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 40px; width: 85px; text-align: center;">限制油品</td>
+				<td style="height: 30px; width: 50px">
+					<select name="registerCustomerBean.oilTypeLimit" id="oilTypeLimit" style="width: 100%;">
+						<option selected></option>
+						<c:forEach var="oilTypeLimit" items="${oilTypeLimit}">
+							<option value="${oilTypeLimit.key}">
+								${oilTypeLimit.value}
+							</option>
+						</c:forEach>
+					</select>
+				</td>
+				<td style="height: 40px; width: 85px; text-align: center;">备注</td>
+				<td style="height: 30px; width: 50px" colspan="3">
+					<input name="registerCustomerBean.remark" id="remark" style="width: 100%;">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 40px; width: 85px; text-align: center;">限站信息</td>
+				<td style="height: 30px; width: 50px" colspan="3">
+					<input name="registerCustomerBean.stationInfoLimit" id="stationInfoLimit" style="width: 100%;">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<hr color="#ff8000">
+</body>

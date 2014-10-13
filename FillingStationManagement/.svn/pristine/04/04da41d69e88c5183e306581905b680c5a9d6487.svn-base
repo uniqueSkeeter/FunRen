@@ -1,0 +1,234 @@
+package com.fr.station.common.bean;
+
+/**
+ * @author hjq this bean works for displayCardList.jsp
+ */
+public class CardStorageBean implements StandardBean {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	// ------- Instance Variables (private) ------------------------------------
+	/**
+	 * INOUTNO
+	 */
+	private String recepitNum;
+
+	/**
+	 * cardgg
+	 */
+	private String cardType;
+
+	/**
+	 * cardgg
+	 */
+	private Integer cardSum;
+
+	/**
+	 * outno
+	 */
+	private String supplier;
+
+	/**
+	 * outno
+	 */
+	private String supplyDate;
+
+	private String receiver;
+
+	private String receiveDate;
+
+	/**
+	 * outno
+	 */
+	private String receiptStatus;
+
+	private String applyDate;
+
+	private String userId;
+
+	private String note;
+
+	/**
+	 * search criteria, for card application records
+	 */
+
+	private String receiptType;
+
+	private String startDate;
+
+	private String endDate;
+
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardStorageBean() {
+		super();
+	}
+
+	public String getRecepitNum() {
+		return recepitNum;
+	}
+
+	public void setRecepitNum(String recepitNum) {
+		this.recepitNum = recepitNum;
+	}
+
+	public String getCardType() {
+		return cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public Integer getCardSum() {
+		return cardSum;
+	}
+
+	public void setCardSum(Integer cardSum) {
+		this.cardSum = cardSum;
+	}
+
+	public String getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+
+	public String getSupplyDate() {
+		return supplyDate;
+	}
+
+	public void setSupplyDate(String supplyDate) {
+		this.supplyDate = supplyDate;
+	}
+
+	public String getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+
+	public String getReceiveDate() {
+		return receiveDate;
+	}
+
+	public void setReceiveDate(String receiveDate) {
+		this.receiveDate = receiveDate;
+	}
+
+	public String getReceiptStatus() {
+		return receiptStatus;
+	}
+
+	public void setReceiptStatus(String receiptStatus) {
+		this.receiptStatus = receiptStatus;
+	}
+
+	public String getApplyDate() {
+		return applyDate;
+	}
+
+	public void setApplyDate(String applyDate) {
+		this.applyDate = applyDate;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getReceiptType() {
+		return receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalData() {
+		return totalData;
+	}
+
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	@Override
+	public String toString() {
+		return "CardStorageBean [recepitNum=" + recepitNum + ", cardType=" + cardType + ", cardSum=" + cardSum + ", supplier="
+				+ supplier + ", supplyDate=" + supplyDate + ", receiver=" + receiver + ", receiveDate=" + receiveDate
+				+ ", receiptStatus=" + receiptStatus + ", applyDate=" + applyDate + ", userId=" + userId + ", note=" + note
+				+ ", receiptType=" + receiptType + ", startDate=" + startDate + ", endDate=" + endDate + ", pageNumber="
+				+ pageNumber + ", pageSize=" + pageSize + ", totalData=" + totalData + "]";
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

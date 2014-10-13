@@ -1,0 +1,128 @@
+	$(document).ready(function(){
+		$('#cardList > tbody tr:even').css('background','#FFFEE6'); 
+		$("#haveCardDelete").click(function(){
+			alert("有卡销户");
+			var guestNo= $("#guestNo").text();
+			if(guestNo == ''){
+				$.messager.alert('错误', '单位客户编号不能为空!');
+				return;
+			}
+			if(confirm('确定是有卡销户以及满足所有有卡销户条件?')){
+				deleteCustomer(guestNo);
+			}else{
+				alert("结束");
+			}
+		});
+		$("#noHaveCardDelete").click(function(){
+			alert("无卡销户");
+			var guestNo= $("#guestNo").text();
+			if(guestNo == ''){
+				$.messager.alert('错误', '单位客户编号不能为空!');
+				return;
+			}
+			if(confirm('确定是无卡销户以及丢失的卡已经挂失且挂失时间经过48小时?')){
+				deleteCustomerNoCard(guestNo);
+			}else{
+				if(confirm('确定挂失所有卡片?')){
+					allCardLost(guestNo);
+				}else{
+					alert("结束");
+				}
+			}
+			
+		});
+	});
+	//单位客户有卡销户
+	function deleteCustomer(guestNo){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerDelete/deleteMultiCustomer',
+			data : {
+				"customerDeleteBean.guestNo" : guestNo
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$('#printCardIFrame')[0].src= server_context + '/view/card/customer/customCancel/printCustomerDelete.jsp'
+				+'?guestNo='+$("#guestNo").text()
+				+'&guestName='+encodeURI(encodeURI($("#companyName").text()))
+				+'&spareAccount='+$("#spareAccount").text()
+				+'&accountSum='+$("#accountSum").text()
+				+'&preSum='+$("#preSum").text()
+				+'&refundAmount='+(parseFloat($("#spareAccount").text())+parseFloat($("#accountSum").text())+parseFloat($("#preSum").text()));
+				$('#printCardDialog').dialog({
+					closed : false,
+	                title : '卡片信息',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '返回',
+	                    id : 'returnBtn',
+	                    handler:function(){
+	                    	$("#printCardDialog").dialog("close");
+	                    }
+	                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '销户失败!');
+			}
+			
+		});
+	}
+	//单位客户无卡销户
+	function deleteCustomerNoCard(guestNo){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerDelete/deleteMultiCustomerNoCard',
+			data : {
+				"customerDeleteBean.guestNo" : guestNo
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$('#printCardIFrame')[0].src= server_context + '/view/card/customer/customCancel/printCustomerDelete.jsp'
+				+'?guestNo='+$("#guestNo").text()
+				+'&guestName='+encodeURI(encodeURI($("#companyName").text()))
+				+'&spareAccount='+$("#spareAccount").text()
+				+'&accountSum='+$("#accountSum").text()
+				+'&preSum='+$("#preSum").text()
+				+'&refundAmount='+(parseFloat($("#spareAccount").text())+parseFloat($("#accountSum").text())+parseFloat($("#preSum").text()));
+				$('#printCardDialog').dialog({
+					closed : false,
+	                title : '卡片信息',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '返回',
+	                    id : 'returnBtn',
+	                    handler:function(){
+	                    	$("#printCardDialog").dialog("close");
+	                    }
+	                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '销户失败!,挂失时间或不满48小时');
+			}
+		});
+	}
+	//挂失所有卡
+	function allCardLost(guestNo){
+		$.ajax({
+			url:encodeURI(server_context+'/cardMaintain/allCardLost'),type:'POST',timeout:3000,dataType:'html',
+			data : {
+				"cardMaintainBean.guestNo" : guestNo
+				},
+			cache : false,
+			success : function() {
+				$.messager.alert('成功', '所有卡挂失成功!');
+				
+			},
+			error : function() {
+				$.messager.alert('失败', '所有卡挂失失败!');
+			}
+		});
+	}

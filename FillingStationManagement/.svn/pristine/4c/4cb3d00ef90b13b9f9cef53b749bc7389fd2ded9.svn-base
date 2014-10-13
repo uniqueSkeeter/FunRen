@@ -1,0 +1,322 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.RegistMultiCustomerDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+@Repository
+public class RegistMultiCustomerDaoImpl extends AbstractBaseDAO<FkTCardEntity> implements RegistMultiCustomerDAO {
+
+	// public Map<String, String> department = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RegistMultiCustomerDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	/**
+	 * 查询司机一览SQL 2014-7-26更新
+	 */
+	private final String driverSql = "SELECT guest.guestName,guest.guestNo,guest.stats,card.guestNum,card.cardNo,card.cardStatus,guest.cardNo,guestDep.depName "
+			+ "FROM FK_T_GUEST guest,FK_T_CARD card,FK_T_GUESTDEP guestDep WHERE guest.guestNo = card.guestNo AND card.depNo = guestDep.depNo";
+
+	/**
+	 * 统计司机一览SQL 2014-7-26更新
+	 */
+	private final String countDriverSql = "SELECT count(*) FROM FK_T_GUEST guest,FK_T_CARD card,FK_T_GUESTDEP guestDep WHERE guest.guestNo = card.guestNo AND card.depNo = guestDep.depNo";
+
+	/**
+	 * 查询部门一览SQL 2014-7-26跟新
+	 */
+	private final String departmentSql = "SELECT guest.guestNo,guest.guestName,guestDep.depNo,guestDep.depName,guestDep.depMaster,guestDep.depTel,guestDep.limitStation,guestDep.id "
+			+ "FROM FK_T_GUEST guest,FK_T_GUESTDEP guestDep WHERE guestDep.guestNo = guest.guestNo";
+
+	/**
+	 * 统计部门一览SQL 2014-7-26跟新
+	 */
+	private final String countDepartmentSql = "SELECT count(*) FROM FK_T_GUEST guest,FK_T_GUESTDEP guestDep WHERE guestDep.guestNo = guest.guestNo";
+
+	/**
+	 * 当前部门信息
+	 */
+	private final String allDepartmentSql = "SELECT guestDep.guestNo,guestDep.depNo,guestDep.depName,guestDep.depMaster,guestDep.depTel,guestDep.limitStation,guestDep.id From FK_T_GUESTDEP guestDep "
+			+ "WHERE ";
+
+	/**
+	 * 获得stationParameter.depNo
+	 */
+	private final String getSysParameter_depNo_Sql = "SELECT attriValue FROM stationParameter WHERE attriName = 'depNo' ";
+
+	/**
+	 * depNo自增
+	 */
+	private final String updateSysParameter_depNo_Sql = "UPDATE stationParameter SET attriValue = (SELECT attriValue FROM stationParameter WHERE attriName = 'depNo') WHERE attriName = ? ";
+
+	// ------- Constructors ----------------------------------------------------
+	public RegistMultiCustomerDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * 获得司机一览列表
+	 */
+	@Override
+	public List<RegisterCustomerBean> getDriverRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int startPage,
+			int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.driverSql);
+		builderForTotalResult.append(this.countDriverSql);
+		try {
+			StringBuilder builder = this.validateDriverInput(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDriverDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 获得部门一览列表
+	 */
+	@Override
+	public List<RegisterCustomerBean> getDepRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int startPage,
+			int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.departmentSql);
+		builderForTotalResult.append(this.countDepartmentSql);
+		try {
+			StringBuilder builder = this.validateDepInput(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDepDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 获得datagrid对应的bean
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RegisterCustomerBean> getAllDepartment(RegisterCustomerBean registerCustomerBean) {
+		List<RegisterCustomerBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.allDepartmentSql);
+		try {
+			StringBuilder req = this.validateDepIdInput(registerCustomerBean);
+			builder.append(req);
+			Query query = null;
+			try {
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n");
+			}
+			List<Object[]> result = query.list();
+			resultList = this.convertDepDataToBean(result);
+
+		} catch (QueryException e) {
+			resultList = new ArrayList<RegisterCustomerBean>();
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw, true));
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n" + sw.toString());
+			return resultList;
+		}
+		return resultList;
+	}
+
+	/**
+	 * 获得部门编号 2014-7-24
+	 */
+	@Override
+	public Integer getDepNo() {
+
+		Integer depNo = 0;
+		try {
+			depNo = (Integer) this.findBySql(this.getSysParameter_depNo_Sql).get(0);
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return depNo;
+
+		/*
+		 * Integer depNo = 0; Object[] args = { "depNo" }; try { depNo = (Integer)
+		 * this.findBySql(this.getSysParameterAttriValueSql, args).get(0); } catch (Exception e) {
+		 * log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage()
+		 * + "\n" + ErrorLogUtil.printInfo(e)); } return depNo;
+		 */
+	}
+
+	/**
+	 * 部门编号自增
+	 */
+	@Override
+	public void updateDepNo() {
+		Object[] args = { "depNo" };
+		this.upateBySql(this.updateSysParameter_depNo_Sql, args);
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	/**
+	 * 查询司机信息SQL语句查询条件
+	 */
+	private StringBuilder validateDriverInput(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(registerCustomerBean.getMainCardNo())) {
+			builder.append(" AND ").append("guest.cardNo = '").append(registerCustomerBean.getMainCardNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNo())) {
+			builder.append(" AND ")
+					.append("guest.cardNo IN ( SELECT guest2.cardNo FROM FK_T_CARD card2 WHERE card2.guestNo = '")
+					.append(registerCustomerBean.getGuestNo()).append("' )");
+		}
+		return builder;
+	}
+
+	/**
+	 * 查询部门信息SQL语句查询条件
+	 */
+	private StringBuilder validateDepInput(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestName())) {
+			builder.append(" AND ").append("guest.guestName = '").append(registerCustomerBean.getGuestName()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNo())) {
+			builder.append(" AND ").append("guest.guestNo = '").append(registerCustomerBean.getGuestNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getDeptNo())) {
+			builder.append(" AND ").append("guestDep.depNo = '").append(registerCustomerBean.getDeptNo()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 部门ID作为查询条件
+	 */
+	private StringBuilder validateDepIdInput(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		if (registerCustomerBean.getId() != null) {
+			builder.append("guestDep.id = '").append(registerCustomerBean.getId()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 把司机信息查询结果覆盖到RegisterCustomerBean 2014-7-26跟新
+	 */
+	private List<RegisterCustomerBean> convertDriverDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestNo(String.valueOf(dataRow[0]));
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[1]));
+			registerCustomerBean.setGuestStatus(String.valueOf(dataRow[2]));
+			registerCustomerBean.setGuestNum(String.valueOf(dataRow[3]));
+			registerCustomerBean.setCardNo(String.valueOf(dataRow[4]));
+			registerCustomerBean.setCardStatus(String.valueOf(dataRow[5]));
+			registerCustomerBean.setMainCardNo(String.valueOf(dataRow[6]));
+			registerCustomerBean.setDepName(String.valueOf(dataRow[7]));
+			registerCustomerBean.setTotalData(totalAccount);
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+
+	/**
+	 * 把部门信息查询结果覆盖到RegisterCustomerBean 2014-7-26跟新
+	 */
+	private List<RegisterCustomerBean> convertDepDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestNo(String.valueOf(dataRow[0]));
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[1]));
+			registerCustomerBean.setDeptNo(String.valueOf(dataRow[2]));
+			registerCustomerBean.setDepName(String.valueOf(dataRow[3]));
+			registerCustomerBean.setDepMaster(String.valueOf(dataRow[4]));
+			registerCustomerBean.setDepTel(String.valueOf(dataRow[5]));
+			registerCustomerBean.setLimitStation(String.valueOf(dataRow[6]));
+			registerCustomerBean.setId(Integer.valueOf(String.valueOf(dataRow[7])));
+			registerCustomerBean.setTotalData(totalAccount);
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+
+	/**
+	 * 把当前部门信息覆盖到RegisterCustomerBean
+	 */
+	private List<RegisterCustomerBean> convertDepDataToBean(List<Object[]> dataResult) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestNo(String.valueOf(dataRow[0]));
+			registerCustomerBean.setDeptNo(String.valueOf(dataRow[1]));
+			registerCustomerBean.setDepName(String.valueOf(dataRow[2]));
+			registerCustomerBean.setDepMaster(String.valueOf(dataRow[3]));
+			registerCustomerBean.setDepTel(String.valueOf(dataRow[4]));
+			registerCustomerBean.setLimitStation(String.valueOf(dataRow[5]));
+			registerCustomerBean.setId(Integer.valueOf(String.valueOf(dataRow[6])));
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

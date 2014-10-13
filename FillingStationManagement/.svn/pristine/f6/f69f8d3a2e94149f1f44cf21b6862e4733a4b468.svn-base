@@ -1,0 +1,573 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.data.DataCollections;
+import com.fr.station.common.entity.card.CardEntity;
+import com.fr.station.common.entity.card.FKTCardTZEntity;
+import com.fr.station.common.entity.card.FKTGuestAcc;
+import com.fr.station.common.entity.card.FKTGuestDep;
+import com.fr.station.common.entity.card.FkTGuestEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.customer.dao.RegistMultiCustomerDAO;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.customer.service.RegistMultiCustomerService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+@Service
+public class RegistMultiCustomerServiceImpl extends AbstractBaseService implements RegistMultiCustomerService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static Logger log = Logger.getLogger(RegistMultiCustomerServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private RegistMultiCustomerDAO saleMultiUserCardDaoImpl;
+
+	private RegisterCustomerDAO registerCustomerDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public RegistMultiCustomerServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * show Driver list
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<RegisterCustomerBean> findDriverRecordsByCriteria(RegisterCustomerBean registerCustomerBean) {
+		log.info("in findDriverRecordsByCriteria");
+		int pageNumber = registerCustomerBean.getPageNumber();
+		int pageSize = registerCustomerBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		log.info("out findDriverRecordsByCriteria");
+		return this.saleMultiUserCardDaoImpl.getDriverRecordsByCriteria(registerCustomerBean, start, number);
+	}
+
+	/**
+	 * 查询部门一览
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<RegisterCustomerBean> findDepRecordsByCriteria(RegisterCustomerBean registerCustomerBean) {
+		log.info("start to find department records by Criteria");
+		int pageNumber = registerCustomerBean.getPageNumber();
+		int pageSize = registerCustomerBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		log.info("end find department records by Criteria");
+		return this.saleMultiUserCardDaoImpl.getDepRecordsByCriteria(registerCustomerBean, start, number);
+	}
+
+	/**
+	 * 返回对应部门信息的bean
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<RegisterCustomerBean> getDepByFormCondition(RegisterCustomerBean registerCustomerBean) {
+		if (registerCustomerBean == null) {
+			return null;
+		}
+		List<RegisterCustomerBean> depList = null;
+		depList = this.saleMultiUserCardDaoImpl.getAllDepartment(registerCustomerBean);
+		return depList;
+	}
+
+	/**
+	 * addCustomer(multiUserCard mainCard)2014-7-25
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addCustomer(RegisterCustomerBean registerCustomerBean) {
+		log.info("Persist registerCustomerBean entity begain");
+
+		// construct guest entity
+		FkTGuestEntity guestEntity = this.covertDataToGuestEntity(registerCustomerBean);
+
+		// construct card entity
+		CardEntity cardEntity = this.convertDataToCardEntity(registerCustomerBean);
+
+		// construct card account entity
+		FKTCardTZEntity cardAccEntity = this.covertDataToCardAccEntity(registerCustomerBean);
+
+		// construct guest account entity
+		FKTGuestAcc guestAccEntity = this.covertDataToGuestAccEntity(registerCustomerBean);
+
+		// get user guest number from system parameter table.
+		Integer guestNo = this.registerCustomerDaoImpl.getGuestNo();
+
+		// get class number from class info table.
+		Object[] resultArray = this.registerCustomerDaoImpl.getClassNum();
+		this.initializeClassInfoData(guestEntity, cardEntity, cardAccEntity, guestAccEntity, guestNo, resultArray);
+
+		// set default value like date for below entity.
+		this.initializeDefaultData(guestEntity, cardEntity, cardAccEntity, guestAccEntity, guestNo);
+
+		// convert type value to digit which already define in the dictionary table
+		this.convertTypeToDicValue(registerCustomerBean, cardEntity);
+
+		// persist guest entity
+		this.save(guestEntity);
+		this.save(cardEntity);
+		this.save(cardAccEntity);
+		this.save(guestAccEntity);
+		// update table system parameter set attriValue plus one when guest info is successfully save into DB.
+		this.registerCustomerDaoImpl.updateGuestNo();
+
+		log.info("Succefully saved guest entity into DB");
+	}
+
+	/**
+	 * addDepartment 2014-7-25
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addDepartment(RegisterCustomerBean registerCustomerBean) {
+		log.info("Persist registerCustomerBean entity begain");
+
+		// construct guestDep entity
+		FKTGuestDep guestDepEntity = this.covertDataToGuestDepEntity(registerCustomerBean);
+		// get department number from system parameter table.
+		Integer depNo = this.saleMultiUserCardDaoImpl.getDepNo();
+		// set depNo
+		guestDepEntity.setDeptNo(String.valueOf(depNo));
+		// set create_day
+		guestDepEntity.setCreateDate(DateUtil.currentTimestamp());
+		// persist guestDep entity
+		this.save(guestDepEntity);
+		// update table system parameter set attriValue plus one
+		this.saleMultiUserCardDaoImpl.updateDepNo();
+
+		log.info("Succefully saved guestDep entity into DB");
+	}
+
+	/**
+	 * update department
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateDepartment(RegisterCustomerBean registerCustomerBean) {
+		log.info("in updateDepartment");
+		FKTGuestDep guestDepEntity = this.covertDataToGuestDepEntity(registerCustomerBean);
+		this.saveOrUpdate(guestDepEntity);
+		log.info("out updateDepartment");
+	}
+
+	/**
+	 * delete department
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteDepartment(RegisterCustomerBean registerCustomerBean) {
+		log.info("in deleteDepartment");
+		FKTGuestDep guestDepEntity = this.covertDataToGuestDepEntity(registerCustomerBean);
+		this.delete(guestDepEntity);
+		log.info("out deleteDepartment");
+	}
+
+	@Autowired
+	public void setRegistMultiCustomerDAO(RegistMultiCustomerDAO saleMultiUserCardDaoImpl) {
+		super.setBaseDao(saleMultiUserCardDaoImpl);
+		this.saleMultiUserCardDaoImpl = saleMultiUserCardDaoImpl;
+	}
+
+	@Autowired
+	public void setRegisterCustomerDAO(RegisterCustomerDAO registerCustomerDaoImpl) {
+		super.setBaseDao(registerCustomerDaoImpl);
+		this.registerCustomerDaoImpl = registerCustomerDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	private void initializeClassInfoData(FkTGuestEntity guestEntity, CardEntity cardEntity, FKTCardTZEntity cardAccEntity,
+			FKTGuestAcc guestAccEntity, Integer guestNo, Object[] resultArray) {
+
+		if (resultArray != null && resultArray.length == 3) {
+			cardEntity.setAccDate(DateUtil.formatDate((Timestamp) resultArray[0], DateUtil.DATE_PATTERN_8));
+			cardEntity.setAccNo((String) resultArray[1]);
+			guestEntity.setBjid((Integer) resultArray[2]);
+		}
+	}
+
+	private void initializeDefaultData(FkTGuestEntity guestEntity, CardEntity cardEntity, FKTCardTZEntity cardAccEntity,
+			FKTGuestAcc guestAccEntity, Integer guestNo) {
+		// set new default date for guestEntity cardEntity.
+		guestEntity.setCreateDate(DateUtil.currentTimestamp());
+		cardEntity.setCreateDate(DateUtil.currentTimestamp());
+		cardAccEntity.setCreateDate(DateUtil.currentTimestamp());
+		guestAccEntity.setCreateDate(DateUtil.currentTimestamp());
+		// set new customer number guestEntity cardEntity.
+		cardEntity.setGuestNo(guestNo);
+		guestEntity.setGuestno(guestNo);
+		guestAccEntity.setGuestNo(guestNo);
+		// 设置主卡标识为true
+		cardEntity.setCardFlag(true);
+		// 设置卡状态为启用,key为“1”
+		cardEntity.setCardstatus("1");
+		// 设置客户状态为使用中,key为“11”
+		guestEntity.setStats("11");
+		// 设置发卡数量为初值0
+		guestEntity.setCardsum(0);
+	}
+
+	private void convertTypeToDicValue(RegisterCustomerBean registerCustomerBean, CardEntity cardEntity) {
+		// 把卡片类型的文字转换为数字
+		final Map<String, String> dicUseType = DataCollections.dicUseType;
+		for (final Entry<String, String> entry : dicUseType.entrySet()) {
+			if (entry.getValue().trim().equalsIgnoreCase(registerCustomerBean.getCardType())) {
+				cardEntity.setCardtype(entry.getKey());
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 将registerCustomerBean转换成CardEntity
+	 */
+	private CardEntity convertDataToCardEntity(RegisterCustomerBean registerCustomerBean) {
+
+		CardEntity fktCardEntity = new CardEntity();
+		// id
+		if (registerCustomerBean.getId() != null) {
+			fktCardEntity.setId(registerCustomerBean.getId());
+		}
+		// 卡片信息
+		// 卡号 (主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardNo())) {
+			fktCardEntity.setCardno(registerCustomerBean.getCardNo());
+		}
+		// 卡片类型(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardType())) {
+			fktCardEntity.setCardtype(registerCustomerBean.getCardType());
+		}
+		// 押金(主卡必填)
+		if (registerCustomerBean.getDeposit() != null) {
+			fktCardEntity.setDeposit(registerCustomerBean.getDeposit());
+		}
+		// 卡内金额(主卡必填)
+		if (registerCustomerBean.getCardAmount() != null) {
+			fktCardEntity.setCardbal(registerCustomerBean.getCardAmount());
+		}
+		// 生效日期(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getEffectiveDate())) {
+			fktCardEntity.setBegdate(DateUtil.formatStrTOStampBySmt(registerCustomerBean.getEffectiveDate(),
+					DateUtil.DATE_PATTERN_17));
+		}
+		// 失效日期(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getDisEffectiveDate())) {
+			fktCardEntity.setEnddate(DateUtil.formatStrTOStampBySmt(registerCustomerBean.getDisEffectiveDate(),
+					DateUtil.DATE_PATTERN_17));
+		}
+		// 卡印刷号(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardExno())) {
+			fktCardEntity.setCardexno(registerCustomerBean.getCardExno());
+		}
+		// 卡密码标识(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getPassFlag())) {
+			if (registerCustomerBean.getPassFlag().equals("true")) {
+				fktCardEntity.setPassFlag(true);
+			} else {
+				fktCardEntity.setPassFlag(false);
+			}
+
+		}
+		// 卡密码(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardPass())) {
+			fktCardEntity.setPassword(registerCustomerBean.getCardPass());
+		}
+		// 备注(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getRemark())) {
+			fktCardEntity.setBz(registerCustomerBean.getRemark());
+		}
+		// 加油限制
+		// 每次加油限量
+		if (StringUtils.isNotBlank(registerCustomerBean.getRefuelLimit())) {
+			fktCardEntity.setXvol(registerCustomerBean.getRefuelLimit());
+		}
+		// 每天加油次数
+		if (StringUtils.isNotBlank(registerCustomerBean.getRefuelTimes())) {
+			fktCardEntity.setXcount(registerCustomerBean.getRefuelTimes());
+		}
+		// 每天消费金额
+		if (StringUtils.isNotBlank(registerCustomerBean.getConsumeAmount())) {
+			fktCardEntity.setXamn(registerCustomerBean.getConsumeAmount());
+		}
+		// 限车号标识
+		if (StringUtils.isNotBlank(registerCustomerBean.getCarNoFlag())) {
+			if (registerCustomerBean.getCarNoFlag().equals("true")) {
+				fktCardEntity.setCarNoFlag(true);
+			} else {
+				fktCardEntity.setCarNoFlag(false);
+			}
+
+		}
+		// 限车号
+		if (StringUtils.isNotBlank(registerCustomerBean.getCarNoConstr())) {
+			fktCardEntity.setXcarno(registerCustomerBean.getCarNoConstr());
+		}
+		// 限制油品
+		if (StringUtils.isNotBlank(registerCustomerBean.getOilTypeLimit())) {
+			fktCardEntity.setXoil(registerCustomerBean.getOilTypeLimit());
+		}
+		// 限站标识
+		if (StringUtils.isNotBlank(registerCustomerBean.getStationFlag())) {
+			if (registerCustomerBean.getStationFlag().equals("true")) {
+				fktCardEntity.setStationFlag(true);
+			} else {
+				fktCardEntity.setStationFlag(false);
+			}
+
+		}
+		// 限站信息
+		if (StringUtils.isNotBlank(registerCustomerBean.getStationInfoLimit())) {
+			fktCardEntity.setXeare(registerCustomerBean.getStationInfoLimit());
+		}
+		// 客户档案
+		// 单位名称||持卡人姓名(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestName())) {
+			fktCardEntity.setGuestname(registerCustomerBean.getGuestName());
+		}
+		// 证件类型(主卡卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestType())) {
+			fktCardEntity.setGuesttype(registerCustomerBean.getGuestType());
+		}
+		// 证件号码(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestNum())) {
+			fktCardEntity.setGuestnum(registerCustomerBean.getGuestNum());
+		}
+		// 电话(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestTel())) {
+			fktCardEntity.setGuesttel(registerCustomerBean.getGuestTel());
+		}
+		// 电子邮箱(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getEmail())) {
+			fktCardEntity.setEmail(registerCustomerBean.getEmail());
+		}
+		// 性别(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGender())) {
+			fktCardEntity.setGender(registerCustomerBean.getGender());
+		}
+		// 邮政编码(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getZipCode())) {
+			fktCardEntity.setGuestpost(registerCustomerBean.getZipCode());
+		}
+		// 地址(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCustomerAddr())) {
+			fktCardEntity.setGuestadd(registerCustomerBean.getCustomerAddr());
+		}
+		// 开票类型(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getBillType())) {
+			fktCardEntity.setBillType(registerCustomerBean.getBillType());
+		}
+		// 站点编号(主卡有值)
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getStationNum())) {
+			fktCardEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		}
+		// 操作员编号(主卡有值)
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getOperatorNo())) {
+			fktCardEntity.setUserid(Integer.parseInt(ApplicationContext.getInstance().getOperatorNo()));
+		}
+		return fktCardEntity;
+	}
+
+	/**
+	 * 将registerCustomerBean转换成fktGuestEntity
+	 */
+	private FkTGuestEntity covertDataToGuestEntity(RegisterCustomerBean registerCustomerBean) {
+		FkTGuestEntity fktGuestEntity = new FkTGuestEntity();
+		// id
+		if (registerCustomerBean.getId() != null) {
+			fktGuestEntity.setId(registerCustomerBean.getId());
+		}
+		// 主卡号(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardNo())) {
+			fktGuestEntity.setCardno(registerCustomerBean.getCardNo());
+		}
+		// 单位名称(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestName())) {
+			fktGuestEntity.setGuestname(registerCustomerBean.getGuestName());
+		}
+		// 单位编号
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestNo())) {
+			fktGuestEntity.setGuestno(Integer.parseInt(registerCustomerBean.getGuestNo()));
+		}
+		// 单位类型(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCorpType())) {
+			fktGuestEntity.setGuesttype(registerCustomerBean.getCorpType());
+		}
+		// 电话(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestTel())) {
+			fktGuestEntity.setTel(registerCustomerBean.getGuestTel());
+		}
+		// 电子邮箱(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getEmail())) {
+			fktGuestEntity.setEmail(registerCustomerBean.getEmail());
+		}
+		// 邮政编码(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getZipCode())) {
+			fktGuestEntity.setPost(registerCustomerBean.getZipCode());
+		}
+		// 地址(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCustomerAddr())) {
+			fktGuestEntity.setAdd(registerCustomerBean.getCustomerAddr());
+		}
+		// 联系人姓名(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getContactName())) {
+			fktGuestEntity.setName(registerCustomerBean.getContactName());
+		}
+		// 联系人证件类型(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getContactType())) {
+			fktGuestEntity.setIdcardType(registerCustomerBean.getContactType());
+		}
+		// 联系人证件号码(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getContactNum())) {
+			fktGuestEntity.setIdcardNum(registerCustomerBean.getContactNum());
+		}
+		// 联系人生日(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getContactBir())) {
+			fktGuestEntity.setBirthday(DateUtil.formatStrTOStampBySmt(registerCustomerBean.getContactBir(),
+					DateUtil.DATE_PATTERN_17));
+		}
+		// 银行类型(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getBankType())) {
+			fktGuestEntity.setBankno(registerCustomerBean.getBankType());
+		}
+		// 银行帐号(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getBankAcc())) {
+			fktGuestEntity.setBankacc(registerCustomerBean.getBankAcc());
+		}
+		// 税务登记号(主卡必填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getTaxNum())) {
+			fktGuestEntity.setTaxno(registerCustomerBean.getTaxNum());
+		}
+		// 备注(主卡选填)
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestRemark())) {
+			fktGuestEntity.setBeizhu(registerCustomerBean.getGuestRemark());
+		}
+		// 站点编号 (主卡有值)
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getStationNum())) {
+			fktGuestEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		}
+		// 操作员编号(主卡有值)
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getOperatorNo())) {
+			fktGuestEntity.setUserid(Integer.parseInt(ApplicationContext.getInstance().getOperatorNo()));
+		}
+		return fktGuestEntity;
+	}
+
+	/**
+	 * 将registerCustomerBean转换成fktGuestDepEntity
+	 */
+	private FKTGuestDep covertDataToGuestDepEntity(RegisterCustomerBean registerCustomerBean) {
+		FKTGuestDep fktGuestDepEntity = new FKTGuestDep();
+		if (registerCustomerBean.getId() != null) {
+			fktGuestDepEntity.setId(registerCustomerBean.getId());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestNo())) {
+			fktGuestDepEntity.setGuestNo(registerCustomerBean.getGuestNo());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getDeptNo())) {
+			fktGuestDepEntity.setDeptNo(registerCustomerBean.getDeptNo());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getDepName())) {
+			fktGuestDepEntity.setDeptName(registerCustomerBean.getDepName());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getDepMaster())) {
+			fktGuestDepEntity.setContactName(registerCustomerBean.getDepMaster());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getDepTel())) {
+			fktGuestDepEntity.setContactPhone(Integer.parseInt(registerCustomerBean.getDepTel()));
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getLimitStation())) {
+			fktGuestDepEntity.setStationLimit(registerCustomerBean.getLimitStation());
+		}
+		return fktGuestDepEntity;
+	}
+
+	/**
+	 * 将registerCustomerBean转换成fktCardTZEntity 2014-7-25
+	 */
+	private FKTCardTZEntity covertDataToCardAccEntity(RegisterCustomerBean registerCustomerBean) {
+		FKTCardTZEntity fktCardTZEntity = new FKTCardTZEntity();
+		// 卡号 (主卡有值)
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardNo())) {
+			fktCardTZEntity.setCardNo(registerCustomerBean.getCardNo());
+		}
+		// 卡内余额(主卡有值)
+		if (registerCustomerBean.getCardAmount() != null) {
+			fktCardTZEntity.setCardbal(registerCustomerBean.getCardAmount());
+		}
+		// 操作员编号 (主卡有值)
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getOperatorNo())) {
+			fktCardTZEntity.setUserid(Integer.parseInt(ApplicationContext.getInstance().getOperatorNo()));
+		}
+		// 充值总额设置初始值
+		fktCardTZEntity.setCardinc(BigDecimal.valueOf(0.0));
+		// 消费总额设置初始值
+		fktCardTZEntity.setCarddec(BigDecimal.valueOf(0.0));
+		// 卡备用金金额设置初始值
+		fktCardTZEntity.setPre(BigDecimal.valueOf(0.0));
+		// 积分设置初始值
+		fktCardTZEntity.setSCORE(BigDecimal.valueOf(0.0));
+		return fktCardTZEntity;
+	}
+
+	/**
+	 * 将registerCustomerBean转换成FKTGuestAccEntity 2014-7-25
+	 */
+	private FKTGuestAcc covertDataToGuestAccEntity(RegisterCustomerBean registerCustomerBean) {
+		FKTGuestAcc fktGuestAccEntity = new FKTGuestAcc();
+		// 卡内余额(主卡有值)
+		if (registerCustomerBean.getCardAmount() != null) {
+			fktGuestAccEntity.setCardacc(registerCustomerBean.getCardAmount());
+		}
+		// 账上余额设置初始值
+		fktGuestAccEntity.setBal(BigDecimal.valueOf(0.0));
+		// 充值金额设置初始值
+		fktGuestAccEntity.setCreditacc(BigDecimal.valueOf(0.0));
+		// 消费金额设置初始值
+		fktGuestAccEntity.setDebitacc(BigDecimal.valueOf(0.0));
+		// 已分配金额设置初始值
+		fktGuestAccEntity.setInuse(BigDecimal.valueOf(0.0));
+		// 积分设置初始值
+		fktGuestAccEntity.setScore(BigDecimal.valueOf(0.0));
+		return fktGuestAccEntity;
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

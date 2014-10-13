@@ -1,0 +1,75 @@
+	$(function(){
+		$('#w2').window({
+			modal:true,
+			closed:true
+		});
+		$('#w3').window({
+			modal:true,
+			closed:true
+		});
+	   });
+	   
+
+	$(document).ready(function(){
+		  $("#cardMaintain_loss").click(function(){
+				// 3.$.ajax拼接url的异步请求
+			  var cardNo=$("#cardNo").val();
+			  var guestType=$("#guestType").val();
+			  var guestNum=$("#guestNum").val();
+			  var temp=document.getElementsByName("cardMiantainBean.lostChoice");
+			  if(temp[0].checked){
+			  if(cardNo==''){
+					$.messager.alert('错误','卡号必填!');
+					return ;
+					}
+			  if(guestType==''){
+					$.messager.alert('错误','证件类型必填!');
+					return ;
+					}
+			  if(guestNum==''){
+					$.messager.alert('错误','证件号必填!');
+					return ;
+					}
+			  $("#w2").window('open');
+			  }
+			  if(temp[1].checked)
+				  $("#w3").window('open');
+		  });
+		  $("#cardLost_yes1").click(function(){
+			  lostCard();
+			  alert("挂失成功!!");
+			  $('#w2').window('close');
+		  });
+		  $("#cardLost_no1").click(function(){
+			  $('#w2').window('close');
+		  });
+		  $("#cardLost_yes2").click(function(){
+		  });
+		  $("#cardLost_no2").click(function(){
+			  $('#w3').window('close');
+		  });
+		});
+		  
+		function lostCard(cardno, guesttye,guestnum){
+			var yz = $.ajax({
+				type : 'post',
+				url : 'cardMaintain/doCardLost',
+				data : {
+					"cardMaintainBean.cardNo" : $("#cardNo").val(),
+					"cardMaintainBean.guestType" :$("#guestType").val(),
+					"cardMaintainBean.guestNum" :$("#guestNum").val(),
+					},
+				cache : false,
+				dataType : 'json',
+				success : function(loaddata) {
+					gridData = loaddata.jsonData;
+					if(gridData == null){
+						$('#card_dg').datagrid('loadData',{total:0,rows:[]});
+					}
+					var data = $.parseJSON(gridData);    
+					$('#card_dg').datagrid('loadData', data);
+				},
+				error : function() {
+				}
+			});
+		}

@@ -1,0 +1,141 @@
+package com.fr.station.component.report.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.report.ShiftChangeBean;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.dao.ShiftChangeRefuelDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ * 
+ * @author _wsq
+ */
+@Repository
+public class ShiftChangeRefuelDaoImpl extends AbstractBaseDAO<OperatelogEntity> implements ShiftChangeRefuelDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(ShiftChangeRefuelDaoImpl.class);
+
+	private static final String SHIFT_NUM = "AccNo";
+
+	private static final String EMP = "EMP";
+
+	private static final String CREATE_DATE = "JBRQ";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String selectOperateLogViewSql = "SELECT ckd.GUNPORT, ckd.oilName, ckd.oilPrice, ckd.CSSL,"
+			+ " ckd.JCSL, ckd.CKSL, ckd.CKJE, ckd.AMN2, ckd.VOL2, ckd.BLSL,"
+			+ " ckd.BLJE, ckd.IC_SL, ckd.IC_JE, ckd.TANK_SL, ckd.TANK_JE FROM view_all_ckd ckd WHERE ";
+
+	private final String selectAllCountOperateLogViewSql = "SELECT count(*) FROM view_all_ckd ckd WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public ShiftChangeRefuelDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * inherited java doc.
+	 */
+	@Override
+	public List<ShiftChangeBean> getAllShiftChangeRecords(ShiftChangeBean operateLogBean) throws Exception {
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ShiftChangeBean> getShiftChangeRecordsByCriteria(ShiftChangeBean shiftChangeBean, int startPage, int number) {
+		List<ShiftChangeBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.selectOperateLogViewSql);
+		builderForTotalResult.append(this.selectAllCountOperateLogViewSql);
+		try {
+			StringBuilder builder = this.validateInputCriteria(shiftChangeBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			// List<Object[]> result = (List<Object[]>) this.findBySql(builder.toString());
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	private StringBuilder validateInputCriteria(ShiftChangeBean shiftChangeBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(shiftChangeBean.getShiftChageNum())) {
+			builder.append(SHIFT_NUM).append(" = ").append(shiftChangeBean.getShiftChageNum());
+		}
+		if (StringUtils.isNotEmpty(shiftChangeBean.getClassNum())) {
+			builder.append(" AND ").append(EMP).append(" = ").append(shiftChangeBean.getClassNum());
+		}
+		if (shiftChangeBean.getShiftDate() != null) {
+			String shiftDate = DateUtil.formatDate(shiftChangeBean.getShiftDate(), DateUtil.DATE_PATTERN_8);
+			String shiftDateplus = DateUtil.addDaysPatternEight(shiftDate, 1);
+			builder.append(" AND ").append(CREATE_DATE).append(" >= '").append(shiftDate).append("'").append(" AND ")
+					.append(CREATE_DATE).append(" < '").append(shiftDateplus).append("'");
+		}
+		return builder;
+	}
+
+	private List<ShiftChangeBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<ShiftChangeBean> shiftChangeBeanList = new ArrayList<ShiftChangeBean>();
+		ShiftChangeBean shiftChangeBean = null;
+		for (Object[] dataRow : dataResult) {
+			shiftChangeBean = new ShiftChangeBean();
+			shiftChangeBean.setOilGunNum(Integer.valueOf(String.valueOf(dataRow[0])));
+			shiftChangeBean.setOilName(String.valueOf(dataRow[1]));
+			shiftChangeBean.setOilPrice(((BigDecimal) dataRow[2]));
+			shiftChangeBean.setStartOilAmount(((BigDecimal) dataRow[3]));
+			shiftChangeBean.setCurrentOilAccount(((BigDecimal) dataRow[4]));
+			shiftChangeBean.setEndOilAmount(((BigDecimal) dataRow[5]));
+			shiftChangeBean.setCashAmount(((BigDecimal) dataRow[6]));
+			shiftChangeBean.setCashMoney(((BigDecimal) dataRow[7]));
+			shiftChangeBean.setBankConsum(((BigDecimal) dataRow[8]));
+			shiftChangeBean.setBankMoney(((BigDecimal) dataRow[9]));
+			shiftChangeBean.setIcCard(((BigDecimal) dataRow[10]));
+			shiftChangeBean.setIcConsum(((BigDecimal) dataRow[11]));
+			shiftChangeBean.setTinBack(((BigDecimal) dataRow[12]));
+			shiftChangeBean.setTinBackMoney(((BigDecimal) dataRow[13]));
+			shiftChangeBean.setTotalData(totalAccount);
+			shiftChangeBeanList.add(shiftChangeBean);
+		}
+		return shiftChangeBeanList;
+	}
+
+}

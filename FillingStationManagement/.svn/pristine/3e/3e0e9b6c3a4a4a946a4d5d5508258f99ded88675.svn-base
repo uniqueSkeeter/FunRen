@@ -1,0 +1,99 @@
+/**
+ * this js works for mainCardInfo.jsp
+ */
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+$(function(){
+   $('#viceCardTable').datagrid({
+    iconCls:'icon-ok',
+    nowrap:false,
+    striped: true,
+    fit: true,//自动大小 
+    collapsible:true,
+    singleSelect:true,
+    loadMsg:'数据装载中......',
+    sortName:'code',
+    sortOrder:'desc',
+    remoteSort:false,
+    frozenColumns:[[
+     {field:'ck',checkbox:true}
+    ]],
+    columns:viceCardColumns,
+    pagination:true,
+    rownumbers:true,
+    AllowPaging:true
+   });
+// 设置分页控件  
+	var p = $('#viceCardTable').datagrid('getPager');
+	$(p).pagination({
+		 onSelectPage:function(pageNumber,pageSize){  
+		 	searchData(pageNumber, pageSize);
+		 }  
+	});
+  
+  $(p).pagination({  
+      pageSize: 20,//每页显示的记录条数，默认为10  
+      pageList: [20,30,40,60,80],//可以设置每页记录条数的列表  
+      beforePageText: '第',//页数文本框前显示的汉字  
+      afterPageText: '页    共 {pages} 页',  
+      displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录'
+  }); 
+
+ });
+
+$(document).ready(function(){
+	$('#read_card').click(function(){
+		$.messager.alert("读卡","读卡");
+		document.getElementById("search_card").disabled=false;
+		document.getElementById("changeGuestInfo").disabled=false;
+		document.getElementById("changeDrivercardInfo").disabled=false;
+	});
+	$('#search_card').click(function(){
+		var mainCardNo=$("#mainCardNo").val();
+		if(mainCardNo==''){
+			$.messager.alert('错误','卡号不能为空!');
+			return;
+		}
+		searchData();	
+	});
+});
+function searchData(pageNumber, pageSize){
+	var yz = $.ajax({
+		type : 'post',
+		url : server_context+'/updateCardInfo/showMainCardInfo',
+		data : {
+			"updateCardInfoBean.mainCardNo" : $("#mainCardNo").val(),
+			"updateCardInfoBean.pageNumber" : pageNumber,
+			"updateCardInfoBean.pageSize" : pageSize
+			},
+		cache : false,
+		dataType : 'json',
+		success : function(loaddata) {
+			gridData = loaddata.jsonData;
+			if(gridData == null){
+				$('#viceCardTable').datagrid('loadData',{total:0,rows:[]});
+			}
+			var data = $.parseJSON(gridData);    
+			$('#viceCardTable').datagrid('loadData', data);
+		},
+		error : function() {
+		}
+	});
+}
+var viceCardColumns = [[ 
+                        {field:'guestName',title:'姓名',width:150, align:'left'},
+                        {field:'cardNo',title:'卡号',width:150, align:'left'},
+                        {field:'cardStatus',title:'卡状态',width:150,formatter: function(value,row,index){
+                  			var key = "option[value='" + value + "']";
+                  			var text = $("#cardStatus").find(key).text();
+                  			return text;
+            			},align:'left'},
+            			{field:'guestNo',title:'客户编号',width:150,align:'left'},
+            			{field:'provisionAccount',title:'账户余额',width:150,align:'left'},
+            			{field:'cardFlag',title:'是否主卡',width:150,formatter: function(value,row,index){
+            				return value == true?'是':'否';
+            			},align:'left'},
+            			{field:'depName',title:'所属部门',width:150,align:'left'}
+                       ]];

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.objectFactory" value="spring" />
+   	<!--  
+    <constant name="struts.ui.theme" value="simple" />
+    -->
+	<package name="lng" extends="struts-default" namespace="">
+		<global-results>
+			<result name="success">view/success.jsp</result>
+			<result name="success">view/error.jsp</result>
+			<!--  
+    		<result name="sessiontimeout"></result>
+    		-->
+    	</global-results>
+    	
+    	<!-- add lng action 
+    	<action name="addUserInfo" class="" method="addUser">
+            <result name="input">index.jsp</result>
+            <result>/success.jsp</result>
+        </action>
+	-->
+	</package>
+	
+</struts>

@@ -1,0 +1,351 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * this DaoImpl is for find registerCustomer records from DB to display in displayRegisterCustomer.jsp by implements
+ * getRegisterCustomerRecordsByCriteria() method
+ * 
+ * @author WR
+ */
+@Repository
+public class RegisterCustomerDaoImpl extends AbstractBaseDAO<FkTCardEntity> implements RegisterCustomerDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RegisterCustomerDaoImpl.class);
+
+	private static final String CARD_NO = "fkt_card.cardNo";
+
+	private static final String GUEST_NAME = "fkt_card.guestName";
+
+	private static final String CARD_EXNO = "fkt_card.cardExno";
+
+	private static final String CARD_TYPE = "fkt_card.cardType";
+
+	private static final String GUEST_TYPE = "fkt_card.guestType";
+
+	private static final String GUEST_NUM = "fkt_card.guestNum";
+
+	private static final String STATION_NO = "fkt_card.stationNo";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	/**
+	 * 查询客户一览SQL 2014-7-25
+	 */
+	private final String registerCustomerSql = "SELECT fkt_card.guestName,fkt_card.guestNo,fkt_card.cardNo,fkt_card.cardStatus,fkt_card.guestType,"
+			+ "fkt_card.guestNum, fkt_card.guestTel,CONVERT(varchar(100), fkt_card.create_date, 21),fkt_card.stationNo FROM FK_T_CARD fkt_card WHERE ";
+
+	/**
+	 * 统计客户一览SQL 2014-7-25
+	 */
+	private final String countRegisterCustomerSql = "SELECT count(*) FROM FK_T_CARD fkt_card WHERE ";
+
+	private final String driverSql = "SELECT fkt_guest.guestNo,fkt_guest.guestName,fkt_guest.stats,fkt_guest.idNum,fkt_card.cardNo,"
+			+ "fkt_card.cardStatus,fkt_card.depNo FROM FK_T_CARD fkt_card,FK_T_GUEST fkt_guest WHERE ";
+
+	private final String countDriverSql = "SELECT count(*) FROM FK_T_CARD fkt_card,FK_T_GUEST fkt_guest WHERE ";
+
+	private final String departmentSql = "SELECT fkt_guest1.guestName,fkt_guestDep.depNo,fkt_guestDep.depName,fkt_guestDep.depMaster,fkt_guestDep.depTel,fkt_guestDep.limitStation "
+			+ "FROM FK_T_GUESTDEP fkt_guestDep,FK_T_GUEST fkt_guest1 WHERE ";
+
+	private final String countDepartmentSql = "SELECT count(*) FROM FK_T_GUESTDEP fkt_guestDep,FK_T_GUEST fkt_guest1 WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegisterCustomerDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	// // 查询司机信息
+	// @SuppressWarnings("unchecked")
+	// @Override
+	// public List<RegisterCustomerBean> getDriverRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int
+	// startPage,
+	// int number) {
+	// List<RegisterCustomerBean> resultList = null;
+	// int totalSize = 0;
+	// StringBuilder builderForPagination = new StringBuilder();
+	// StringBuilder builderForTotalResult = new StringBuilder();
+	// builderForPagination.append(this.driverSql);
+	// builderForTotalResult.append(this.countDriverSql);
+	// try {
+	// StringBuilder builder = this.validateDriverInput(registerCustomerBean);
+	// builderForPagination.append(builder);
+	// builderForTotalResult.append(builder);
+	// Query query = this.getQueryByCriteria(builderForPagination.toString());
+	// Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+	// if (resultAccount != null) {
+	// totalSize = (int) resultAccount[0];
+	// }
+	// query.setFirstResult(startPage);
+	// query.setMaxResults(number);
+	// List<Object[]> result = query.list();
+	// resultList = this.convertDriverDataToBean(result, totalSize);
+	// } catch (QueryException e) {
+	// log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() +
+	// "\n"
+	// + ErrorLogUtil.printInfo(e));
+	// } catch (Exception e) {
+	// log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+	// + ErrorLogUtil.printInfo(e));
+	// }
+	// return resultList;
+	// }
+
+	/**
+	 * 查询客户编号 2014-7-24
+	 */
+	@Override
+	public Integer getGuestNo() {
+		Integer guestNo = 0;
+		try {
+			guestNo = (Integer) this.findBySql("SELECT attriValue FROM stationParameter WHERE attriName = 'guestNo' ").get(0);
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			e.printStackTrace();
+		}
+		return guestNo;
+	}
+
+	/**
+	 * 根据查询条件查询已售卡的客户信息 2014-7-24
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RegisterCustomerBean> getRegisterCustomerRecordsByCriteria(RegisterCustomerBean registerCustomerBean,
+			int startPage, int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.registerCustomerSql);
+		builderForTotalResult.append(this.countRegisterCustomerSql);
+		try {
+			StringBuilder builder = this.validateInputCriteria(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 根据查询条件查询部门信息 (2014-7-24最新版本)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RegisterCustomerBean> getDepartmentRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int startPage,
+			int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.departmentSql);
+		builderForTotalResult.append(this.countDepartmentSql);
+		try {
+			StringBuilder builder = this.validateDepartmentInput(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDepartmentDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private StringBuilder validateInputCriteria(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		boolean searchFlag = false;
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardNo())) {
+			searchFlag = true;
+			builder.append(CARD_NO).append(" = '").append(registerCustomerBean.getCardNo()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestName())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_NAME).append(" = '").append(registerCustomerBean.getGuestName()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardExno())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(CARD_EXNO).append(" = '").append(registerCustomerBean.getCardExno()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardType())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(CARD_TYPE).append(" = '").append(registerCustomerBean.getCardType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestType())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_TYPE).append(" = '").append(registerCustomerBean.getGuestType()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNum())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_NUM).append(" = '").append(registerCustomerBean.getGuestNum()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(ApplicationContext.getInstance().getStationNum())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(STATION_NO).append(" = '").append(ApplicationContext.getInstance().getStationNum()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 查询司机信息SQL语句查询条件
+	 */
+	private StringBuilder validateDriverInput(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardNo())) {
+			builder.append("fkt_guest.guestNo").append(" = ").append("fkt_card.guestNo").append(" AND ")
+					.append("fkt_guest.cardNo = '").append(registerCustomerBean.getCardNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNo())) {
+			builder.append("fkt_guest.guestNo")
+					.append(" = ")
+					.append("fkt_card.guestNo")
+					.append(" AND ")
+					.append("fkt_guest.cardNo IN ( SELECT fkt_guest2.cardNo FROM FK_T_GUEST fkt_guest2 WHERE fkt_guest2.guestNo = '")
+					.append(registerCustomerBean.getGuestNo()).append("' )");
+		}
+		return builder;
+	}
+
+	/**
+	 * 查询部门信息SQL语句查询条件
+	 */
+	private StringBuilder validateDepartmentInput(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNo())) {
+			builder.append(
+					"fkt_guestDep.guestId = fkt_guest1.id AND fkt_guestDep.guestId IN (SELECT fkt_guest.id FROM FK_T_GUEST fkt_guest WHERE fkt_guest.guestNo = '")
+					.append(registerCustomerBean.getGuestNo()).append("' )");
+		} else if (StringUtils.isNotEmpty(registerCustomerBean.getGuestName())) {
+			builder.append(
+					"fkt_guestDep.guestId = fkt_guest1.id AND fkt_guestDep.guestId IN ( SELECT fkt_guest.id FROM FK_T_GUEST fkt_guest WHERE fkt_guest.guestName = '")
+					.append(registerCustomerBean.getGuestName()).append("' )");
+		}
+		return builder;
+	}
+
+	private boolean indicateSearchFlag(StringBuilder builder, boolean searchFlag) {
+		if (searchFlag) {
+			builder.append(" AND ");
+		} else {
+			searchFlag = true;
+		}
+		return searchFlag;
+	}
+
+	/**
+	 * 把客户信息查询结果覆盖到RegisterCustomerBean
+	 */
+	private List<RegisterCustomerBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[0]));
+			registerCustomerBean.setGuestNo(String.valueOf(dataRow[1]));
+			registerCustomerBean.setCardNo(String.valueOf(dataRow[2]));
+			registerCustomerBean.setCardStatus(String.valueOf(dataRow[3]));
+			registerCustomerBean.setGuestType(String.valueOf(dataRow[4]));
+			registerCustomerBean.setGuestNum(String.valueOf(dataRow[5]));
+			registerCustomerBean.setGuestTel(String.valueOf(dataRow[6]));
+			registerCustomerBean.setCreate_date(String.valueOf(dataRow[7]));
+			registerCustomerBean.setStationNo(String.valueOf(dataRow[8]));
+			registerCustomerBean.setTotalData(totalAccount);
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+
+	// /**
+	// * 把司机信息查询结果覆盖到RegisterCustomerBean
+	// */
+	// private List<RegisterCustomerBean> convertDriverDataToBean(List<Object[]> dataResult, int totalAccount) {
+	// List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+	// RegisterCustomerBean registerCustomerBean = null;
+	// for (Object[] dataRow : dataResult) {
+	// registerCustomerBean = new RegisterCustomerBean();
+	// registerCustomerBean.setGuestNo(String.valueOf(dataRow[0]));
+	// registerCustomerBean.setGuestName(String.valueOf(dataRow[1]));
+	// registerCustomerBean.setGuestStatus(String.valueOf(dataRow[2]));
+	// registerCustomerBean.setGuestNum(String.valueOf(dataRow[3]));
+	// registerCustomerBean.setCardNo(String.valueOf(dataRow[4]));
+	// registerCustomerBean.setCardStatus(String.valueOf(dataRow[5]));
+	// registerCustomerBean.setDeptNo(String.valueOf(dataRow[6]));
+	// registerCustomerBeanList.add(registerCustomerBean);
+	// }
+	// return registerCustomerBeanList;
+	// }
+
+	/**
+	 * 把部门信息查询结果覆盖到RegisterCustomerBean
+	 */
+	private List<RegisterCustomerBean> convertDepartmentDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[0]));
+			registerCustomerBean.setDeptNo(String.valueOf(dataRow[1]));
+			registerCustomerBean.setDepName(String.valueOf(dataRow[2]));
+			registerCustomerBean.setDepMaster(String.valueOf(dataRow[3]));
+			registerCustomerBean.setDepTel(String.valueOf(dataRow[4]));
+			registerCustomerBean.setLimitStation(String.valueOf(dataRow[5]));
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+}

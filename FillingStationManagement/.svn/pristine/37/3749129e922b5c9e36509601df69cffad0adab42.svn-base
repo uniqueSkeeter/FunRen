@@ -1,0 +1,80 @@
+package com.fr.station.component.report.service.impl;
+
+import java.util.List;
+
+import javax.persistence.FetchType;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.ShiftChangeBean;
+import com.fr.station.common.entity.report.OilGunConsumeEntity;
+import com.fr.station.component.report.dao.ShiftChangeRefuelDAO;
+import com.fr.station.component.report.service.ShiftChangeRefuelService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get station trade logs for each car.
+ * Mainly responsible to handle different scenario search
+ * 
+ * @author henry
+ */
+@Service
+public class ShiftChangeRefuelServiceImpl extends AbstractBaseService<OilGunConsumeEntity> implements ShiftChangeRefuelService {
+	
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private ShiftChangeRefuelDAO reportRecordsDaoImpl;
+	
+	// ------- Constructors ----------------------------------------------------
+	
+	public ShiftChangeRefuelServiceImpl() {
+		super();
+	}
+	
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 *  inherited java doc.
+	 *  
+	 */
+	@Override
+	public List<OilGunConsumeEntity> findAllShiftChangeRecords() throws Exception {
+		List<OilGunConsumeEntity> oilGunConsumeEntityList = this.findAll();
+		return oilGunConsumeEntityList;
+	}
+
+	/**
+	 *  inherited java doc.
+	 *  
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<ShiftChangeBean> findShiftChangeRecordsByCriteria(ShiftChangeBean shiftChangeBean) {
+		int pageNumber = shiftChangeBean.getPageNumber();
+		int pageSize = shiftChangeBean.getPageSize();
+		//当前页  
+        int intPage = pageNumber == 0 ? 1 : pageNumber;  
+        //每页显示条数  
+        int number = pageSize == 0 ?  20 : pageSize;  
+        //每页的开始记录  第一页为1  第二页为number +1   
+        int start = (intPage-1)*number; 
+		return this.reportRecordsDaoImpl.getShiftChangeRecordsByCriteria(shiftChangeBean, start, number);
+	}
+	
+	@Autowired
+	public void setEmployeeDAO(ShiftChangeRefuelDAO reportRecordsDaoImpl) {
+		super.setBaseDao(reportRecordsDaoImpl);
+		this.reportRecordsDaoImpl = reportRecordsDaoImpl;
+	}
+	
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+}

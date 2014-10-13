@@ -1,0 +1,64 @@
+package com.fr.station.component.customer.service;
+
+import java.util.List;
+
+import com.fr.station.common.bean.TransferAccountsBean;
+
+/**
+ * 该接口用于与转账相关的service操作
+ * 
+ * 
+ * @author hjq
+ */
+public interface TransferAccountsService {
+
+	/**
+	 * 获得每条副卡记录显示在jsp页面上
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param TransferAccountsBean transferAccountsBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<TransferAccountsBean> findViceCardsRecordsByCriteria(TransferAccountsBean transferAccountsBean);
+
+	/**
+	 * 获得主副卡信息显示在jsp页面上
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param TransferAccountsBean transferAccountsBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<TransferAccountsBean> findAccountsInfoByCriteria(TransferAccountsBean transferAccountsBean);
+
+	/**
+	 * save allocate records into DB
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param TransferAccountsBean transferAccountsBean include the search criteria.
+	 * 
+	 * @return success infomation
+	 */
+	public void saveAllocateRecords(TransferAccountsBean transferAccountsBean);
+
+	/**
+	 * save gahter records into DB
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param TransferAccountsBean transferAccountsBean include the search criteria.
+	 * 
+	 * @return success infomation
+	 */
+	public void saveGatherRecords(TransferAccountsBean transferAccountsBean);
+
+	/**
+	 * save credit for load records into DB
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param TransferAccountsBean transferAccountsBean include the search criteria.
+	 * 
+	 * @return success infomation
+	 */
+	public void saveCreditForLoadRecords(TransferAccountsBean transferAccountsBean);
+}

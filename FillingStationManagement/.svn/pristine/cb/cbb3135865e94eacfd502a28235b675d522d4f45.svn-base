@@ -1,0 +1,70 @@
+package com.fr.station.component.card.service;
+
+import java.util.List;
+
+import com.fr.station.common.bean.BlackCardBean;
+import com.fr.station.common.bean.CardMaintainBean;
+import com.fr.station.component.card.dao.CardMaintainDAO;
+
+/*
+ * 定义cardMaintainService接口，用于实现卡片维护界面的查询等操作
+ * 
+ * @author:yy
+ */
+public interface CardMaintainService {
+
+	/**
+	 * 定义通过条件查找卡片维护界面的数据
+	 */
+	public List<CardMaintainBean> findCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean);
+
+	/**
+	 * 定义卡片维护的设置DAO
+	 */
+	public void setCardMaintainDAO(CardMaintainDAO reportRecordsDaoImpl);
+
+	/**
+	 * 定义通过条件查找挂失卡
+	 */
+	// 更新数据库挂失信息
+	public void updateCardLost(CardMaintainBean cardMaintainBean);
+
+	// 查询挂失信息
+	public List<CardMaintainBean> getCardLost(CardMaintainBean cardMaintainBean) throws Exception;
+
+	// 增加黑卡记录
+	public void addBlackCardRecords(BlackCardBean blackCardBean);
+
+	/**
+	 * 定义止挂
+	 */
+	// 更新数据库止挂信息
+	public void updateCancelLossCard(CardMaintainBean cardMaintainBean);
+
+	// 得带卡止挂信息
+	public List<CardMaintainBean> getCancelLossCard(CardMaintainBean cardMaintainBean) throws Exception;
+
+	// 删除黑卡记录
+	public void deleteBlackCardRecords(BlackCardBean blackCardBean);
+
+	/**
+	 * 定义修改密码
+	 */
+	// 更新数据库修改密码信息
+	public void updateChangePass(CardMaintainBean cardMaintainBean, Object... args);
+
+	// 检测密码是否正确
+	public List<CardMaintainBean> findPassRecodes(CardMaintainBean cardMaintainBean);
+
+	// 得到需要更改的密码的卡的信息
+	public List<CardMaintainBean> getChangePass(CardMaintainBean cardMaintainBean) throws Exception;
+
+	/**
+	 * 定义补卡
+	 */
+	public List<CardMaintainBean> getExistCard(CardMaintainBean cardMaintainBean) throws Exception;
+
+	// 更新数据库换卡信息
+	public void updateReplaceCard(CardMaintainBean cardMaintainBean, Object... args);
+
+}

@@ -1,0 +1,188 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.customer.CustomerChargeBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FKTGuestAcc;
+import com.fr.station.common.entity.card.FkTtGuestcreditEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.customer.dao.CustomerChargeDAO;
+import com.fr.station.component.customer.service.CustomerChargeService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The customerChargeServiceImpl for customerCharge
+ * 
+ * @author WR
+ */
+@Service
+public class CustomerChargeServiceImpl extends AbstractBaseService implements CustomerChargeService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static Logger log = Logger.getLogger(CustomerChargeServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private CustomerChargeDAO customerChargeDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public CustomerChargeServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	@Autowired
+	public void setCardChargeDAO(CustomerChargeDAO customerChargeDaoImpl) {
+		super.setBaseDao(customerChargeDaoImpl);
+		this.customerChargeDaoImpl = customerChargeDaoImpl;
+	}
+
+	/**
+	 * @Inherited doc 返回对应的客户账户信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CustomerChargeBean> findCustomAccountRecordsByCriteria(CustomerChargeBean customerChargeBean) {
+		List<CustomerChargeBean> customerChargeBeanList = null;
+		log.info("start find customer account records by criteria");
+		if (customerChargeBean == null) {
+			log.info("customerChargeBean is null");
+			return null;
+		}
+		customerChargeBeanList = this.customerChargeDaoImpl.getCustomAccountRecordsByCriteria(customerChargeBean);
+		if (customerChargeBeanList == null) {
+			customerChargeBeanList = new ArrayList<CustomerChargeBean>();
+			log.info("customerChargeBeanList is null");
+		}
+		log.info("end find customer account records by criteria");
+		return customerChargeBeanList;
+	}
+
+	/**
+	 * @Inherited doc 客户备用金充值
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addCustomChargeInfo(CustomerChargeBean customerChargeBean) {
+		log.info("Persist customerChargeBean entity begain");
+
+		// 把customerChargeBean覆盖到guestAccEntity
+		FKTGuestAcc guestAccEntity = this.covertDataToGuestACCEntity(customerChargeBean);
+
+		// 更新客户账户信息表
+		this.customerChargeDaoImpl.updateGuestAccEntity(guestAccEntity);
+
+		// get user tradeNo from system parameter table.
+		Integer tradeNo = this.customerChargeDaoImpl.getTradeNo();
+
+		// 把customerChargeBean覆盖到guestCreditEntity
+		FkTtGuestcreditEntity guestCreditEntity = this.covertDataToGuestCreditEntity(customerChargeBean);
+
+		// 设置客户交易号
+		guestCreditEntity.setIncno(String.valueOf(tradeNo));
+
+		// 新增客户交易记录
+		this.save(guestCreditEntity);
+
+		// update table system parameter set attriValue plus one when guest info is successfully save into DB.
+		this.customerChargeDaoImpl.updateTradeNo();
+
+		log.info("Succefully saved  entity into DB");
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	/**
+	 * 将customerChargeBean转换成fktGuestAccEntity
+	 */
+	private FKTGuestAcc covertDataToGuestACCEntity(CustomerChargeBean customerChargeBean) {
+		FKTGuestAcc fktGuestAccEntity = new FKTGuestAcc();
+		if (customerChargeBean.getId() != null) {
+			fktGuestAccEntity.setId(customerChargeBean.getId());
+		}
+
+		// 账户余额(即备用金账户)更新
+		if (customerChargeBean.getSpareAccount() != null && customerChargeBean.getChargeAmount() != null) {
+			fktGuestAccEntity.setBal(customerChargeBean.getSpareAccount().add(customerChargeBean.getChargeAmount()));
+		}
+		// 充值总额更新
+		if (customerChargeBean.getRechargeAmount() != null && customerChargeBean.getChargeAmount() != null) {
+			fktGuestAccEntity.setCreditacc(customerChargeBean.getRechargeAmount().add(customerChargeBean.getChargeAmount()));
+		}
+
+		return fktGuestAccEntity;
+	}
+
+	/**
+	 * 将cardChargeBean转换成FkTguestCreditEntity
+	 */
+	private FkTtGuestcreditEntity covertDataToGuestCreditEntity(CustomerChargeBean customerChargeBean) {
+		FkTtGuestcreditEntity guestCreditEntity = new FkTtGuestcreditEntity();
+		// 单位名称
+		if (StringUtils.isNotBlank(customerChargeBean.getGuestName())) {
+			guestCreditEntity.setGuestname(customerChargeBean.getGuestName());
+		}
+		// 交易序号 银行卡充值时或支票充值时有值
+		if (StringUtils.isNotBlank(customerChargeBean.getBankSerialNum())) {
+			guestCreditEntity.setIncno(customerChargeBean.getBankSerialNum());
+		}
+		// 客户编号
+		if (StringUtils.isNotBlank(customerChargeBean.getGuestNo())) {
+			guestCreditEntity.setGuestno(customerChargeBean.getGuestNo());
+		}
+		// 交易额
+		if (customerChargeBean.getChargeAmount() != null) {
+			guestCreditEntity.setAmn(customerChargeBean.getChargeAmount());
+		}
+		// 交易前余额
+		if (customerChargeBean.getSpareAccount() != null) {
+			guestCreditEntity.setPre(customerChargeBean.getSpareAccount());
+		}
+		// 交易后余额
+		if (customerChargeBean.getSpareAccount() != null && customerChargeBean.getChargeAmount() != null) {
+			guestCreditEntity.setBal(customerChargeBean.getSpareAccount().add(customerChargeBean.getChargeAmount()));
+		}
+		// 交易类型
+		if (StringUtils.isNotBlank(customerChargeBean.getTradeType())) {
+			guestCreditEntity.setJylx(customerChargeBean.getTradeType());
+		}
+		// 支付类型
+		if (StringUtils.isNotBlank(customerChargeBean.getPayType())) {
+			guestCreditEntity.setZffs(customerChargeBean.getPayType());
+		}
+		// 站点编号
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getStationNum())) {
+			guestCreditEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		}
+		// 操作员编号
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getOperatorNo())) {
+			guestCreditEntity.setUserid(Integer.parseInt(ApplicationContext.getInstance().getOperatorNo()));
+		}
+		// 班结号
+		if (StringUtils.isNotBlank(ApplicationContext.getInstance().getClassChangeBean().getClassNo())) {
+			guestCreditEntity.setBjid(Integer.valueOf(ApplicationContext.getInstance().getClassChangeBean().getClassNo()));
+		}
+		// 创建日期
+		guestCreditEntity.setCreateDate(DateUtil.currentTimestamp());
+
+		return guestCreditEntity;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

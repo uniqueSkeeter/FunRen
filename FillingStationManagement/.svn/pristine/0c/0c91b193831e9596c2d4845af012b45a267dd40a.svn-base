@@ -1,0 +1,251 @@
+package com.fr.station.component.report.action;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.ClassChangeBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.service.ShiftChangeReportService;
+import com.fr.station.component.system.action.AbstractAction;
+
+@Namespace("/classChange")
+@ParentPackage("custom-default")
+public class ShiftChangeAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(ShiftChangeAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected ShiftChangeReportService classChangeService;
+
+	protected ClassChangeBean classChangeBean;
+
+	private String jsonData;
+
+	// ------- Constructors ----------------------------------------------------
+	public ShiftChangeAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param
+	 * @return displayCardList jsp
+	 * @throws
+	 */
+
+	@Action(value = "showClassChangeRecords", results = { @Result(name = "success", type = "json"), })
+	public String showClassChangeRecords() {
+		log.info("Starting to load show class change records infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<ClassChangeBean> classChangeBeanList = null;
+		try {
+			classChangeBeanList = this.classChangeService.findClassRecordsByCriteria(this.classChangeBean);
+			if (!classChangeBeanList.isEmpty()) {
+				map.put(TOTAL, classChangeBeanList.get(0).getTotalData());
+				map.put(ROWS, classChangeBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("Successfully load class change records data from DB");
+			} else {
+				log.info("Cannot find shift change information from DB.");
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading class change records data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "showCardStroageRecords", results = { @Result(name = "success", type = "json"), })
+	public String showCardStroageRecords() {
+		log.info("Starting to load show card storage records infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<ClassChangeBean> classChangeBeanList = null;
+		try {
+			classChangeBeanList = this.classChangeService.findCardStorageRecordsByCriteria(this.classChangeBean);
+			if (!classChangeBeanList.isEmpty()) {
+				map.put(TOTAL, classChangeBeanList.get(0).getTotalData());
+				map.put(ROWS, classChangeBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("Successfully load show card storage records data from DB");
+			} else {
+				log.info("Cannot find card storage information from DB.");
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading show card storage records data from DB occured error, please references the detail log\n " + "["
+					+ e + "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "showStationTradeRecords", results = { @Result(name = "success", type = "json"), })
+	public String showStationTradeRecords() {
+		log.info("Starting to load show station trade records infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<ClassChangeBean> classChangeBeanList = null;
+		try {
+			classChangeBeanList = this.classChangeService.findStationTradeRecordsByCriteria(this.classChangeBean);
+			if (!classChangeBeanList.isEmpty()) {
+				map.put(TOTAL, classChangeBeanList.get(0).getTotalData());
+				map.put(ROWS, classChangeBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("Successfully load show station trade records data from DB");
+
+			} else {
+				log.info("Cannot find station storage information from DB.");
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading show station trade records data from DB occured error, please references the detail log\n " + "["
+					+ e + "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "showInvoiceRecords", results = { @Result(name = "success", type = "json"), })
+	public String showInvoiceRecords() {
+		log.info("Starting to load show invoice records infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<ClassChangeBean> classChangeBeanList = null;
+		try {
+			classChangeBeanList = this.classChangeService.findInvoiceRecordsByCriteria(this.classChangeBean);
+			if (!classChangeBeanList.isEmpty()) {
+				map.put(TOTAL, classChangeBeanList.get(0).getTotalData());
+				map.put(ROWS, classChangeBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("Successfully load load show invoice records data from DB");
+
+			} else {
+				log.info("Cannot find invoice information from DB.");
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading load show invoice records data from DB occured error, please references the detail log\n " + "["
+					+ e + "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "showShiftChangeInfo", results = { @Result(name = "success", location = "/view/card/report/checkShiftInfo.jsp"), })
+	public String checkShiftInfo() {
+		log.info("Starting to load show shift change infomation from DB");
+		boolean flag = false;
+		try {
+			this.classChangeBean = this.classChangeService.findClassSummaryByCriteria(this.classChangeBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("Loading show shift change infomation data from DB occured error, please references the detail log\n "
+					+ "[" + e + "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully load show shift change infomation data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "exportShiftInfo", results = { @Result(name = "success", type = "json") })
+	public String exportShiftInfo() {
+		log.info("Starting to load export shift info  from DB");
+		boolean flag = false;
+		try {
+			this.classChangeService.generateShiftChangeExcel(this.classChangeBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("Loading export shift info data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully load export shift info data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public ClassChangeBean getClassChangeBean() {
+		return this.classChangeBean;
+	}
+
+	public void setClassChangeBean(ClassChangeBean classChangeBean) {
+		this.classChangeBean = classChangeBean;
+	}
+
+	public String getJsonData() {
+		return this.jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

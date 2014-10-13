@@ -1,0 +1,98 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	var readFlag = false;
+	$(document).ready(function(){
+		$("#anonymousCard_add").click(function(){
+		$('#saleCardIFrame')[0].src= server_context + '/view/card/customer/saleAnonymousCard.jsp'; 
+        	$('#saleCardDialog').form('clear');
+        	readFlag=false;
+            $('#saleCardDialog').dialog({
+                closed : false,
+                title : '不记名卡售卡',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '读卡',
+                    id : 'readBtn',
+                    handler:function(){
+                    	alert("读卡");
+                    	readFlag = true;
+                    }
+                }, {
+                    text : '售卡',
+                    id : 'saleBtn',
+                    handler : function() {
+                        if(readFlag){
+                        	var rDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                        	var flag = validateAnonyFieldValue(rDocument);
+                        	var saleAnonymousCard_form = rDocument.getElementsByTagName('form');
+                        	if(flag){
+                        		$.ajax({
+                        			data:$(saleAnonymousCard_form).serialize(),
+                        			url:encodeURI("saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+    	                			success:function(data){
+    	                				$("#saleCardDialog").dialog("close");
+    	                        				alert("不记名卡数据传输成功");
+    	                        				$('#printCardIFrame')[0].src= server_context + '/view/card/customer/printAnonymousCard.jsp?cardNo='+
+    	                        				rDocument.getElementById('cardNo').value+'&cardAmount='+rDocument.getElementById('cardAmount').value+
+    	                        				'&deposit='+rDocument.getElementById('deposit').value+
+    	                        				'&amount='+(parseInt(rDocument.getElementById('cardAmount').value,0)+parseInt(rDocument.getElementById('deposit').value,0))+
+    	                        				'&effectiveDate='+document.getElementById("saleCardIFrame").contentWindow.window.$("#effectiveDate").datebox('getValue')+
+    	                        				'&disEffectiveDate='+document.getElementById("saleCardIFrame").contentWindow.window.$("#disEffectiveDate").datebox('getValue');
+    	    	                				$('#printCardDialog').dialog({
+    	    	                					 closed : false,
+    	    	                		                title : '不记名卡打印',
+    	    	                		                shadow : true,
+    	    	                		                modal : true,
+    	    	                		                collapsible : true,
+    	    	                		                buttons : [{
+    	    	                		                	text : '返回',
+    	    	                		                    id : 'returnBtn',
+    	    	                		                    handler:function(){
+    	    	                		                    	alert("返回");
+    	    	                		                    	$("#printCardDialog").dialog("close");
+    	    	                		                    }
+    	    	                		                }]
+    	    	                				});
+    	    	        			},
+    	    	        			error:function(){
+    	    	        				$.messager.alert('错误','不记名卡信息保存失败，请重试!');
+    	    	        			}
+    	            		});
+                        	}
+                        }
+                      }
+                }, {
+                    text : '重置',
+                    id : 'resetBtn',
+                    handler : function() {
+                    	var rDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                    	rDocument.getElementById('saleAnonymousCard_form').reset();
+                    }
+                }]
+        });
+	
+	});
+	});
+
+	function validateAnonyFieldValue(rDocument){
+    	var cardNo = rDocument.getElementById('cardNo');
+		var cardType = rDocument.getElementById('cardType');
+		var deposit = rDocument.getElementById('deposit');
+		var stationNo = rDocument.getElementById('stationNo');
+		var cardAmount = rDocument.getElementById('cardAmount');
+		var effectiveDate =document.getElementById("saleCardIFrame").contentWindow.window.$("#effectiveDate").datebox('getValue');
+		var disEffectiveDate = document.getElementById("saleCardIFrame").contentWindow.window.$("#disEffectiveDate").datebox('getValue');
+		if (check(cardNo) || check(cardType) || check(deposit) || check(stationNo)||check(cardAmount)||effectiveDate == ''||disEffectiveDate == ''){
+			
+			return false;
+			
+		}else{
+			
+			return true;
+		}
+	}
+	

@@ -1,0 +1,15 @@
+ 
+#tabMenu {margin:0;padding:0 0 0 15%;list-style:none;}
+#tabMenu li {float:left;height:32px;width:100px;cursor:pointer;cursor:hand}
+li.mouseover {background-position:0 0;}
+li.mouseout {background-position:0 -32px;}
+li.selected {background-position:0 0;}
+
+.nav_content { 
+    height:38px;  
+    line-height:38px;  
+    overflow:hidden; 
+    position: relative;
+    width: 100%;
+    background: #286DA3;
+}

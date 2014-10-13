@@ -1,0 +1,85 @@
+package com.fr.station.component.system.service.impl;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+import com.fr.station.component.system.service.BaseService;
+
+public abstract class AbstractBaseService<T extends Serializable> implements BaseService<T>{
+
+	protected AbstractBaseDAO<T> baseDao;
+
+	@Override
+	public void save(T t) {
+		this.baseDao.save(t);
+	}
+	
+	@Override
+	public void saveOrUpdate(T t) {
+		this.baseDao.saveOrUpdate(t);
+	}
+
+	@Override
+	public void update(T t) {
+		this.baseDao.update(t);
+	}
+
+	@Override
+	public void delete(T t) {
+		this.baseDao.delete(t);
+	}
+
+	@Override
+	public T get(Serializable id) throws Exception {
+		return this.baseDao.get(id);
+	}
+
+	@Override
+	public List<T> findAll() throws Exception {
+		return this.baseDao.findAll();
+	}
+
+	@Override
+	public List<T> findByExample(T t) throws Exception {
+		return this.baseDao.findByExample(t);
+	}
+	
+	public List<T> findByExample(T t, Order order){
+		return this.baseDao.findByExample(t, order);
+	}
+	
+	@Override
+	public List<T> findByHql(String hql, Object... t) throws Exception {
+		return (List<T>) this.baseDao.findByHql(hql, t);
+	}
+	
+	@Override
+	public List<T> findByHql(String hql) throws Exception {
+		return (List<T>) this.baseDao.findByHql(hql);
+	}
+
+	@Override
+	public List<T> findBySql(String sql, Object... t) throws Exception {
+		return (List<T>) this.baseDao.findByHql(sql, t);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setBaseDao(Object t) {
+		this.baseDao = (AbstractBaseDAO<T>) t;
+	}
+	
+	public Criteria findByDetachedCriteria(Class<?> thisClass, ProjectionList pList) throws Exception{
+		return this.baseDao.findByDetachedCriteria(thisClass, pList);
+	}
+	
+	 public int upateBySql(String sql, final Object... objects) {
+		 return this.baseDao.upateBySql(sql, objects);
+	 }
+	 
+}

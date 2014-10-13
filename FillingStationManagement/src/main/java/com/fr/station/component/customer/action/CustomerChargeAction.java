@@ -1,0 +1,139 @@
+package com.fr.station.component.customer.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.customer.CustomerChargeBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.service.CustomerChargeService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * action for customer charge
+ * 
+ * @author WR
+ */
+@Namespace("/customerCharge")
+@ParentPackage("custom-default")
+public class CustomerChargeAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(CustomerChargeAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected CustomerChargeService customerChargeServiceImpl;
+
+	protected CustomerChargeBean customerChargeBean;
+
+	protected List<CustomerChargeBean> customerChargeBeanList = new ArrayList<CustomerChargeBean>();
+
+	private String jsonData;
+
+	// ------- Constructors ----------------------------------------------------
+	public CustomerChargeAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * action for link to displayCustomerDepositCharge.jsp
+	 */
+	@Action(value = "customerDepositChargeInit", results = {
+			@Result(name = "success", location = "/view/card/card/cardCharge/displayCustomerDepositCharge.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String customerDepositInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for click search button to display customerAccount info
+	 */
+	@Action(value = "showCustomAccountInfo", results = { @Result(name = "success", location = "/view/card/card/cardCharge/displayCustomerDepositCharge.jsp"), })
+	public String showCustomAccountInfo() {
+		log.info("Starting to show Customer Account info");
+		boolean flag = false;
+		try {
+			this.customerChargeBeanList = this.customerChargeServiceImpl
+					.findCustomAccountRecordsByCriteria(this.customerChargeBean);
+			if (this.customerChargeBeanList.size() > 0) {
+				this.customerChargeBean = this.customerChargeBeanList.get(0);
+				log.info("Successfully get the customer account info");
+			} else {
+				this.customerChargeBean = null;
+				log.info("can not get the customer account info");
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("execute findCustomAccountRecordsByCriteria occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * action for click depositCharge button in displayCustomerDepositCharge.jsp
+	 */
+	@Action(value = "saveCustomChargeInfo", results = { @Result(name = "success", type = "json"), })
+	public String saveCustomChargeInfo() {
+		log.info("Starting to save customer charge info into DB");
+		boolean flag = false;
+		try {
+			this.customerChargeServiceImpl.addCustomChargeInfo(this.customerChargeBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("save customer charge  data into DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully save customer charge info into DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public CustomerChargeBean getCustomerChargeBean() {
+		return this.customerChargeBean;
+	}
+
+	public void setCustomerChargeBean(CustomerChargeBean customerChargeBean) {
+		this.customerChargeBean = customerChargeBean;
+	}
+
+	public String getJsonData() {
+		return this.jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

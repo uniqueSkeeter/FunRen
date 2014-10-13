@@ -1,0 +1,50 @@
+package com.fr.station.common.utility;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+
+import com.fr.station.common.bean.EmployeeBean;
+import com.fr.station.common.entity.system.EmployeeEntity;
+
+/**
+ * @author henry
+ * 
+ */
+public class CommonUtility {
+	public static EmployeeEntity createModel(EmployeeBean userBean) {
+		EmployeeEntity empployee = new EmployeeEntity();
+		return empployee;
+	}
+
+	public static List<EmployeeBean> createUserBeanList(List<EmployeeEntity> employeeEntityList) {
+		List<EmployeeBean> employeeBeanList = new ArrayList<EmployeeBean>();
+		EmployeeBean employeeBean = null;
+		for (EmployeeEntity user : employeeEntityList) {
+			employeeBean = new EmployeeBean();
+			employeeBeanList.add(employeeBean);
+		}
+		return employeeBeanList;
+
+	}
+
+	public static String convertArrayToCsv(String[] arr) {
+		String csv = "";
+		for (String value : arr) {
+			csv += value + ",";
+		}
+		return csv;
+	}
+
+	public static String[] convertCsvToArr(String csv) {
+		String[] values = csv.split(",");
+		return values;
+	}
+	
+	public static ProjectionList setReturnColumns(String column){
+		return Projections.projectionList().add(Property.forName(column));
+	}
+}

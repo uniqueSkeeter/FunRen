@@ -1,0 +1,125 @@
+package com.fr.station.common.bean.card;
+
+import com.fr.station.common.bean.system.StandardBean;
+
+public class CardStorageDetailBean implements StandardBean {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private String cardDetail;
+
+	/*
+	 * id
+	 */
+	private Integer id;
+
+	/*
+	 * inoutid
+	 */
+
+	private Integer inOutId;
+
+	/*
+	 * no1起始号
+	 */
+	private String startNo;
+
+	/*
+	 * no2结束号
+	 */
+	private String endNo;
+
+	/*
+	 * 数量
+	 */
+	private Integer cardSum;
+
+	/*
+	 * 说明
+	 */
+	private String note;
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageDetailBean() {
+		super();
+	}
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getInOutId() {
+		return this.inOutId;
+	}
+
+	public void setInOutId(Integer inOutId) {
+		this.inOutId = inOutId;
+	}
+
+	public String getStartNo() {
+		return this.startNo;
+	}
+
+	public void setStartNo(String startNo) {
+		this.startNo = startNo;
+	}
+
+	public String getEndNo() {
+		return this.endNo;
+	}
+
+	public void setEndNo(String endNo) {
+		this.endNo = endNo;
+	}
+
+	public Integer getCardSum() {
+		return this.cardSum;
+	}
+
+	public void setCardSum(Integer cardSum) {
+		this.cardSum = cardSum;
+	}
+
+	public String getNote() {
+		return this.note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getCardDetail() {
+		return this.cardDetail;
+	}
+
+	public void setCardDetail(String cardDetail) {
+		this.cardDetail = cardDetail;
+	}
+
+	@Override
+	public String toString() {
+		return "CardStorageDetailBean [cardDetail=" + this.cardDetail + ", id=" + this.id + ", inOutId=" + this.inOutId
+				+ ", startNo=" + this.startNo + ", endNo=" + this.endNo + ", cardSum=" + this.cardSum + ", note=" + this.note
+				+ "]";
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

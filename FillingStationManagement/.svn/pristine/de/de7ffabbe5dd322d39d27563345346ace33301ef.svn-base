@@ -1,0 +1,93 @@
+package com.fr.station.component.card.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.card.CardStorageDetailBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.CardStorageDetailEntity;
+import com.fr.station.component.card.dao.CardStorageDetailDAO;
+import com.fr.station.component.card.dao.impl.CardStorageDetailDaoImpl;
+import com.fr.station.component.card.service.CardStorageDetailService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+@Service
+public class CardStorageDetailServiceImpl extends AbstractBaseService<CardStorageDetailEntity> implements
+		CardStorageDetailService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static Logger log = Logger.getLogger(CardStorageServiceImpl.class);
+
+	@SuppressWarnings("unused")
+	private CardStorageDetailDAO cardStorageDetailDaoImpl;
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageDetailServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addCardOrderDetail(CardStorageDetailBean cardStorageDetailBean) {
+		log.info("Persist cardStorageDetail entity begain...");
+
+		List<CardStorageDetailEntity> cardDetailList = this.initialCardDetailEntity(cardStorageDetailBean.getCardDetail());
+
+		for (CardStorageDetailEntity cardDetailEntity : cardDetailList) {
+			this.saveOrUpdate(cardDetailEntity);
+		}
+		log.info("Succefully saved cardStorage entity...");
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	@Autowired
+	public void setCardStorageDetailDAO(CardStorageDetailDaoImpl cardStorageDetailDaoImpl) {
+		super.setBaseDao(cardStorageDetailDaoImpl);
+		this.cardStorageDetailDaoImpl = cardStorageDetailDaoImpl;
+	}
+
+	private List<CardStorageDetailEntity> initialCardDetailEntity(String cardData) {
+		if (StringUtils.isBlank(cardData)) {
+			return null;
+		}
+		CardStorageDetailEntity storageDetailEntity = null;
+		List<CardStorageDetailEntity> cardStorageDetailEntityList = new ArrayList<CardStorageDetailEntity>();
+		String[] dataArray = cardData.trim().split(";");
+		for (String data : dataArray) {
+			String[] dataDetail = data.trim().split(":");
+			storageDetailEntity = new CardStorageDetailEntity();
+			storageDetailEntity.setStartNo(dataDetail[0].trim());
+			storageDetailEntity.setEndNo(dataDetail[1].trim());
+			if (dataDetail.length == 3) {
+				storageDetailEntity.setNote(dataDetail[2].trim());
+			}
+			storageDetailEntity
+					.setCardAcount(Long.valueOf(dataDetail[1].trim()) - Long.valueOf(dataDetail[0].trim()) + 1);
+			storageDetailEntity.setCardInOutEntity(ApplicationContext.getInstance().getCardInoutEntity());
+			cardStorageDetailEntityList.add(storageDetailEntity);
+		}
+
+		return cardStorageDetailEntityList;
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

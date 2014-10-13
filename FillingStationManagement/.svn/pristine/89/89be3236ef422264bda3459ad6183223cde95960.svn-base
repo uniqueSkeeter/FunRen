@@ -1,0 +1,165 @@
+package com.fr.station.component.card.action;
+
+import net.sf.json.JSONObject;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+
+import com.fr.station.common.data.DataCollections;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for user CRUD. It handles the user different request,including add crate,update,delete user.
+ * Mainly responsible to handle user request
+ * 
+ * @author henry
+ */
+@Namespace("/card")
+@ParentPackage("custom-default")
+public class CardMaintainAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+	
+	protected static Logger log = Logger.getLogger(CardMaintainAction.class);
+	
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	
+	private JSONObject tree;
+	
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	@Action(value = "cardInit", results = {
+            @Result(name = "success", location = "/view/card/card/cardList.jsp"),
+            @Result(name = "error", location = "/view/login.jsp") })
+        public String cInit() {
+    	JSONObject jsonObject = null;
+		try {
+			jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+			        currfunc).get(3));
+			System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+    	tree = jsonObject;
+        return SUCCESS;
+        }
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardSell", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/carSell.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardSell() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardCharge", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/cardCharge.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardCharge() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardLost", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/cardLost.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardLost() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardFound", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/cardFound.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardFound() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardDelete", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/cardDelete.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardDelete() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 */
+	@Action(value="cardStorage", results={
+	           @Result(name="success", location="/view/card/success.jsp"),
+	           @Result(name="input", location="/view/card/cardStorage.jsp"),
+	           @Result(name="error", location="/view/login.jsp")})
+	public String cardStorage() {
+		log.info("Starting to check the current user is legal...");
+		return null;
+	}
+
+	public JSONObject getTree() {
+		return tree;
+	}
+
+	public void setTree(JSONObject tree) {
+		this.tree = tree;
+	}
+	
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+}

@@ -1,0 +1,130 @@
+package com.fr.station.component.report.action;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.report.ClassChangeBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.service.ExportShiftChangeService;
+import com.fr.station.component.report.service.ShiftChangeReportService;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class ShiftChangeReportAction extends ActionSupport {
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(ShiftChangeReportAction.class);
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected ShiftChangeReportService classChangeService;
+
+	@Autowired
+	protected ExportShiftChangeService exportShiftChangeService;
+
+	protected ClassChangeBean classChangeBean;
+
+	private String fileName;
+
+	private int fileLength;
+
+	private InputStream inputStream;
+
+	// ------- Constructors ----------------------------------------------------
+	public ShiftChangeReportAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	public String exportShiftChangeExcel() {
+
+		log.info("Starting to load export shift info  from DB");
+		boolean flag = false;
+		HSSFWorkbook workbook = null;
+		try {
+			workbook = this.exportShiftChangeService.generateShiftChangeExcel(this.classChangeBean);
+			ByteArrayOutputStream boas = new ByteArrayOutputStream();
+			try {
+				workbook.write(boas);
+			} catch (IOException e) {
+				flag = true;
+				e.printStackTrace();
+			}
+			this.setInputStream(new ByteArrayInputStream(boas.toByteArray()));
+			flag = true;
+		}catch (Exception e) {
+			log.info("Loading export shift info data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Override
+	public String execute() throws Exception {
+		return SUCCESS;
+	}
+
+	public void setFileName(String start) {
+		this.fileName = start;
+	}
+
+	public void setFileLength(int fileLength) {
+		this.fileLength = fileLength;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public int getFileLength() {
+		return this.fileLength;
+	}
+
+	public ClassChangeBean getClassChangeBean() {
+		return this.classChangeBean;
+	}
+
+	public void setClassChangeBean(ClassChangeBean classChangeBean) {
+		this.classChangeBean = classChangeBean;
+	}
+
+	private FileOutputStream preExportSSGTemplatePath(String shiftChangeDataPath) {
+
+		FileOutputStream fos = null;
+		try {
+
+			File ssgSourceTemplateDir = new File(shiftChangeDataPath);
+
+			fos = new FileOutputStream(ssgSourceTemplateDir);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return fos;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public InputStream getInputStream() {
+		return this.inputStream;
+	}
+
+}

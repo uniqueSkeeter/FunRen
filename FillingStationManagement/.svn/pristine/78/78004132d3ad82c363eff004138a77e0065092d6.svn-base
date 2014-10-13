@@ -1,0 +1,190 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	$(document).ready(function(){
+		$("#readCard").click(function(){
+		alert("读卡");
+		});
+		$("#search").click(function(){
+			alert("查询");
+			var cardNo = $("#cardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(cardNo == '' && guestNo == ''){
+				$.messager.alert('错误', '卡号和客户编号不能同时为空');
+				return;
+			}
+			//提交表单
+			document.cardAccount_form.submit();
+		});
+		$("#charge").click(function(){
+			alert("充值");
+			//判断是否经过查询
+			var cardNo = $("#cardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(cardNo =='' || guestNo == ''){
+				$.messager.alert('错误', '必须先查询!');
+				return;
+			}
+			//判断交易额是否为空
+			var chargeAmount = $("#chargeAmount").val();
+			if(chargeAmount == ''){
+				$.messager.alert('错误', '交易额不能为空!');
+				return;
+			}
+			//判断交易类型是否是充值
+			var tradeType = $("#tradeType").find("option:selected").text();
+			alert(tradeType);
+			if(tradeType != '充值'){
+				$.messager.alert('错误', '交易类型只能是充值!');
+				return;
+			}
+			alert("做充值");
+			//充值
+			doCharge();
+		});
+		$("#reset").click(function(){
+			alert("重置");
+			document.cardAccount_form.reset();
+		});
+		$("#cancel").click(function(){
+			alert("扣款");
+			//判断是否经过查询
+			var cardNo = $("#cardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(!(cardNo !='' && guestNo != '')){
+				$.messager.alert('错误', '必须先查询!');
+				return;
+			}
+			//判断交易额是否为空
+			var chargeAmount = $("#chargeAmount").val();
+			if(chargeAmount == ''){
+				$.messager.alert('错误', '交易额不能为空!');
+				return;
+			}
+			//判断交易类型是否是 消费 退款 撤销
+			var tradeType = $("#tradeType").find("option:selected").text();
+			alert('s'+tradeType+'s');
+			if(tradeType != '消费'&&tradeType != '退款'&&tradeType != '撤销'){
+				$.messager.alert('错误', '交易类型只能是消费,退款,撤销!');
+				return;
+			}
+			alert("做扣款");
+			deductAccount();
+		});
+		//改变交易流水号的显示
+		$("#payType").change(function(){
+			if(this.value == '12'){
+				$("#bankSerialNum").show();
+				$("#serialNumLabel").show();
+			}
+			else{
+				$("#bankSerialNum").hide();
+				$("#serialNumLabel").hide();
+			}
+		});
+	});
+	//充值
+	function doCharge(){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/cardCharge/saveCardChargeInfo',
+			data : {
+				"cardChargeBean.id" : $("#cardAccId").val(),
+				"cardChargeBean.cardNo" : $("#cardNo").val(),
+				"cardChargeBean.guestName" : $("#guestName").val(),
+				"cardChargeBean.cardAccount" : $("#cardAccount").val(),
+				"cardChargeBean.rechargeAmount" : $("#rechargeAmount").val(),
+				"cardChargeBean.chargeAmount" : $("#chargeAmount").val(),
+				"cardChargeBean.payType" : $("#payType").val(),
+				"cardChargeBean.tradeType" : $("#tradeType").val(),
+				"cardChargeBean.bankSerialNum" : $("#bankSerialNum").val()
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '已充值!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/cardCharge/printCardCharge.jsp'
+				+'?cardNo='+document.getElementById("cardNo").value
+				+'&cardType='+encodeURI(encodeURI(document.getElementById("cardType").value))
+				+'&cardStatus='+encodeURI(encodeURI(document.getElementById("cardStatus").value))
+				+'&guestNo='+document.getElementById("guestNo").value
+				+'&guestName='+encodeURI(encodeURI(document.getElementById("guestName").value))
+				+'&guestStatus='+encodeURI(encodeURI(document.getElementById("guestStatus").value))
+				+'&chargeAmount='+document.getElementById("chargeAmount").value
+				+'&payType='+encodeURI(encodeURI($("#payType").find("option:selected").text()))
+				+'&cardAccount='+(parseFloat(document.getElementById("cardAccount").value)+parseFloat(document.getElementById("chargeAmount").value));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '充值凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	document.cardAccount_form.submit();
+		                    }
+		                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '充值失败!');
+			}
+		});
+	}
+	//扣款
+	function deductAccount(){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/cardCharge/saveCardChargeInfo',
+			data : {
+				"cardChargeBean.id" : $("#cardAccId").val(),
+				"cardChargeBean.cardNo" : $("#cardNo").val(),
+				"cardChargeBean.guestName" : $("#guestName").val(),
+				"cardChargeBean.cardAccount" : $("#cardAccount").val(),
+				"cardChargeBean.rechargeAmount" : $("#rechargeAmount").val(),
+				"cardChargeBean.chargeAmount" : $("#chargeAmount").val(),
+				"cardChargeBean.payType" : $("#payType").val(),
+				"cardChargeBean.tradeType" : $("#tradeType").val(),
+				"cardChargeBean.bankSerialNum" : $("#bankSerialNum").val()
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '已扣款!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/cardCharge/printCardCharge.jsp'
+				+'?cardNo='+document.getElementById("cardNo").value
+				+'&cardType='+encodeURI(encodeURI(document.getElementById("cardType").value))
+				+'&cardStatus='+encodeURI(encodeURI(document.getElementById("cardStatus").value))
+				+'&guestNo='+document.getElementById("guestNo").value
+				+'&guestName='+encodeURI(encodeURI(document.getElementById("guestName").value))
+				+'&guestStatus='+encodeURI(encodeURI(document.getElementById("guestStatus").value))
+				+'&chargeAmount='+document.getElementById("chargeAmount").value
+				+'&payType='+encodeURI(encodeURI($("#payType").find("option:selected").text()))
+				+'&cardAccount='+(parseFloat(document.getElementById("cardAccount").value)-parseFloat(document.getElementById("chargeAmount").value));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '扣款凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	document.cardAccount_form.submit();
+		                    }
+		                }]
+				});
+			},
+			error : function(){
+				$.messager.alert('错误', '扣款失败!');
+			}
+		});
+	}

@@ -1,0 +1,176 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.*"%>
+<%@ page import="java.text.*" %>
+<%
+   		String path = request.getContextPath();
+		String basePath = request.getScheme() + "://"
+				+ request.getServerName() + ":" + request.getServerPort() + path + "/";
+%>
+	<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="<%=basePath%>themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="<%=basePath%>css/demo.css"> 
+	<script type="text/javascript" src="<%=basePath%>js/system/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="<%=basePath%>js/system/jquery.easyui.min.js"></script>
+	<!-- localization -->
+	<script type="text/javascript" src="<%=basePath%>js/system/locale/easyui-lang-zh_CN.js"></script>
+	<style   media=print>
+		.Noprint{display:none;}
+		.PageNext{page-break-after:   always;}
+	</style>
+<html>
+<head>
+	<title>富仁高科加油站管理系统</title>
+	<base href="<%=basePath%>" />
+	<link rel="shortcut icon" type="image/x-icon"
+	href="<%=basePath%>images/favicon.ico" />
+	<!-- common -->
+	<link href="css/common.css" rel="stylesheet" type="text/css" />
+	<link href="css/commonDialog.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<div style="padding-left:20px">
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 95%; height: 100px">
+		<tr>
+			<td width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<hr>
+				<div class="title">班次信息</div>
+				<table style="font-size: 12px;width: 100%; height: 50px; font-weight: bold;">
+					<tr>
+						<td height="30px" width="100px">业务日期:</td>
+						<td height="30px" width="100px" >
+							<input name="classChangeBean.workDate" id="workDate" readonly="readonly" value="${classChangeBean.workDate }"style="width:150px" >
+						</td>
+						<td height="30px" width="100px">班次号:</td>
+						<td height="30px" width="100px" >
+							<input name="classChangeBean.classNo" id="classNo" readonly="readonly" value="${classChangeBean.classNo }"style="width:150px" >
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" width="100px">班次状态:</td>
+						<td height="30px" width="100px" >
+							<s:set var="classStatusKey" value="classChangeBean.classStatus">
+							</s:set>
+							<input name="classChangeBean.classStatus" id="classStatus" readonly="readonly" value="${classStatus[classStatusKey] }"style="width:150px" >
+						</td>
+						<td height="30px" width="100px">管理员编号:</td>
+						<td height="30px" width="100px" >
+							<input name="classChangeBean.userId" id="userId" readonly="readonly" value="${classChangeBean.userId }" style="width:150px" >
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" width="100px">起始时间:</td>
+						<td height="30px" width="100px" >
+							<input name="classChangeBean.startTime" id="startTime" readonly="readonly" value="${classChangeBean.startTime }" style="width:150px" >
+						</td>
+						<td height="30px" width="100px">结束时间:</td>
+						<td height="30px" width="100px" >
+							<input name="classChangeBean.endTime" id="endDate" readonly="readonly" value="${classChangeBean.endTime }" style="width:150px" >
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</TABLE>
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 95%; height: 100px">
+		<tr>
+			<td width="60%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<hr>
+				<div class="title">交易统计报表（单位：元）</div>
+				<table  style="font-size: 12px;width: 100%; height: 50px; font-weight: bold;" border="1">
+					<tr>
+						<td rowspan="2" style="text-align:center;">${stationName }</td>
+						<td colspan="4" style="text-align:center;">IC卡预收款</td>
+						<td colspan="2" style="text-align:center;">押金</td>
+						<td rowspan="2" style="text-align:center;">网点收支合计</td>
+					</tr>
+					<tr>
+						<td align="center" valign="middle">现金充值</td>
+						<td align="center" valign="middle">银行卡充值</td>
+						<td align="center" valign="middle">支票充值登记</td>
+						<td align="center" valign="middle">销户退款</td>
+						<td align="center" valign="middle">押金收入</td>
+						<td align="center" valign="middle">押金退还</td>
+					</tr>
+					<tr>
+						<td align="center" valign="middle">总计</td>
+						<td align="center" valign="middle">${classChangeBean.chargeFromCash }</td>
+						<td align="center" valign="middle">${classChangeBean.chargeFromICCard }</td>
+						<td align="center" valign="middle">${classChangeBean.chargeFromCheque }</td>
+						<td align="center" valign="middle">${classChangeBean.returnAmount }</td>
+						<td align="center" valign="middle">${classChangeBean.receiveForegiftAmount }</td>
+						<td align="center" valign="middle">${classChangeBean.returnForegiftAmount }</td>
+						<td align="center" valign="middle">${classChangeBean.totalMoney }</td>
+					</tr>
+				</table>
+				<div>* 网点收支合计：${classChangeBean.totalMoney }=${classChangeBean.chargeFromCash }+ ${classChangeBean.chargeFromICCard }+${classChangeBean.chargeFromCheque }-${classChangeBean.returnAmount }+${classChangeBean.receiveForegiftAmount }-${classChangeBean.returnForegiftAmount }</div>
+			</td>
+		</tr>
+	</TABLE>
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 95%; height: 100px">
+		<tr>
+			<td width="60%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+			<hr>
+				<div class="title">卡库存统计报表（单位：张）</div>
+				<table  style="font-size: 12px;width: 100%; height: 50px; font-weight: bold; text-align:center;" border="1">
+					<tr>
+						<td></td>
+						<td>IC卡类型</td>
+						<td>期初数量</td>
+						<td>期末数量</td>
+						<td>卡片数量</td>
+						<td>交易笔数</td>
+					</tr>
+					<c:forEach var="cardStorageList" items="${classChangeBean.cardStorageList }">
+						<tr>
+							<td>总计</td>
+							<td>
+								<c:set var="cardTypeKey" value="${cardStorageList.cardType}"></c:set>
+								${cardCategory[cardTypeKey]}
+							</td>
+							<td>${cardStorageList.cardQuantityBegin }</td>
+							<td>${cardStorageList.cardQuantityEnd }</td>
+							<td>${cardStorageList.cardQuantity }</td>
+							<td>${cardStorageList.tradeCount }</td>
+						</tr>		
+					</c:forEach>
+				</table>
+			</td>
+		</tr>
+	</TABLE>
+	
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 95%; height: 100px">
+		<tr>
+			<td width="60%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+			<hr>
+				<div class="title">发票统计报表（单位：元）</div>
+				<table  style="font-size: 12px;width: 100%; height: 50px; font-weight: bold; text-align:center;" border="1">
+					<tr>
+						<td></td>
+						<td>发票金额（元）</td>
+						<td>发票数</td>
+					</tr>
+					<tr>
+						<td>总计</td>
+						<td>${classChangeBean.invoiceTotalAmount }</td>
+						<td>${classChangeBean.invoiceTotalCount }</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</TABLE>
+	</div>
+	<div style="padding-left:150px" class= "NOPRINT ">
+		<table>
+			<tr>
+				<td>
+					<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-print" onclick="javascript:window.print();">打印</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

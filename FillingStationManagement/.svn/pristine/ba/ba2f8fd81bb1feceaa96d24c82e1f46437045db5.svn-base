@@ -1,0 +1,39 @@
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(document).ready(function(){
+	$("#cardMaintain_searchfor").click(function(){
+		 var cardno=document.getElementById("cardNo").value;
+		 if(cardno==''){
+			alert('请读卡!');
+			return false;
+		 }
+		 document.myForm.reset();
+		 $("#cardNo").val(cardno);
+		 document.myForm.submit();
+	});
+	
+	$("#cardMaintain_clear").click(function(){
+		document.myForm.reset();
+	});
+	
+	$("#cardMaintain_saveCardInfo").click(function(){
+    	var flag = validateAnonyFieldValue();
+    	alert($(myForm).serialize());
+    	if(flag){
+    		$.ajax({
+    			data:$(myForm).serialize(),
+    			url:encodeURI(server_context+"/cardInfo/saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+    			success:function(data){
+    			},
+    			error:function(){
+    			}
+    		});
+    	}
+	});
+});
+
+function validateAnonyFieldValue(){
+	return true;
+}

@@ -1,0 +1,101 @@
+package com.fr.station.component.report.action;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.ClassChangeBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.service.ShiftChangeReportService;
+import com.fr.station.component.report.service.ExportShiftChangeService;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class ShiftChangeReportAction extends ActionSupport {
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(ShiftChangeReportAction.class);
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected ShiftChangeReportService classChangeService;
+
+	@Autowired
+	protected ExportShiftChangeService exportShiftChangeService;
+
+	protected ClassChangeBean classChangeBean;
+
+	private String fileName;
+
+	private int fileLength;
+
+	// ------- Constructors ----------------------------------------------------
+	public ShiftChangeReportAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	public InputStream getInputStream() {
+
+		log.info("Starting to load export shift info  from DB");
+		boolean flag = false;
+		HSSFWorkbook workBook = null;
+		try {
+			workBook = this.exportShiftChangeService.generateShiftChangeExcel(this.classChangeBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("Loading export shift info data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+		}
+		if (flag) {
+			// String content = workBook.toString();
+
+			String content = "Hahahahaha : " + this.fileName;
+
+			this.setFileLength(content.getBytes().length);
+			// System.out.println("The File Size : " + content.getBytes().length);
+			// log.info("Successfully load export shift info data from DB");
+
+			return new ByteArrayInputStream(content.getBytes(), 0, content.length());
+
+		}
+		return null;
+
+	}
+
+	@Override
+	public String execute() throws Exception {
+		return SUCCESS;
+	}
+
+	public void setFileName(String start) {
+		this.fileName = start;
+	}
+
+	public void setFileLength(int fileLength) {
+		this.fileLength = fileLength;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public int getFileLength() {
+		return this.fileLength;
+	}
+
+	public ClassChangeBean getClassChangeBean() {
+		return this.classChangeBean;
+	}
+
+	public void setClassChangeBean(ClassChangeBean classChangeBean) {
+		this.classChangeBean = classChangeBean;
+	}
+
+}

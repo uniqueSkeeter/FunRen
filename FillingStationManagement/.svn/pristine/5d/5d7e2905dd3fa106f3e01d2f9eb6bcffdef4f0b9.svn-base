@@ -1,0 +1,30 @@
+	// 表单验证
+	var check = function(input) {
+	    if (input.value == '') {
+	    	inputError(input);
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	       
+	    };
+	};
+
+	
+	// 输入错误提示
+	
+	var inputError = function (input) {
+	    clearTimeout(inputError.timer);
+	    var num = 0;
+	    var fn = function () {
+	        inputError.timer = setTimeout(function () {
+	            input.className = input.className == '' ? 'form-error' : '';
+	            if (num == 5) {
+	                input.className = '';
+		            } else {
+		                fn(num ++);
+		            };
+		        }, 150);
+		    };
+		    fn();
+		};

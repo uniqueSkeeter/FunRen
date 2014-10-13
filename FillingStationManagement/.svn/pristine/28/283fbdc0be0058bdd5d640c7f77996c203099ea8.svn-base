@@ -1,0 +1,134 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CardChargeBean;
+import com.fr.station.common.entity.card.FKTCardTZEntity;
+import com.fr.station.common.entity.card.FkTCreditEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.CardChargeDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The cardChargeServiceImpl for cardCharge
+ * 
+ * @author WR
+ */
+@Repository
+public class CardChargeDaoImpl extends AbstractBaseDAO<FkTCreditEntity> implements CardChargeDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardChargeDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	private final String cardAcountSql = "SELECT card.cardType,card.cardStatus,guest.stats,card.guestName,card.guestType,card.guestNum, "
+			+ "cardAcc.cardBal,guestAcc.bal,guestAcc.cardAcc,card.cardNo,card.guestNo,cardAcc.id,cardAcc.cardInc "
+			+ "FROM FK_T_CARD card,FK_T_GUEST guest,FK_T_CARDTZ cardAcc,FK_T_GUESTACC guestAcc "
+			+ "WHERE guest.guestNo = guestAcc.guestNo AND guest.guestNo = card.guestNo AND card.cardNo = cardAcc.cardNo ";
+
+	private final String updateCardTZSql = "UPDATE FK_T_CARDTZ SET cardBal = ? ,cardInc = ? ,userId = ? WHERE id = ? ";
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+	public CardChargeDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 获得卡账户信息 2014-7-30 更新
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardChargeBean> getCardAccountRecordsByCriteria(CardChargeBean cardChargeBean) {
+		List<CardChargeBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.cardAcountSql);
+		try {
+			StringBuilder req = this.validateCardAccountInput(cardChargeBean);
+			builder.append(req);
+			Query query = null;
+			try {
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log" + e.getMessage() + "\n");
+			}
+			List<Object[]> result = query.list();
+			resultList = this.convertCardAccountToBean(result);
+
+		} catch (QueryException e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 卡充值时更新卡账信息表
+	 */
+	@Override
+	public void updateCardAccEntity(FKTCardTZEntity cardAccEntity) {
+		Object[] args = { cardAccEntity.getCardbal(), cardAccEntity.getCardinc(), cardAccEntity.getUserid(),
+				cardAccEntity.getId() };
+		this.upateBySql(this.updateCardTZSql, args);
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 查询卡账户信息SQL语句查询条件 2014-7-30更新
+	 */
+	private StringBuilder validateCardAccountInput(CardChargeBean cardChargeBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(cardChargeBean.getCardNo())) {
+			builder.append(" AND ").append("card.cardNo = '").append(cardChargeBean.getCardNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardChargeBean.getGuestNo())) {
+			builder.append(" AND ").append("card.guestNo = '").append(cardChargeBean.getGuestNo()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 把卡账户信息覆盖到bean 2014-7-30 更新
+	 */
+	private List<CardChargeBean> convertCardAccountToBean(List<Object[]> dataResult) {
+		List<CardChargeBean> cardChargeBeanList = new ArrayList<CardChargeBean>();
+		CardChargeBean cardChargeBean;
+		for (Object[] dataRow : dataResult) {
+			cardChargeBean = new CardChargeBean();
+			cardChargeBean.setCardType(String.valueOf(dataRow[0]));
+			cardChargeBean.setCardStatus(String.valueOf(dataRow[1]));
+			cardChargeBean.setGuestStatus(String.valueOf(dataRow[2]));
+			cardChargeBean.setGuestName(String.valueOf(dataRow[3]));
+			cardChargeBean.setGuestType(String.valueOf(dataRow[4]));
+			cardChargeBean.setGuestNum(String.valueOf(dataRow[5]));
+			cardChargeBean.setCardAccount(((BigDecimal) (dataRow[6])));
+			cardChargeBean.setSpareAccount(((BigDecimal) (dataRow[7])));
+			cardChargeBean.setCardAccountLeft(((BigDecimal) (dataRow[8])));
+			cardChargeBean.setCardNo(String.valueOf(dataRow[9]));
+			cardChargeBean.setGuestNo(String.valueOf(dataRow[10]));
+			cardChargeBean.setId(((Integer) (dataRow[11])));
+			cardChargeBean.setRechargeAmount(((BigDecimal) (dataRow[12])));
+			cardChargeBeanList.add(cardChargeBean);
+		}
+		return cardChargeBeanList;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

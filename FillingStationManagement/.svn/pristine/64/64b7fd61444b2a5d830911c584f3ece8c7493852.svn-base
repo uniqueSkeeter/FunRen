@@ -1,0 +1,256 @@
+package com.fr.station.common.entity.card;
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.entity.base.BaseEntity;
+
+@Entity
+@Table(name = "FK_T_Storage")
+public class CardStorageEntity extends BaseEntity {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue
+	private Integer id;
+
+	/**
+	 * 日期
+	 */
+	@Column(name = "`workdate`")
+	private Timestamp startNo;
+
+	/**
+	 * 卡类型
+	 */
+	@Column(name = "`cardtype`")
+	private String cardType;
+
+	/**
+	 * 库存数量
+	 */
+	@Column(name = "`cardsum`")
+	private int stockAmount;
+
+	/**
+	 * 入库数量
+	 */
+	@Column(name = "`Insum`")
+	private int stockInAmount;
+
+	/**
+	 * 出库数量
+	 */
+	@Column(name = "`Outsum`")
+	private int stockOutAmount;
+
+	/**
+	 * 调整数量
+	 */
+	@Column(name = "`chsum`")
+	private int adjustAmount;
+
+	/**
+	 * 备注
+	 */
+	@Column(name = "`NOTE`")
+	private String NOTE;
+
+	/**
+	 * 网点编号
+	 */
+	@Column(name = "`STATIONNO`")
+	private String stationNo;
+
+	/**
+	 * 记录标识
+	 */
+	@Column(name = "`BZ`")
+	private String bz;
+
+	@Override
+	public Integer getId() {
+		return this.id;
+	}
+
+	@Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Timestamp getStartNo() {
+		return this.startNo;
+	}
+
+	public void setStartNo(Timestamp startNo) {
+		this.startNo = startNo;
+	}
+
+	public String getCardType() {
+		return this.cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public int getStockAmount() {
+		return this.stockAmount;
+	}
+
+	public void setStockAmount(int stockAmount) {
+		this.stockAmount = stockAmount;
+	}
+
+	public int getStockInAmount() {
+		return this.stockInAmount;
+	}
+
+	public void setStockInAmount(int stockInAmount) {
+		this.stockInAmount = stockInAmount;
+	}
+
+	public int getStockOutAmount() {
+		return this.stockOutAmount;
+	}
+
+	public void setStockOutAmount(int stockOutAmount) {
+		this.stockOutAmount = stockOutAmount;
+	}
+
+	public int getAdjustAmount() {
+		return this.adjustAmount;
+	}
+
+	public void setAdjustAmount(int adjustAmount) {
+		this.adjustAmount = adjustAmount;
+	}
+
+	public String getNOTE() {
+		return this.NOTE;
+	}
+
+	public void setNOTE(String nOTE) {
+		this.NOTE = nOTE;
+	}
+
+	public String getStationNo() {
+		return this.stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getBz() {
+		return this.bz;
+	}
+
+	public void setBz(String bz) {
+		this.bz = bz;
+	}
+
+	@Override
+	public String toString() {
+		return "CardStorageEntity [id=" + this.id + ", startNo=" + this.startNo + ", cardType=" + this.cardType + ", stockAmount="
+				+ this.stockAmount + ", stockInAmount=" + this.stockInAmount + ", stockOutAmount=" + this.stockOutAmount + ", adjustAmount="
+				+ this.adjustAmount + ", NOTE=" + this.NOTE + ", stationNo=" + this.stationNo + ", bz=" + this.bz + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((this.NOTE == null) ? 0 : this.NOTE.hashCode());
+		result = prime * result + this.adjustAmount;
+		result = prime * result + ((this.bz == null) ? 0 : this.bz.hashCode());
+		result = prime * result + ((this.cardType == null) ? 0 : this.cardType.hashCode());
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		result = prime * result + ((this.startNo == null) ? 0 : this.startNo.hashCode());
+		result = prime * result + ((this.stationNo == null) ? 0 : this.stationNo.hashCode());
+		result = prime * result + this.stockAmount;
+		result = prime * result + this.stockInAmount;
+		result = prime * result + this.stockOutAmount;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		CardStorageEntity other = (CardStorageEntity) obj;
+		if (this.NOTE == null) {
+			if (other.NOTE != null) {
+				return false;
+			}
+		} else if (!this.NOTE.equals(other.NOTE)) {
+			return false;
+		}
+		if (this.adjustAmount != other.adjustAmount) {
+			return false;
+		}
+		if (this.bz == null) {
+			if (other.bz != null) {
+				return false;
+			}
+		} else if (!this.bz.equals(other.bz)) {
+			return false;
+		}
+		if (this.cardType == null) {
+			if (other.cardType != null) {
+				return false;
+			}
+		} else if (!this.cardType.equals(other.cardType)) {
+			return false;
+		}
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		if (this.startNo == null) {
+			if (other.startNo != null) {
+				return false;
+			}
+		} else if (!this.startNo.equals(other.startNo)) {
+			return false;
+		}
+		if (this.stationNo == null) {
+			if (other.stationNo != null) {
+				return false;
+			}
+		} else if (!this.stationNo.equals(other.stationNo)) {
+			return false;
+		}
+		if (this.stockAmount != other.stockAmount) {
+			return false;
+		}
+		if (this.stockInAmount != other.stockInAmount) {
+			return false;
+		}
+		if (this.stockOutAmount != other.stockOutAmount) {
+			return false;
+		}
+		return true;
+	}
+
+}

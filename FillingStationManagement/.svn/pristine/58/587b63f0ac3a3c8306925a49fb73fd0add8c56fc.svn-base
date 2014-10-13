@@ -1,0 +1,90 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.*"%>
+<%@ page import="java.text.*" %>
+<%@include file="../../common/common.jsp" %>
+<html>
+<head>
+	<title>富仁高科加油站管理系统</title>
+	<base href="<%=basePath%>" />
+	<link rel="shortcut icon" type="image/x-icon"
+	href="<%=basePath%>images/favicon.ico" />
+	<!-- common -->
+	<link href="css/common.css" rel="stylesheet" type="text/css" />
+	<link href="css/commonDialog.css" rel="stylesheet" type="text/css" />
+</head>
+<body id ="cardListApply-body">
+	<div style="height:100px;padding-left:10px">
+	<p style="color:#2874ff;font-size: 14px;text-align: right">当前站点:${stationNo} ${stationName} 当前班次 :${classNo}</p>
+	<hr class="subLineColor">
+	<form id= "cardListApply-form" method="post" action="cardStorage/saveApplication">
+			<div style="padding-left:30px">
+			<table style="font-size: 20px;width:600px; height: 100px">
+				<tr>
+					<td style="height:3px; width:100px; ">卡片类型:</td>
+					<td height="10px" width="120px">
+						<select name="cardStorageBean.cardType" id="cardCategory" style="width:150px">
+							<s:set var="cardType" value="cardStorageBean.cardType">
+							</s:set>
+							<c:forEach var="cardType" items="${cardCategory }">
+								<option value="${cardType.key }">
+									${cardType.value }
+								</option>
+							</c:forEach>
+						</select>
+					</td>
+					<td style="height:3px; width:100px;">申请日期:</td>
+					<td style="height:3px; width:120px">
+						<input name="cardStorageBean.applyDate" id="datepicker3" class="easyui-datebox" style="width:150px" editable="false" showSeconds="false">	
+					</td>
+					
+				</tr>
+				<tr>
+					<td style="height:3px; width:100px;">领取方:</td>
+					<td style="height:10px; width:120px">
+						<input type="text" name="cardStorageBean.receiver" id="receiver" value="${stationName}" readonly="readonly" style="width:150px">
+					</td>
+					<td style="height:3px; width:100px;">供货方:</td>
+					<td height="10px" style="width:120px">
+						<!-- <input type="text" name="cardStorageBean.supplier" id="supplier" value="${cardStorageBean.supplier }" style="width:150px"></input> -->
+						<select name="cardStorageBean.supplier" id="supplier" style="width:150px;">
+						<c:forEach var="stationList" items="${stationList}">
+							<option value="${stationList.key}">
+								${stationList.value}
+							</option>
+						</c:forEach>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td style="height:3px; width:100px;">数量:</td>
+					<td height="10px" style="width:120px">
+						<input name="cardStorageBean.cardSum" id="cardSum" style="width:150px" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></input>
+					</td>
+					
+					<td style="height:3px; width:100px;">备注:</td>
+					<td height="10px" style="width:120px">
+						<input name="cardStorageBean.note" id="note" value="${cardStorageBean.note }" style="width:150px" maxLength="10"></input>
+					</td>
+				</tr>
+				<tr>
+					<td style="height:3px; width:80px">
+						<input type="hidden" name="cardStorageBean.receiptType" id="applyReceiptType" value="1">
+					</td>
+					<td height="3px" width="120px">
+						<input type="hidden" name="cardStorageBean.stationNum" id="stationNum" value="${stationNo}">
+					</td>
+					<td height="3px" width="80px">
+						<input type="hidden" name="cardStorageBean.receiptStatus" id="receiptStatus" value="1">
+					</td>	
+				</tr>
+			</table>
+			</div>
+		</form>
+	<hr class="subLineColor">
+</div>
+</body>
+</html>

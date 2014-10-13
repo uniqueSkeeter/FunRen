@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+
+		<mapping class="com.fr.station.common.entity.system.EmployeeEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.DictionaryEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTGuestEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTCardEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.OperatorEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.RoleInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.StationEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.RoleFunctionInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.FunctionInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.report.OilManageEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTCardInOutEntity"></mapping>
+		
+		<mapping resource="classpath:../../META-INF/hibernate/iccardSql.hbm.xml" />  
+	</session-factory>
+</hibernate-configuration>

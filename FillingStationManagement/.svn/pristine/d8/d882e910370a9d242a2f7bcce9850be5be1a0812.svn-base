@@ -1,0 +1,17 @@
+package com.fr.station.common.entity.base;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import com.fr.station.common.bean.StandardBean;
+
+public class BaseEntity implements StandardBean {
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "ID")
+	@GeneratedValue
+	private Integer id;
+
+}

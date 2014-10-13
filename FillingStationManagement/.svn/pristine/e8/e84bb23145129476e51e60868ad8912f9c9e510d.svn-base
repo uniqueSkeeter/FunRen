@@ -1,0 +1,166 @@
+package com.fr.station.component.report.action;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.SessionAware;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.ShiftChangeBean;
+import com.fr.station.common.data.DataCollections;
+import com.fr.station.common.utility.DateJsonValueProcessor;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.service.ShiftChangeRefuelService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for dashboard. It handles the user request from the web page.
+ * 
+ * 
+ * @author henry
+ */
+@Namespace("/shiftChange")
+@ParentPackage("custom-default")
+public class ShiftChangeRefuelAction extends AbstractAction implements SessionAware{
+	
+	// ------- Constants (static final) ----------------------------------------
+	
+	private static final long serialVersionUID = 1L;
+	
+	private static Logger log = Logger.getLogger(ShiftChangeRefuelAction.class);
+	
+	public static final String SHIFTSTATUS = "shiftStatus";
+	public static final String SHIFTTYPE = "shiftType";
+	public static final String LOGINSTATUS = "loginStatus";
+	public static final String POLITICALSTATUS = "politicalStatus";
+	public static final String BANKTYPE = "bankType";
+	public static final String EDUCATION = "education";
+	
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+    protected ShiftChangeRefuelService shiftChangeService;
+	
+	protected ShiftChangeBean shiftChangeBean;
+	
+    private String jsonData;
+    
+	private Map<String, Object> session;
+    
+	// ------- Constructors ----------------------------------------------------
+    
+	public ShiftChangeRefuelAction() {
+		super();
+	}
+    
+	// ------- Instance Methods (public) ---------------------------------------
+	
+    @Action(value = "shiftChangeInit", results = {
+            @Result(name = "success", location = "/view/card/report/displayShiftChangeRefuel.jsp"),
+            @Result(name = "error", location = "/view/login.jsp") })
+        public String employeeInit() {
+		try {
+//			jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+//			        currfunc).get(0));
+//			System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+        return SUCCESS;
+        }
+
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 * @throws com.fr.station.card.ICCard.exception.ICCardException 
+	 */
+	@Action(value="showShiftChange", results={
+				@Result(name="success",  type = "json"),
+	           })
+	public String showUser() {
+		log.info("Starting to load shift change infomation from DB");
+		Map<String,Object> map=new HashMap<String,Object>();
+		boolean flag = false;
+		List<ShiftChangeBean> shiftChangeBeanList = null;
+		try {
+			shiftChangeBeanList = this.shiftChangeService.findShiftChangeRecordsByCriteria(shiftChangeBean);
+			if(!shiftChangeBeanList.isEmpty()){
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(
+			            DateUtil.DATE_PATTERN_2));
+//				this.getShiftChangeJsonArray().addAll(shiftChangeBeanList, config);
+				map.put("total", shiftChangeBeanList.get(0).getTotalData());
+				map.put("rows", shiftChangeBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+			}else{
+				map.clear();
+			}
+			flag = true;
+		}catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "["
+					+  e + "]\n" + ErrorLogUtil.printInfo(e));
+		}catch (Exception e) {
+			log.info("Loading oil gun consume data from DB occured error, please references the detail log\n " + "[" 
+					+  e + "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if(flag){
+			log.info("Successfully load oil consume data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public ShiftChangeBean getShiftChangeBean() {
+		return shiftChangeBean;
+	}
+
+	public void setShiftChangeBean(ShiftChangeBean shiftChangeBean) {
+		this.shiftChangeBean = shiftChangeBean;
+	}
+
+	public String getJsonData() {
+		return jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+	
+	/**
+	 * Assign the value of session to session.
+	 * 
+	 * @param session the session to set
+	 *            
+	 */
+	public void setSession(Map<String, Object> session) {
+		this.session = session;
+		this.session.put(SHIFTSTATUS, DataCollections.shiftStatus);
+		this.session.put(SHIFTTYPE, DataCollections.shiftType);
+		this.session.put(LOGINSTATUS, DataCollections.loginStatus);
+		this.session.put(POLITICALSTATUS, DataCollections.poliStatus);
+		this.session.put(BANKTYPE, DataCollections.dicBank);
+		this.session.put(EDUCATION, DataCollections.educationType);
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	
+}

@@ -1,0 +1,18 @@
+package com.fr.station.component.card.dao;
+
+import java.util.List;
+
+import com.fr.station.common.bean.CardDetailBean;
+
+/**
+ * 卡片明细DAO
+ * 
+ * @author _yy
+ */
+public interface CardDetailDAO {
+
+	/**
+	 * 传递carddetail数据
+	 */
+	public List<CardDetailBean> getCardDetailInfo(CardDetailBean cardDetailBean) throws Exception;
+}

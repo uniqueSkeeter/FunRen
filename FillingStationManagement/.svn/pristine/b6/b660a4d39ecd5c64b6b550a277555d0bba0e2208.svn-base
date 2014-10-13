@@ -1,0 +1,163 @@
+package com.fr.station.common.entity.system;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+@Entity
+@Table(name = "fk_zd_userinfo")
+public class OperatorEntity implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "USERID")
+	@GeneratedValue
+	private int id;
+
+	@OneToOne
+	@JoinColumn(name = "USERID")
+	private EmployeeEntity emplEntity;
+
+	@OneToOne
+	@JoinColumn(name = "role_id")
+	private RoleInfoEntity roleEntity;
+
+	@Column(name = "USERNAME")
+	private String userName;
+
+	@Column(name = "USERPSW")
+	private String passWord;
+
+	@Column(name = "CARDID")
+	private String cardNum;
+	
+	@Column(name = "USERNUMBER")
+	private String userNum;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public EmployeeEntity getEmplEntity() {
+		return emplEntity;
+	}
+
+	public void setEmplEntity(EmployeeEntity emplEntity) {
+		this.emplEntity = emplEntity;
+	}
+
+	public RoleInfoEntity getRoleEntity() {
+		return roleEntity;
+	}
+
+	public void setRoleEntity(RoleInfoEntity roleEntity) {
+		this.roleEntity = roleEntity;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPassWord() {
+		return passWord;
+	}
+
+	public void setPassWord(String passWord) {
+		this.passWord = passWord;
+	}
+
+	public String getCardNum() {
+		return cardNum;
+	}
+
+	public void setCardNum(String cardNum) {
+		this.cardNum = cardNum;
+	}
+
+	public String getUserNum() {
+		return userNum;
+	}
+
+	public void setUserNum(String userNum) {
+		this.userNum = userNum;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cardNum == null) ? 0 : cardNum.hashCode());
+		result = prime * result
+				+ ((emplEntity == null) ? 0 : emplEntity.hashCode());
+		result = prime * result + id;
+		result = prime * result
+				+ ((passWord == null) ? 0 : passWord.hashCode());
+		result = prime * result
+				+ ((roleEntity == null) ? 0 : roleEntity.hashCode());
+		result = prime * result
+				+ ((userName == null) ? 0 : userName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OperatorEntity other = (OperatorEntity) obj;
+		if (cardNum == null) {
+			if (other.cardNum != null)
+				return false;
+		} else if (!cardNum.equals(other.cardNum))
+			return false;
+		if (emplEntity == null) {
+			if (other.emplEntity != null)
+				return false;
+		} else if (!emplEntity.equals(other.emplEntity))
+			return false;
+		if (id != other.id)
+			return false;
+		if (passWord == null) {
+			if (other.passWord != null)
+				return false;
+		} else if (!passWord.equals(other.passWord))
+			return false;
+		if (roleEntity == null) {
+			if (other.roleEntity != null)
+				return false;
+		} else if (!roleEntity.equals(other.roleEntity))
+			return false;
+		if (userName == null) {
+			if (other.userName != null)
+				return false;
+		} else if (!userName.equals(other.userName))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "OperatorEntity [id=" + id + ", emplEntity=" + emplEntity
+				+ ", roleEntity=" + roleEntity + ", userName=" + userName
+				+ ", passWord=" + passWord + ", cardNum=" + cardNum + "]";
+	}
+
+}

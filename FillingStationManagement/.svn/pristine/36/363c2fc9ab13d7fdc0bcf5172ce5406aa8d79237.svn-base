@@ -1,0 +1,187 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib uri="/struts-tags" prefix="s"%>
+<%@ page import="java.util.*"%>
+<%@include file="../../common/common.jsp"%>
+<script type="text/javascript" src="<%=basePath%>js/card/cardMaintain/cardInfo.js"></script>
+</head>
+<body>
+	<s:form name="myForm" action="showCardInfo">
+		<tr>
+			<td width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<span style="color: black; background:#DCDCDC;">个人卡信息</span>	
+			</td>
+		</tr>
+		<table style="font-size: 12px; width: 100%; height: 50px; font-weight: bold;">
+			<tr>
+				<td height="30px" style="width: 90px">卡号:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.cardNo" value="${cardInfoBean.cardNo}" style="width: 165px" id="cardNo"></input>
+				</td>
+				<td height="30px" style="width: 90px">卡片类型:</td>
+				<td height="30px" style="width: 165px">
+				   <s:set var="cardTypeKey" value="cardInfoBean.cardType">
+				   </s:set>
+				   <input value="${cardType[cardTypeKey]}" disabled="disabled" style="width: 165px">
+				</td>
+				<td height="30px" style="width: 90px">押金:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.deposit" value="${cardInfoBean.deposit}" disabled="disabled" style="width: 165px" id="deposit"></input>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">有效期:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.disEffectiveDate" value="${cardInfoBean.disEffectiveDate}" disabled="disabled" style="width: 165px" id="disEffectiveDate"></input>
+				</td>
+				<td height="30px" style="width: 90px">卡片状态:</td>
+				<td height="30px" style="width: 165px">
+				   <s:set var="cardStakey" value="cardInfoBean.cardStatus">
+				   </s:set>
+				   <input value="${cardStatus[cardStakey]}" disabled="disabled" style="width: 165px">
+				</td>
+			</tr>
+		</table>
+			<hr>
+		    <tr>
+			    <td width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				    <span style="color: black; background:#DCDCDC">客户档案</span>
+			    </td>
+		   	</tr>
+		<table style="font-size: 12px; width: 100%; height: 50px; font-weight: bold;">
+			<tr>
+				<td height="30px" style="width: 90px">姓名:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.guestName" value="${cardInfoBean.guestName}" style="width: 165px" id="guestName"></input>
+				</td>
+				<td height="30px" style="width: 90px">证件类型:</td>
+				<td height="30px" style="width: 165px">
+				    <select name="cardInfoBean.guestType" style="width: 165px" id="guestType">
+						<s:set var="guestTypeKey" value="cardInfoBean.guestType">
+						</s:set>
+						<option value="${guestTypeKey}">${guestType[guestTypeKey]}</option>
+						<c:forEach var="guestType" items="${guestType}">
+							<option value="${guestType.key}">${guestType.value}</option>
+						</c:forEach>
+				    </select>
+				</td>
+				<td height="30px" style="width: 90px">证件号码:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.guestNum" value="${cardInfoBean.guestNum}" style="width: 165px" id="guestNum"></input>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">电话:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.guestTel" onkeyup="value=value.replace(/[^(\d)]/g,'')" value="${cardInfoBean.guestTel}" style="width: 165px" id="guestTel"></input>
+				</td>
+				<td style="height: 40px; width: 85px; ">性别</td>
+				<td width="165px">
+					男<input name="cardInfoBean.gender" type=radio id="genderMale" value="男" ${(cardInfoBean.gender=="男")?'checked' : ''}>
+					&nbsp;&nbsp;&nbsp;
+					女<input name="cardInfoBean.gender" type=radio id="genderFemale" value="女" ${(cardInfoBean.gender=="女")?'checked' : ''}>
+				</td>
+				<td height="30px" style="width: 90px">电子邮箱:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.email"  value="${cardInfoBean.email}" style="width: 165px" id="email"></input>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">邮政编码:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.zipCode"  onkeyup="value=value.replace(/[^(\d)]/g,'')" value="${cardInfoBean.zipCode}" style="width: 165px" id="zipCode"></input>
+				</td>
+				<td height="30px" style="width: 90px">联系地址:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.customerAddr" value="${cardInfoBean.customerAddr}" style="width: 165px" id="customerAddr"></input>
+				</td>
+				<td height="30px" style="width: 90px">初始日期:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.createDate" disabled="disabled" value="${cardInfoBean.createDate}" style="width: 165px" id="createDate"></input>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">备注:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.remark"  value="${cardInfoBean.remark}" style="width: 165px" id="remark"></input>
+				</td>
+				<td height="30px" style="width: 90px">卡密码</td>
+				<td height="30px" style="width: 165px" >
+					启用<input name="cardInfoBean.passFlag" type=radio id="passEnable" value="T" ${(cardInfoBean.passFlag=='T')?'checked' : ''} >
+					停用<input name="cardInfoBean.passFlag" type=radio id="passDisenable" value="N" ${(cardInfoBean.passFlag=='N')?'checked' : ''}>
+				</td>
+			</tr>
+		</table>
+			<hr>
+			<tr>
+			    <td width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<span style="color: black; background:#DCDCDC">加油限制</span>
+			    </td>
+		    </tr>
+		<table style="font-size: 12px; width: 100%; height: 50px; font-weight: bold;">
+			<tr>
+				<td height="30px" style="width: 90px">车牌号:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.carNoConstr" value="${cardInfoBean.carNoConstr}" style="width: 165px" id="carNoConstr"></input>
+				</td>
+				<td height="30px" style="width: 90px">每天加油次数:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.refuelTimes"  value="${cardInfoBean.refuelTimes}" style="width: 165px" id="refuelTimes"></input>
+				</td>
+				<td height="30px" style="width: 90px">每天消费金额:</td>
+				<td height="30px" style="width: 165px">
+			        <input name="cardInfoBean.consumeAmount" value="${cardInfoBean.consumeAmount}" style="width: 165px" id="consumeAmount"></input>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">每次加油限量:</td>
+				<td height="30px" style="width: 165px">
+				    <input name="cardInfoBean.refuelLimit"  value="${cardInfoBean.refuelLimit}" style="width: 165px" id="refuelLimit"></input>
+				</td>	
+				<td height="30px" style="width: 90px">油品限制:</td>
+				<td height="30px" style="width: 165px">
+					<select name="cardInfoBean.oilTypeLimit" style="width: 165px" id="oilTypeLimit">
+						<s:set var="oilTypeLimitkey" value="cardInfoBean.oilTypeLimit">
+						</s:set>
+						<option value="${oilTypeLimitkey}">${oilTypeLimit[oilTypeLimitkey]}</option>
+						<c:forEach var="oilTypeLimit" items="${oilTypeLimit}">
+							<option value="${oilTypeLimit.key}">${oilTypeLimit.value}</option>
+						</c:forEach>
+				    </select>
+				</td>
+				<td height="30px" style="width: 90px">开票类型</td>
+				<td height="30px" style="width: 165px">
+					<select name="cardInfoBean.billType" style="width: 165px" id="billType">
+						<s:set var="billTypekey" value="cardInfoBean.billType">
+						</s:set>
+						<option value="${billTypekey}">${billType[billTypekey]}</option>
+						<c:forEach var="billType" items="${billType}">
+							<option value="${billType.key}">${billType.value}</option>
+						</c:forEach>
+				    </select>
+				</td>
+			</tr>
+			<tr>
+				<td height="30px" style="width: 90px">限制区站:</td>
+				<td height="30px" style="width: 165px">
+					<c:forEach var="stationNumber" items="${cardInfoBean.stationInfoLimit}" >
+                		<option >${stationList[stationNumber]}</option>
+        			</c:forEach>
+				</td>
+				<td height="30px" style="width: 90px"></td>
+				<td height="30px" style="width: 90px"></td>
+				<td height="30px" style="width: 90px"></td>
+				<td height="30px" style="width: 165px">
+					<input type='button' value='读卡' id="cardMaintain_readonly" onclick="alert('读卡')" style="width: 30px">
+					<input type='button' value='查询' id="cardMaintain_searchfor" style="width: 30px" >
+					<input type='button' value='重置' id="cardMaintain_clear"style="width: 30px">	
+					<input type='button' value='保存并写卡' id="cardMaintain_saveCardInfo" style="width: 65px; ">
+				</td>				
+			</tr>
+		</table>
+	</s:form>
+</body>
+</html>

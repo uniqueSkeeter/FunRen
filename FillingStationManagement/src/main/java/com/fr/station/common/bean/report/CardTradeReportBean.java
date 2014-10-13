@@ -1,0 +1,298 @@
+package com.fr.station.common.bean.report;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import com.fr.station.common.bean.system.CommonBean;
+import com.fr.station.common.bean.system.StandardBean;
+
+/**
+ * @author hjq this bean works for displayCardTradeList.jsp
+ */
+
+public class CardTradeReportBean extends CommonBean implements StandardBean {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final long serialVersionUID = 1L;
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private String guestName;
+
+	private Integer guestNo;
+
+	private String cardNo;
+
+	private Date startDate;
+
+	private Date endDate;
+
+	private String cardType;
+
+	private String tradeType;
+
+	private String tradeDate;
+
+	private String incNo;
+
+	private String cardStatus;
+
+	/*
+	 * 交易前金额 cardbeg
+	 */
+
+	private BigDecimal moneyBefore;
+
+	/*
+	 * 交易额 cardinc
+	 */
+
+	private BigDecimal tradeMoney;
+
+	/*
+	 * 交易后余额 cardbal
+	 */
+
+	private BigDecimal moneyAfter;
+
+	private String userId;
+
+	private Integer stationNo;
+
+	/*
+	 * guestcredit
+	 */
+
+	private String payType;
+
+	/*
+	 * card predistribution
+	 */
+
+	private BigDecimal preAmount;
+
+	private String receiptNo;
+
+	private String receiptType;
+
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	public CardTradeReportBean() {
+		super();
+	}
+
+	public String getGuestName() {
+		return this.guestName;
+	}
+
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	public Integer getGuestNo() {
+		return this.guestNo;
+	}
+
+	public void setGuestNo(Integer guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	public String getCardNo() {
+		return this.cardNo;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public Date getStartDate() {
+		return this.startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getCardType() {
+		return this.cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public String getTradeType() {
+		return this.tradeType;
+	}
+
+	public void setTradeType(String tradeType) {
+		this.tradeType = tradeType;
+	}
+
+	public String getTradeDate() {
+		return this.tradeDate;
+	}
+
+	public void setTradeDate(String tradeDate) {
+		this.tradeDate = tradeDate;
+	}
+
+	public String getIncNo() {
+		return this.incNo;
+	}
+
+	public void setIncNo(String incNo) {
+		this.incNo = incNo;
+	}
+
+	public String getCardStatus() {
+		return this.cardStatus;
+	}
+
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	public BigDecimal getMoneyBefore() {
+		return this.moneyBefore;
+	}
+
+	public void setMoneyBefore(BigDecimal moneyBefore) {
+		this.moneyBefore = moneyBefore;
+	}
+
+	public BigDecimal getTradeMoney() {
+		return this.tradeMoney;
+	}
+
+	public void setTradeMoney(BigDecimal tradeMoney) {
+		this.tradeMoney = tradeMoney;
+	}
+
+	public BigDecimal getMoneyAfter() {
+		return this.moneyAfter;
+	}
+
+	public void setMoneyAfter(BigDecimal moneyAfter) {
+		this.moneyAfter = moneyAfter;
+	}
+
+	public String getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public Integer getStationNo() {
+		return this.stationNo;
+	}
+
+	public void setStationNo(Integer stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	@Override
+	public int getPageNumber() {
+		return this.pageNumber;
+	}
+
+	@Override
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	@Override
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	@Override
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	@Override
+	public int getTotalData() {
+		return this.totalData;
+	}
+
+	@Override
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	public String getPayType() {
+		return this.payType;
+	}
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public BigDecimal getPreAmount() {
+		return this.preAmount;
+	}
+
+	public void setPreAmount(BigDecimal preAmount) {
+		this.preAmount = preAmount;
+	}
+
+	public String getReceiptNo() {
+		return this.receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
+	}
+
+	public String getReceiptType() {
+		return this.receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
+	}
+
+	@Override
+	public String toString() {
+		return "CardTradeReportBean [guestName=" + this.guestName + ", guestNo=" + this.guestNo + ", cardNo=" + this.cardNo
+				+ ", startDate=" + this.startDate + ", endDate=" + this.endDate + ", cardType=" + this.cardType
+				+ ", tradeType=" + this.tradeType + ", tradeDate=" + this.tradeDate + ", incNo=" + this.incNo + ", cardStatus="
+				+ this.cardStatus + ", moneyBefore=" + this.moneyBefore + ", tradeMoney=" + this.tradeMoney + ", moneyAfter="
+				+ this.moneyAfter + ", userId=" + this.userId + ", stationNo=" + this.stationNo + ", payType=" + this.payType
+				+ ", preAmount=" + this.preAmount + ", receiptNo=" + this.receiptNo + ", receiptType=" + this.receiptType
+				+ ", pageNumber=" + this.pageNumber + ", pageSize=" + this.pageSize + ", totalData=" + this.totalData + "]";
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

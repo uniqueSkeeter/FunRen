@@ -1,0 +1,108 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	var readFlag = false;
+	$(document).ready(function(){
+		$("#anonymousCard_add").click(function() {
+		$('#saleCardIFrame')[0].src= server_context + '/view/card/customer/saleAnonymousCard.jsp'; 
+        	$('#saleCardDialog').form('clear');
+            $('#saleCardDialog').dialog({
+                closed : false,
+                title : '不记名卡售卡',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '读卡',
+                    id : 'readBtn',
+                    handler:function() {
+                    	readFlag = true;
+                    }
+                }, {
+                    text : '售卡',
+                    id : 'saleBtn',
+                    handler : function() {
+                    	alert('readFlag---'+readFlag);
+                        if(readFlag){
+                        	var rDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                        	var flag = validateFieldValue(rDocument);
+                        	alert('flag---'+flag);
+                        	var saleAnonymousCard_form = rDocument.getElementsByTagName('form');
+                        	if(flag){
+                        		alert("验证通过");
+                        		$.ajax({
+                        			data:$(saleAnonymousCard_form).serialize(),
+                        			url:encodeURI("registCustomer/saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+    	                			success:function(data){
+    	    	        				$("#saleCardDialog").dialog("close");
+    	    	        				$.messager.alert('成功','卡信息已经输入数据库!');
+    	    	        			},
+    	    	        			error:function(){
+    	    	        				$.messager.alert('错误','卡信息保存失败，请重试!');
+    	    	        			}
+    	            		});
+                        	}
+                        }
+                      }
+                }, {
+                    text : '重置',
+                    id : 'resetBtn',
+                    handler : function() {
+                    	var rDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                    	rDocument.getElementById('saleAnonymousCard_form').reset();
+                    }
+                } ]
+        });
+	
+	});
+	});
+
+	function validateFieldValue(rDocument){
+		
+    	var cardNo = rDocument.getElementById('cardNo');
+		var cardType = rDocument.getElementById('cardType');
+		var deposit = rDocument.getElementById('deposit');
+		var stationNo = rDocument.getElementById('stationNo');
+		var effectiveDate =document.getElementById("saleCardIFrame").contentWindow.window.$("#effectiveDate").datebox('getValue');
+		alert(effectiveDate);
+		var disEffectiveDate = document.getElementById("saleCardIFrame").contentWindow.window.$("#disEffectiveDate").datebox('getValue');
+		alert(disEffectiveDate);
+		if (check(cardNo) || check(cardType) || check(deposit) || check(stationNo)||effectiveDate == ''||disEffectiveDate== ''){
+			return false;
+			
+		}else{
+			
+			return true;
+		}
+	}
+		
+	// 表单验证
+	var check = function(input) {
+	    if (input.value == '') {
+	    	inputError(input);
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	       
+	    };
+	};
+
+	// 输入错误提示
+	
+	var inputError = function (input) {
+	    clearTimeout(inputError.timer);
+	    var num = 0;
+	    var fn = function () {
+	        inputError.timer = setTimeout(function () {
+	            input.className = input.className == '' ? 'form-error' : '';
+	            if (num == 5) {
+	                input.className = '';
+		            } else {
+		                fn(num ++);
+		            };
+		        }, 150);
+		    };
+		    fn();
+		};

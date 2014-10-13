@@ -1,0 +1,209 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.customer.CustomerChargeBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FKTGuestAcc;
+import com.fr.station.common.entity.card.FkTtGuestcreditEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.CustomerChargeDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The customerChargeDaoImpl for customerCharge
+ * 
+ * @author WR
+ */
+@Repository
+public class CustomerChargeDaoImpl extends AbstractBaseDAO<FkTtGuestcreditEntity> implements CustomerChargeDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CustomerChargeDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	/**
+	 * 查询客户账户信息的SQL
+	 */
+	private final String customAccountSql = " SELECT guest.cardNo, card.guestName cName, card.cardStatus, card.cardType, card.cardFlag, card.guestType cType, card.guestNum, "
+			+ " cardAcc.cardBal, cardAcc.pre, guest.guestNo, guest.guestName gName, guest.stats, guest.guestType gType, guestAcc.bal, guestAcc.creditAcc, guestAcc.id "
+			+ " FROM FK_T_CARD card, FK_T_GUEST guest, FK_T_CARDTZ cardAcc, FK_T_GUESTACC guestAcc "
+			+ " WHERE guest.guestNo = guestAcc.guestNo AND guest.cardNo = card.cardNo AND card.cardNo = cardAcc.cardNo ";
+
+	/**
+	 * 更新客户账户SQL
+	 */
+	private final String updateGuestAccSql = "UPDATE FK_T_GUESTACC SET bal = ? ,creditacc = ?  WHERE id = ? ";
+
+	/**
+	 * 客户交易号SQL
+	 */
+	private final String selectTradeNoSql = "SELECT attriValue FROM stationParameter WHERE attriName = 'tradeNo' ";
+
+	/**
+	 * 更新系统参数表SQL
+	 */
+	private final String updateSysParameterAttriValueSql = "UPDATE stationParameter SET attriValue = attriValue + '1'  WHERE attriName = ? ";
+
+	// ------- Constructors ----------------------------------------------------
+	public CustomerChargeDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * @Inherited doc 取得客户交易的交易流水号
+	 */
+	@Override
+	public Integer getTradeNo() {
+		Integer tradeNo = 0;
+		try {
+			List<?> resultList = this.findBySql(this.selectTradeNoSql);
+			if (resultList.size() > 0) {
+				tradeNo = (Integer) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return tradeNo;
+	}
+
+	/**
+	 * @Inherited doc 使交易流水号自增
+	 */
+	@Override
+	public void updateTradeNo() {
+		Object[] args = { "tradeNo" };
+		// 执行SQL
+		this.upateBySql(this.updateSysParameterAttriValueSql, args);
+	}
+
+	/**
+	 * @Inherited doc 查询客户账户信息
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomerChargeBean> getCustomAccountRecordsByCriteria(CustomerChargeBean customerChargeBean) {
+		List<CustomerChargeBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		// 传送查询客户账户信息的SQL
+		builder.append(this.customAccountSql);
+		try {
+			// 传送查询条件 (卡号或者客户编号)
+			StringBuilder req = this.validateCustomAccountInput(customerChargeBean);
+			builder.append(req);
+			Query query = null;
+			try {
+				// 执行SQL
+				query = this.getQueryByCriteria(builder.toString());
+			} catch (Exception e) {
+				log.info("Sql execute error, more detail please see the detail log\n" + "[" + e + "]\n"
+						+ ErrorLogUtil.printInfo(e));
+			}
+			List<Object[]> result = query.list();
+			// 把查询结果覆盖到bean
+			resultList = this.convertCustomAccountToBean(result);
+
+		} catch (QueryException e) {
+			log.info("Get DB data occured error, more detail please see the detail log\n" + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * @Inherited doc 卡充值时更新卡账信息表
+	 */
+	@Override
+	public void updateGuestAccEntity(FKTGuestAcc guestAccEntity) {
+		Object[] args = { guestAccEntity.getBal(), guestAccEntity.getCreditacc(), guestAccEntity.getId() };
+		this.upateBySql(this.updateGuestAccSql, args);
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 查询客户账户信息SQL语句查询条件
+	 */
+	private StringBuilder validateCustomAccountInput(CustomerChargeBean customerChargeBean) {
+		StringBuilder builder = new StringBuilder();
+		if (ApplicationContext.getInstance().getStationNum() != null) {
+			builder.append(" AND ").append(" guest.stationNo = '").append(ApplicationContext.getInstance().getStationNum())
+					.append("' ");
+		}
+		if (StringUtils.isNotEmpty(customerChargeBean.getMainCardNo())) {
+			builder.append(" AND ").append(" guest.cardNo = '").append(customerChargeBean.getMainCardNo()).append("' ");
+		} else if (StringUtils.isNotEmpty(customerChargeBean.getGuestNo())) {
+			builder.append(" AND ").append(" guest.guestNo = '").append(customerChargeBean.getGuestNo()).append("' ");
+		}
+		return builder;
+	}
+
+	/**
+	 * 把客户账户信息覆盖到bean
+	 */
+	private List<CustomerChargeBean> convertCustomAccountToBean(List<Object[]> dataResult) {
+		List<CustomerChargeBean> customerChargeBeanList = new ArrayList<CustomerChargeBean>();
+		CustomerChargeBean customerChargeBean;
+		for (Object[] dataRow : dataResult) {
+			customerChargeBean = new CustomerChargeBean();
+			// 卡号
+			customerChargeBean.setCardNo(String.valueOf(dataRow[0]));
+			// 持卡人
+			customerChargeBean.setGuestName(String.valueOf(dataRow[1]));
+			// 卡状态
+			customerChargeBean.setCardStatus(String.valueOf(dataRow[2]));
+			// 卡类型
+			customerChargeBean.setCardType(String.valueOf(dataRow[3]));
+			// 是否主卡
+			if (String.valueOf(dataRow[4]).split(" ")[0].equals("Y")) {
+
+				customerChargeBean.setMainCardFlag(true);
+			} else {
+				customerChargeBean.setMainCardFlag(false);
+			}
+			// 证件类型
+			customerChargeBean.setGuestType(String.valueOf(dataRow[5]));
+			// 证件号码
+			customerChargeBean.setGuestNum(String.valueOf(dataRow[6]));
+			// 卡内余额
+			customerChargeBean.setCardAccount(((BigDecimal) (dataRow[7])));
+			// 卡备用金
+			customerChargeBean.setCardPre(((BigDecimal) (dataRow[8])));
+			// 客户编号
+			customerChargeBean.setGuestNo(String.valueOf(dataRow[9]));
+			// 单位名称
+			customerChargeBean.setCompanyName(String.valueOf(dataRow[10]));
+			// 客户状态
+			customerChargeBean.setGuestStatus(String.valueOf(dataRow[11]));
+			// 单位类型
+			customerChargeBean.setCompanyType(String.valueOf(dataRow[12]));
+			// 单位账户
+			customerChargeBean.setSpareAccount(((BigDecimal) (dataRow[13])));
+			// 缴费总和
+			customerChargeBean.setRechargeAmount(((BigDecimal) (dataRow[14])));
+			// 客户账户id
+			customerChargeBean.setId(((Integer) (dataRow[15])));
+			customerChargeBeanList.add(customerChargeBean);
+		}
+		return customerChargeBeanList;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

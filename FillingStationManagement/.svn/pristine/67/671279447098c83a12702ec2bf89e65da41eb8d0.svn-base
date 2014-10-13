@@ -1,0 +1,53 @@
+package com.fr.station.component.customer.dao;
+
+import java.util.List;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+
+public interface RegistMultiCustomerDAO {
+
+	/**
+	 * get each driver records in order to display in the saleMultiUserCard.jsp page.
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param RegisterCustomerBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<RegisterCustomerBean> getDriverRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int startPage,
+			int number);
+
+	/**
+	 * get each department records in order to display in the depMaintain.jsp page.
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param RegisterCustomerBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<RegisterCustomerBean> getDepRecordsByCriteria(RegisterCustomerBean registerCustomerBean, int startPage,
+			int number);
+
+	/**
+	 * 获得满足条件的部门信息
+	 */
+	public List<RegisterCustomerBean> getAllDepartment(RegisterCustomerBean registerCustomerBean);
+
+	/**
+	 * 获得当前单位的客户编号
+	 */
+	public List<RegisterCustomerBean> getCorpGuestNo(RegisterCustomerBean registerCustomerBean);
+
+	/**
+	 * get depNo
+	 * 
+	 * @return return Integer
+	 */
+	public Integer getDepNo();
+
+	/**
+	 * update depNo
+	 * 
+	 */
+	public void updateDepNo();
+}

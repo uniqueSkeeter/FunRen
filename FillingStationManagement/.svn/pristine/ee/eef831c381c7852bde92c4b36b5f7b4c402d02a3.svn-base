@@ -1,0 +1,274 @@
+﻿/*
+ * 班次信息表
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+
+
+package com.fr.station.common.entity.card;
+
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+
+/**
+ * 班次表
+ * 
+ * @version 1.0
+ * @authorguyj
+ */
+ @Entity
+ @Table(name = "CLASS_INFO")
+public class ClassInfoEntity implements StandardBean {
+
+
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ID
+     */
+     @Id
+     @Column(name = "`ID`")
+     @GeneratedValue
+    private Integer id;
+
+    /**
+     * 班组号
+     */
+     @Column(name = "`EMP`")
+    private String emp;
+
+    /**
+     * 名称
+     */
+     @Column(name = "`NAME`")
+    private String name;
+
+    /**
+     * 工作时间开始
+     */
+     @Column(name = "`START_TIME`")
+    private String startTime;
+
+    /**
+     * 工作时间结束
+     */
+     @Column(name = "`END_TIME`")
+    private String endTime;
+
+    /**
+     * 网点
+     */
+     @Column(name = "`STATIONNO`")
+    private Integer stationno;
+
+    /**
+     * 创建时间
+     */
+     @Column(name = "`CREATE_DATE`")
+    private Timestamp createDate;
+
+    /**
+     * 更新时间
+     */
+     @Column(name = "`UPDATE_DATE`")
+    private Timestamp updateDate;
+
+    /**
+     * 操作员编号
+     */
+     @Column(name = "`USERID`")
+    private Integer userid;
+
+
+
+    /**
+     * ID的取得
+     *
+     * @return Integer ID
+     */
+    public Integer getId() {
+        return id;
+    }
+
+
+    /**
+     * 班组号的取得
+     *
+     * @return String 班组号
+     */
+    public String getEmp() {
+        return emp;
+    }
+
+
+    /**
+     * 名称的取得
+     *
+     * @return String 名称
+     */
+    public String getName() {
+        return name;
+    }
+
+
+    /**
+     * 工作时间开始的取得
+     *
+     * @return String 工作时间开始
+     */
+    public String getStartTime() {
+        return startTime;
+    }
+
+
+    /**
+     * 工作时间结束的取得
+     *
+     * @return String 工作时间结束
+     */
+    public String getEndTime() {
+        return endTime;
+    }
+
+
+    /**
+     * 网点的取得
+     *
+     * @return Integer 网点
+     */
+    public Integer getStationno() {
+        return stationno;
+    }
+
+
+    /**
+     * 创建时间的取得
+     *
+     * @return Timestamp 创建时间
+     */
+    public Timestamp getCreateDate() {
+        return createDate;
+    }
+
+
+    /**
+     * 更新时间的取得
+     *
+     * @return Timestamp 更新时间
+     */
+    public Timestamp getUpdateDate() {
+        return updateDate;
+    }
+
+
+    /**
+     * 操作员编号的取得
+     *
+     * @return Integer 操作员编号
+     */
+    public Integer getUserid() {
+        return userid;
+    }
+
+
+    /**
+     * ID的设定
+     *
+     * @param newInteger ID
+     */
+    public void setId(Integer newId) {
+        this.id = newId;
+    }
+
+
+    /**
+     * 班组号的设定
+     *
+     * @param newString 班组号
+     */
+    public void setEmp(String newEmp) {
+        this.emp = newEmp;
+    }
+
+
+    /**
+     * 名称的设定
+     *
+     * @param newString 名称
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
+
+    /**
+     * 工作时间开始的设定
+     *
+     * @param newString 工作时间开始
+     */
+    public void setStartTime(String newStartTime) {
+        this.startTime = newStartTime;
+    }
+
+
+    /**
+     * 工作时间结束的设定
+     *
+     * @param newString 工作时间结束
+     */
+    public void setEndTime(String newEndTime) {
+        this.endTime = newEndTime;
+    }
+
+
+    /**
+     * 网点的设定
+     *
+     * @param newInteger 网点
+     */
+    public void setStationno(Integer newStationno) {
+        this.stationno = newStationno;
+    }
+
+
+    /**
+     * 创建时间的设定
+     *
+     * @param newTimestamp 创建时间
+     */
+    public void setCreateDate(Timestamp newCreateDate) {
+        this.createDate = newCreateDate;
+    }
+
+
+    /**
+     * 更新时间的设定
+     *
+     * @param newTimestamp 更新时间
+     */
+    public void setUpdateDate(Timestamp newUpdateDate) {
+        this.updateDate = newUpdateDate;
+    }
+
+
+    /**
+     * 操作员编号的设定
+     *
+     * @param newInteger 操作员编号
+     */
+    public void setUserid(Integer newUserid) {
+        this.userid = newUserid;
+    }
+}

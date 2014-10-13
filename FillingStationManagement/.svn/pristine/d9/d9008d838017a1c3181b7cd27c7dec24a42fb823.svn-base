@@ -1,0 +1,22 @@
+package com.fr.station.component.card.service;
+
+import java.util.List;
+
+import com.fr.station.common.bean.CardDetailBean;
+import com.fr.station.component.card.dao.CardDetailDAO;
+
+/*
+ * 定义cardMaintainService接口，用于实现卡片维护界面的查询等操作
+ * 
+ * @author:yy
+ */
+public interface CardDetailService {
+
+	public void setCardDetailDAO(CardDetailDAO reportCardDetailsDaoImpl);
+
+	/**
+	 * 得到卡片明细信息
+	 */
+	public List<CardDetailBean> getCardDetail(CardDetailBean cardDetailBean) throws Exception;
+
+}

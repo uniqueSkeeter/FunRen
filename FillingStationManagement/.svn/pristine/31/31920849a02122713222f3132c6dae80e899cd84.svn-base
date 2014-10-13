@@ -1,0 +1,28 @@
+.header {
+	height: 58px;
+	width: 100%;
+	margin: 0 auto;
+	background: url(../images/images1/bg_top.jpg) repeat-x left top;
+}
+.header .logo {
+	background: url("../images/images1/logo.png") no-repeat left top;
+	height: 50px;
+	width: 100%;
+	float: left;
+}
+
+.header .topImages {
+	height: 50px;
+	width: 67%;
+	float: left;
+	margin: 10px, 5px, 4px,8px;
+}
+
+.header .top_menu {
+	float: right;
+/* 	padding-right: 10px; */
+/* 	margin-top: 10px; */
+/* 	font-family: "΢���ź�"; */
+/* 	font-size: 14px; */
+/* 	color: #414a4b; */
+}

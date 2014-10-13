@@ -1,0 +1,753 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.card.CardMaintainBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.CardEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.dao.CardMaintainDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * 卡信息维护的DAO的实现
+ * 
+ * @author _yy
+ */
+@Repository
+public class CardMaintainDaoImpl extends AbstractBaseDAO<CardEntity> implements CardMaintainDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardMaintainDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+	private static final String CARD_NO = "cardno";
+
+	private static final String GUEST_NAME = "guestName";
+
+	private static final String GUEST_NO = "guestNo";
+
+	private static final String GUEST_TYPE = "guestType";
+
+	private static final String GUEST_NUM = "guestNum";
+
+	private static final String ID = "id";
+
+	private static final String CARDACC_CARD_NO = "cardAcc.cardNo";
+
+	private static final String CARD_CARD_NO = "card.cardno";
+
+	private static final String STATION_NO = "stationNo";
+
+	private static final String BLACK_CARD_ID = "black.cardid";
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CardMaintainDAO cardMainDaoImpl;
+
+	// 获取班结号
+	private final String selectShiftChangeNumSql = "SELECT co.create_date, ci.MaxNo, co.id FROM (SELECT MAX (class_no) AS MaxNo FROM [dbo].[CLASS_INFO]) ci INNER JOIN CLASS_INFO co ON co.class_no = ci.MaxNo";
+
+	/**
+	 * 卡片维护·查询按钮·查询记录的SQL
+	 */
+	private final String selectOperateLogViewSql = "SELECT card.guestname,card.guestno,card.cardno,card.guesttype,"
+			+ "card.guestnum,card.enddate,card.cardtype,card.cardstatus,card.id  FROM FK_T_CARD card WHERE ";
+
+	/**
+	 * 卡片维护·查询按钮·查询记录总数的SQL
+	 */
+	private final String selectAllCountOperateLogViewSql = "SELECT count(*) FROM FK_T_CARD card WHERE ";
+
+	/**
+	 * 卡片挂失·更新FK_T_CARD表，将卡状态cardstatus置为2（挂失）
+	 */
+
+	String cardLostSql = "UPDATE FK_T_CARD SET CARDSTATUS='2',update_date=? WHERE cardNo=? ";
+
+	/**
+	 * 单位客户所有卡片挂失·更新FK_T_CARD表，将卡状态cardstatus置为2（挂失）
+	 */
+	String allCardLostSql = "UPDATE FK_T_CARD SET CARDSTATUS='2',update_date=? WHERE guestNo=?";
+
+	/**
+	 * 卡片止挂·更新FK_T_CARD表，将卡状态cardstatus置为1（启用）
+	 */
+	String cancelLossCardSql = "UPDATE FK_T_CARD SET CARDSTATUS='1',update_date=? WHERE cardNo=? ";
+
+	/**
+	 * 修改密码·更新FK_T_CARD表，修改为新密码
+	 */
+	String changePassSql = "UPDATE FK_T_CARD SET PASSWORD=?,update_date=? WHERE cardNo=? ";
+
+	/**
+	 * 通过ID查询需要挂失的卡的信息，SQL
+	 */
+	private final String getCardLostSql = "SELECT card.cardNo,card.guestName,card.guestNum,card.guestType,"
+			+ "card.guestno,card.endDate,card.cardType,card.cardStatus,card.id,card.deposit,"
+			+ "card.create_date FROM FK_T_CARD card WHERE ";
+
+	/**
+	 * 得到补办卡时旧卡的信息，SQL
+	 */
+	private final String getExistCardSql = "SELECT card.cardNo,card.guestName,card.guestno,card.guesttype,card.guestnum,"
+			+ "card.xcarno,card.xcount,card.xvol,cardAcc.pre,card.cardType,card.cardStatus,card.deposit,cardAcc.score,black.create_date "
+			+ "FROM FK_T_CARD card,FK_T_CardTZ cardAcc,blackcard black  WHERE  ";
+
+	/**
+	 * 得到修改密码的卡的信息，SQL
+	 */
+	private final String getChangePassSql = "SELECT card.cardNo,card.endDate,card.guestno,card.guestName,card.guestNum,card.cardType,card.deposit,card.passFlag  "
+			+ " FROM FK_T_CARD card WHERE ";
+
+	/**
+	 * cardMaintain_replace 通过ID查询需要更改密码的卡的旧密码来进行核对，SQL
+	 */
+	private final String getPassSql = "SELECT card.password,card.cardNo FROM FK_T_CARD card WHERE ";
+
+	/**
+	 * 换卡的SQL，
+	 */
+	// 更换FK_T_CARD表中的卡号
+	private final String replaceCard1Sql = "UPDATE FK_T_CARD SET cardstatus= '3',update_date=? WHERE CARDNO=?";
+
+	// ，更换FK_T_GUEST表中的卡号
+	private final String replaceCard2Sql = "UPDATE FK_T_GUEST SET CARDNO = ?,update_date=? WHERE CARDNO=?";
+
+	// 更换FK_T_CardTZ表中的卡号
+	private final String replaceCard3Sql = "UPDATE FK_T_CARDTZ SET CARDNO = ?,update_date=? WHERE CARDNO=?";
+
+	// 更换FK_TT_CARDPRE表中的卡号
+	private final String replaceCard4Sql = "UPDATE FK_TT_CARDPRE SET CARDNO = ? WHERE CARDNO=?";
+
+	// 更换FK_TT_CREDIT表中的卡号
+	private final String replaceCard5Sql = "UPDATE FK_TT_CREDIT SET CARDNO = ? WHERE CARDNO=?";
+
+	/**
+	 * 换卡查询旧卡的所有信息
+	 */
+	private final String getExistCardInfoHql = "FROM CardEntity WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardMaintainDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 卡片维护·查询 函数
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardMaintainBean> getCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean) {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteria(cardMaintainBean);
+
+			// get total records by specified sql.
+			int totalSize = this.getTotalCount(builder, this.selectAllCountOperateLogViewSql);
+			builder.append("  ORDER BY card.cardno ");
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.selectOperateLogViewSql);
+
+			// this is for pagination.
+			this.setPaginationNumber(cardMaintainBean, query);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get card maintain data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 挂失卡·查询挂失的卡的信息
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardMaintainBean> getCardLostInfo(CardMaintainBean cardMaintainBean) throws Exception {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardMaintainBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getCardLostSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Get cardLost data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 止挂卡·查询止挂的卡的信息
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardMaintainBean> getCancelLossCardInfo(CardMaintainBean cardMaintainBean) throws Exception {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardMaintainBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getCardLostSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Get cancelLossCard data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 修改密码·查询修改密码的卡的信息
+	 */
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardMaintainBean> getChangePassInfo(CardMaintainBean cardMaintainBean) throws Exception {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardMaintainBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getChangePassSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertChangePassDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Get changepass data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 修改密码·检测密码
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardMaintainBean> getPassInfo(CardMaintainBean cardMaintainBean) {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteria(cardMaintainBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getPassSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertExistPassDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("check pass  occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 补卡·获取旧卡信息
+	 */
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardMaintainBean> getExistCardInfo(CardMaintainBean cardMaintainBean) throws Exception {
+		List<CardMaintainBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateExistInputCard(cardMaintainBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getExistCardSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertExistCardDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Get exist card data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 卡挂失·更新卡状态为挂失
+	 */
+	@Override
+	public void updateCardLost(CardMaintainBean cardMaintainBean) {
+		Object[] args = { DateUtil.currentTimestamp(), cardMaintainBean.getCardNo() };
+		this.upateBySql(this.cardLostSql, args);
+	}
+
+	/**
+	 * 卡挂失·更新一个单位下所有的卡状态
+	 */
+	@Override
+	public List<Object[]> updateAllCardLost(CardMaintainBean cardMaintainBean) throws Exception {
+		Object[] args = { DateUtil.currentTimestamp(), cardMaintainBean.getGuestNo() };
+		this.upateBySql(this.allCardLostSql, args);
+		List<Object[]> result = null;
+		try {
+			String str = "SELECT cardno,id FROM FK_T_CARD WHERE guestno='" + cardMaintainBean.getGuestNo() + "'";
+			Query query = this.getQueryByCriteria(str);
+			result = query.list();
+		} catch (QueryException e) {
+			log.info("Get exist card data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return result;
+	}
+
+	/**
+	 * 卡止挂·更新止挂卡的卡状态
+	 */
+	@Override
+	public void updateCancelLossCard(CardMaintainBean cardMaintainBean) {
+		Object[] args = { DateUtil.currentTimestamp(), cardMaintainBean.getCardNo() };
+		this.upateBySql(this.cancelLossCardSql, args);
+	}
+
+	/**
+	 * 修改密码·更新密码
+	 */
+	@Override
+	public void updateChangePass(CardMaintainBean cardMaintainBean) {
+		Object[] args = { cardMaintainBean.getCardPass(), DateUtil.currentTimestamp(), cardMaintainBean.getCardNo() };
+		this.upateBySql(this.changePassSql, args);
+	}
+
+	/**
+	 * 补卡·更新补卡卡号
+	 */
+	@Override
+	public void updateReplaceCard(CardMaintainBean cardMaintainBean) {
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardMaintainBean);
+			CardEntity cardEntity = null;
+			// retrieve current query by input hql.
+			List<CardEntity> cardEntityList = this.findByHql(this.getExistCardInfoHql + builder);
+			if (cardEntityList.size() > 0) {
+				cardEntity = cardEntityList.get(0);
+			}
+			this.evict(cardEntity);
+			cardEntity.setId(null);
+			// Object[] resultArray = this.cardMainDaoImpl.getClassNum();
+
+			// this.initializeClassInfoData(cardEntity, resultArray);
+			// change the entity
+			cardEntity = this.changeCardEntity(cardEntity, cardMaintainBean);
+			this.save(cardEntity);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get existcard info occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		// 更新时间，卡状态
+		Object[] args1 = { DateUtil.currentTimestamp(), cardMaintainBean.getCardNo() };
+		// 更新卡号，更新时间
+		Object[] args2 = { cardMaintainBean.getNewCardNo(), DateUtil.currentTimestamp(), cardMaintainBean.getCardNo() };
+		// 更新卡号
+		Object[] args3 = { cardMaintainBean.getNewCardNo(), cardMaintainBean.getCardNo() };
+		this.upateBySql(this.replaceCard1Sql, args1);
+		this.upateBySql(this.replaceCard2Sql, args2);
+		this.upateBySql(this.replaceCard3Sql, args2);
+		this.upateBySql(this.replaceCard4Sql, args3);
+		this.upateBySql(this.replaceCard5Sql, args3);
+
+	}
+
+	// ------- Instance Methods (private) --------------------------------------
+	/**
+	 * 卡片维护·SQL语句的条件
+	 */
+	private StringBuilder validateInputCriteria(CardMaintainBean cardMaintainBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(STATION_NO).append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		// 以下为where后面的判断条件
+		// cardNo卡号
+		if (StringUtils.isNotEmpty(cardMaintainBean.getCardNo())) {
+			builder.append(SqlConsts.ADD).append(CARD_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		// guestName客户名称
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestName())) {
+			builder.append(SqlConsts.ADD).append(GUEST_NAME).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getGuestName()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		// guestNo 客户编号
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestNo())) {
+			builder.append(SqlConsts.ADD).append(GUEST_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getGuestNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		// guestType证件类型
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestType())) {
+			builder.append(SqlConsts.ADD).append(GUEST_TYPE).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getGuestType()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		// guestNum证件号
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestNum())) {
+			builder.append(SqlConsts.ADD).append(GUEST_NUM).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getGuestNum()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 卡挂失·SQL语句的条件
+	 */
+	private StringBuilder validateInputCardCriteria(CardMaintainBean cardMaintainBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(STATION_NO).append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		// 以下为where后面的判断条件
+		// ID
+		if (cardMaintainBean.getId() != null) {
+			builder.append(SqlConsts.ADD).append(ID).append(SqlConsts.EQUAL).append(cardMaintainBean.getId());
+		}
+		if (cardMaintainBean.getCardNo() != null) {
+			builder.append(SqlConsts.ADD).append(CARD_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 补卡·查询旧卡·SQL语句的条件
+	 */
+	private StringBuilder validateExistInputCard(CardMaintainBean cardMaintainBean) {
+		StringBuilder builder = new StringBuilder();
+		// FK_T_CARD,FK_T_CARDTZ表关联
+		// FK_T_CARD，FK_T_CARDTZ通过card的cardno关联
+		builder.append("card.stationno").append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum())).append(SqlConsts.ADD);
+		builder.append(CARD_CARD_NO).append(SqlConsts.EQUAL).append(CARDACC_CARD_NO);
+		if (StringUtils.isNotEmpty(cardMaintainBean.getCardNo())) {
+			builder.append(SqlConsts.ADD).append(CARD_CARD_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardMaintainBean.getCardNo()).append(SqlConsts.SINGLE_QUOTES).append(SqlConsts.ADD)
+					.append(CARD_CARD_NO).append(SqlConsts.EQUAL).append(BLACK_CARD_ID);
+		}
+		return builder;
+	}
+
+	/**
+	 * 卡片维护·data转成bean
+	 */
+	private List<CardMaintainBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			if (dataRow[0] != null) {
+				cardMaintainBean.setGuestName(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardMaintainBean.setGuestNo(String.valueOf(dataRow[1]));
+			}
+			if (dataRow[2] != null) {
+				cardMaintainBean.setCardNo(String.valueOf(dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				cardMaintainBean.setGuestType(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				cardMaintainBean.setGuestNum(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardMaintainBean.setDisEffectiveDate(String.valueOf(dataRow[5]).substring(0, 10));
+			}
+			if (dataRow[6] != null) {
+				cardMaintainBean.setCardType(String.valueOf(dataRow[6]));
+			}
+			if (dataRow[7] != null) {
+				cardMaintainBean.setCardStatus(String.valueOf(dataRow[7]));
+			}
+			if (dataRow[8] != null) {
+				cardMaintainBean.setId((int) (dataRow[8]));
+			}
+			cardMaintainBean.setTotalData(totalAccount);
+			cardMaintainBeanList.add(cardMaintainBean);
+		}
+		return cardMaintainBeanList;
+	}
+
+	/**
+	 * 挂失卡·data转成bean·重载上一个函数
+	 */
+	private List<CardMaintainBean> convertDataToBean(List<Object[]> dataResult) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			if (dataRow[0] != null) {
+				cardMaintainBean.setCardNo(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardMaintainBean.setGuestName(String.valueOf(dataRow[1]));
+			}
+			if (dataRow[2] != null) {
+				cardMaintainBean.setGuestNum(String.valueOf(dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				cardMaintainBean.setGuestType(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				cardMaintainBean.setGuestNo(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardMaintainBean.setDisEffectiveDate(String.valueOf(dataRow[5]).substring(0, 10));
+			}
+			if (dataRow[6] != null) {
+				cardMaintainBean.setCardType(String.valueOf(dataRow[6]));
+			}
+			if (dataRow[7] != null) {
+				cardMaintainBean.setCardStatus(String.valueOf(dataRow[7]));
+			}
+			if (dataRow[8] != null) {
+				cardMaintainBean.setId(Integer.valueOf(String.valueOf(dataRow[8])));
+			}
+			if (dataRow[9] != null) {
+				cardMaintainBean.setDeposit(((BigDecimal) dataRow[9]));
+			}
+			if (dataRow[10] != null) {
+				cardMaintainBean.setCreateDate(String.valueOf(dataRow[10]).substring(0, 10));
+			}
+			cardMaintainBeanList.add(cardMaintainBean);
+
+		}
+		return cardMaintainBeanList;
+	}
+
+	/**
+	 * 补卡·获取旧卡信息·data转成bean
+	 */
+	private List<CardMaintainBean> convertExistCardDataToBean(List<Object[]> dataResult) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			if (dataRow[0] != null) {
+				cardMaintainBean.setCardNo(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardMaintainBean.setGuestName(String.valueOf(dataRow[1]));
+			}
+			if (dataRow[2] != null) {
+				cardMaintainBean.setGuestNo(String.valueOf(dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				cardMaintainBean.setGuestType(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				cardMaintainBean.setGuestNum(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardMaintainBean.setCarNo(String.valueOf(dataRow[5]));
+			}
+			if (dataRow[6] != null) {
+				cardMaintainBean.setRefuelTimes(String.valueOf(dataRow[6]));
+			}
+			if (dataRow[7] != null) {
+				cardMaintainBean.setRefuelLimit(String.valueOf(dataRow[7]));
+			}
+			if (dataRow[8] != null) {
+				cardMaintainBean.setProvisionAccount(String.valueOf(dataRow[8]));
+			}
+			if (dataRow[9] != null) {
+				cardMaintainBean.setCardType(String.valueOf(dataRow[9]));
+				cardMaintainBean.setNewCardType(String.valueOf(dataRow[9]));
+			}
+			if (dataRow[10] != null) {
+				cardMaintainBean.setCardStatus(String.valueOf(dataRow[10]));
+			}
+			if (dataRow[11] != null) {
+				cardMaintainBean.setDeposit(((BigDecimal) dataRow[11]));
+			}
+			if (dataRow[12] != null) {
+				cardMaintainBean.setScore(String.valueOf(dataRow[12]));
+			}
+			if (dataRow[13] != null) {
+				Date time = (Date) (dataRow[13]);
+				if ((DateUtil.currentTimestamp().getTime() - time.getTime()) >= 24 * 60 * 60 * 1000) {
+					cardMaintainBean.setLostTimeFlag(true);
+				} else {
+					cardMaintainBean.setLostTimeFlag(false);
+				}
+			}
+			cardMaintainBeanList.add(cardMaintainBean);
+		}
+		return cardMaintainBeanList;
+	}
+
+	/**
+	 * 修改密码·获取卡的信息·data转成bean
+	 */
+	private List<CardMaintainBean> convertChangePassDataToBean(List<Object[]> dataResult) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			if (dataRow[0] != null) {
+				cardMaintainBean.setCardNo(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardMaintainBean.setDisEffectiveDate(String.valueOf(dataRow[1]).substring(0, 10));
+			}
+			if (dataRow[2] != null) {
+				cardMaintainBean.setGuestNo(String.valueOf(dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				cardMaintainBean.setGuestName(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				cardMaintainBean.setGuestNum(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardMaintainBean.setCardType(String.valueOf(dataRow[5]));
+			}
+			if (dataRow[6] != null) {
+				cardMaintainBean.setDeposit(((BigDecimal) dataRow[6]));
+			}
+			if (dataRow[7] != null) {
+				cardMaintainBean.setPassFlag(String.valueOf(dataRow[7]));
+			}
+			cardMaintainBeanList.add(cardMaintainBean);
+		}
+		return cardMaintainBeanList;
+	}
+
+	/**
+	 * 修改密码·检测密码·data转成bean
+	 */
+
+	private List<CardMaintainBean> convertExistPassDataToBean(List<Object[]> dataResult) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			if (dataRow[0] != null) {
+				cardMaintainBean.setCardPass(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardMaintainBean.setCardNo(String.valueOf(dataRow[1]));
+			}
+			cardMaintainBeanList.add(cardMaintainBean);
+		}
+		log.info(cardMaintainBeanList);
+		return cardMaintainBeanList;
+	}
+
+	// 取得查询结果的数量
+	private void setPaginationNumber(CardMaintainBean cardMaintainBean, Query query) {
+		query.setFirstResult(cardMaintainBean.getStartNumber());
+		query.setMaxResults(cardMaintainBean.getTotalNumber());
+	}
+
+	// 取得查询结果的数量
+	private int getTotalCount(StringBuilder builder, String sql) throws Exception {
+		List<?> dataResultList = this.findBySql(new StringBuilder().append(sql).append(builder).toString());
+		if (dataResultList.size() > 0) {
+			return (int) dataResultList.toArray()[0];
+		}
+		return 0;
+	}
+
+	// 连接SQL和SQL条件的函数
+	private Query createSpecifiedQuery(StringBuilder builder, String sql) throws Exception {
+		return this.getQueryByCriteria(new StringBuilder().append(sql).append(builder).toString());
+	}
+
+	/**
+	 * @Inherited doc 获得班结号
+	 */
+	@Override
+	public Object[] getClassNum() {
+		Object[] resultArray = null;
+		try {
+			// 执行SQL
+			List<?> resultList = this.findBySql(this.selectShiftChangeNumSql);
+			if (resultList.size() > 0) {
+				resultArray = (Object[]) resultList.get(0);
+			}
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log\n" + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultArray;
+
+	}
+
+	/**
+	 * 卡信息表设置班结日期和班结号
+	 */
+	private void initializeClassInfoData(CardEntity cardEntity, Object[] resultArray) {
+
+		if (resultArray != null && resultArray.length == 3) {
+			cardEntity.setAccDate(DateUtil.formatDate((Timestamp) resultArray[0], DateUtil.DATE_PATTERN_8));
+			cardEntity.setAccNo((String) resultArray[1]);
+		}
+	}
+
+	/**
+	 * 修改entity里的卡号，印刷号和班结号
+	 * 
+	 * @param cardEntity
+	 * @return
+	 */
+	private CardEntity changeCardEntity(CardEntity cardEntity, CardMaintainBean cardMaintainBean) {
+		cardEntity.setCardno(cardMaintainBean.getNewCardNo());
+		cardEntity.setDeposit(new BigDecimal(cardMaintainBean.getNewCardPreAccount()));
+		cardEntity.setCardexno(cardMaintainBean.getNewPrintNumber());
+		cardEntity.setCardstatus("1");
+		return cardEntity;
+	}
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

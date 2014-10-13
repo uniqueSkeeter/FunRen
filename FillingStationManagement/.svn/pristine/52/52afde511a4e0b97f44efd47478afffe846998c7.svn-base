@@ -1,0 +1,1190 @@
+﻿/*
+ * 卡信息 <--- >发卡信息（Delphi） Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.card;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+/**
+ * 卡信息
+ * 
+ * @version 1.0
+ * @authorguyj
+ */
+@Entity
+@Table(name = "FK_T_CARD")
+public class FkTCardEntity implements StandardBean {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ID
+	 */
+	@Id
+	@Column(name = "`ID`")
+	@GeneratedValue
+	private Integer id;
+
+	/**
+	 * 印刷号
+	 */
+	@Column(name = "`CARDEXNO`")
+	private String cardexno;
+
+	/**
+	 * 卡号
+	 */
+	@Column(name = "`CARDNO`")
+	private String cardno;
+
+	/**
+	 * 卡状态
+	 */
+	@Column(name = "`CARDSTATUS`")
+	private String cardstatus;
+
+	/**
+	 * 卡类型
+	 */
+	@Column(name = "`CARDTYPE`")
+	private String cardtype;
+
+	/**
+	 * 持卡人
+	 */
+	@Column(name = "`GUESTNAME`")
+	private String guestname;
+
+	/**
+	 * 证件类型
+	 */
+	@Column(name = "`GUESTTYPE`")
+	private String guesttype;
+
+	/**
+	 * 证件号
+	 */
+	@Column(name = "`GUESTNUM`")
+	private String guestnum;
+
+	/**
+	 * 邮编
+	 */
+	@Column(name = "`GUESTPOST`")
+	private String guestpost;
+
+	/**
+	 * 地址
+	 */
+	@Column(name = "`GUESTADD`")
+	private String guestadd;
+
+	/**
+	 * 电话
+	 */
+	@Column(name = "`GUESTTEL`")
+	private String guesttel;
+
+	/**
+	 * 邮件地址
+	 */
+	@Column(name = "`EMAIL`")
+	private String email;
+
+	/**
+	 * 单位编号
+	 */
+	@Column(name = "`GUESTNO`")
+	private String guestno;
+
+	/**
+	 * 钱包账户 (账户余额)
+	 */
+	@Column(name = "`CARDBAL`")
+	private BigDecimal cardbal;
+
+	/**
+	 * 充值金额
+	 */
+	@Column(name = "`CARDINC`")
+	private BigDecimal cardinc;
+
+	/**
+	 * 消费金额
+	 */
+	@Column(name = "`CARDDEC`")
+	private BigDecimal carddec;
+
+	/**
+	 * 启用日期
+	 */
+	@Column(name = "`BEGDATE`")
+	private Timestamp begdate;
+
+	/**
+	 * 有效日期
+	 */
+	@Column(name = "`ENDDATE`")
+	private Timestamp enddate;
+
+	/**
+	 * 押金
+	 */
+	@Column(name = "`DEPOSIT`")
+	private BigDecimal deposit;
+
+	/**
+	 * 气瓶编号
+	 */
+	@Column(name = "`CYLINDERS_NO`")
+	private String cylindersNo;
+
+	/**
+	 * 网点
+	 */
+	@Column(name = "`STATIONNO`")
+	private String stationno;
+
+	/**
+	 * 限制油品
+	 */
+	@Column(name = "`XOIL`")
+	private String xoil;
+
+	/**
+	 * 限制区站标识
+	 */
+	@Column(name = "`XEAREFLAG`")
+	private String xeareflag;
+
+	/**
+	 * 限制区站
+	 */
+	@Column(name = "`XEARE`")
+	private String xeare;
+
+	/**
+	 * 限每次加油量
+	 */
+	@Column(name = "`XVOL`")
+	private String xvol;
+
+	/**
+	 * 限每天加油次数
+	 */
+	@Column(name = "`XCOUNT`")
+	private String xcount;
+
+	/**
+	 * 限每天加油金额
+	 */
+	@Column(name = "`XAMN`")
+	private String xamn;
+
+	/**
+	 * 限车号
+	 */
+	@Column(name = "`XCARNO`")
+	private String xcarno;
+
+	/**
+	 * 密码
+	 */
+	@Column(name = "`PASSWORD`")
+	private String password;
+
+	/**
+	 * 记录标识
+	 */
+	@Column(name = "`LOSTFLAG`")
+	private String lostflag;
+
+	/**
+	 * 备用
+	 */
+	@Column(name = "`BZ`")
+	private String bz;
+
+	/**
+	 * 预分配金额
+	 */
+	@Column(name = "`PRE`")
+	private BigDecimal pre;
+
+	/**
+	 * 创建日期 （日期）
+	 */
+	@Column(name = "`CREATE_DATE`")
+	private Timestamp createDate;
+
+	/**
+	 * 更新时间
+	 */
+	@Column(name = "`UPDATE_DATE`")
+	private Timestamp updateDate;
+
+	/**
+	 * 操作员编号
+	 */
+	@Column(name = "`USERID`")
+	private Integer userid;
+
+	/**
+	 * ID的取得
+	 * 
+	 * @return Integer ID
+	 */
+	public Integer getId() {
+		return id;
+	}
+
+	/**
+	 * 印刷号的取得
+	 * 
+	 * @return String 印刷号
+	 */
+	public String getCardexno() {
+		return cardexno;
+	}
+
+	/**
+	 * 卡号的取得
+	 * 
+	 * @return String 卡号
+	 */
+	public String getCardno() {
+		return cardno;
+	}
+
+	/**
+	 * 卡状态的取得
+	 * 
+	 * @return String 卡状态
+	 */
+	public String getCardstatus() {
+		return cardstatus;
+	}
+
+	/**
+	 * 卡类型的取得
+	 * 
+	 * @return String 卡类型
+	 */
+	public String getCardtype() {
+		return cardtype;
+	}
+
+	/**
+	 * 持卡人的取得
+	 * 
+	 * @return String 持卡人
+	 */
+	public String getGuestname() {
+		return guestname;
+	}
+
+	/**
+	 * 证件类型 的取得
+	 * 
+	 * @return String 证件类型
+	 */
+	public String getGuesttype() {
+		return guesttype;
+	}
+
+	/**
+	 * 证件号的取得
+	 * 
+	 * @return String 证件号
+	 */
+	public String getGuestnum() {
+		return guestnum;
+	}
+
+	/**
+	 * 邮编的取得
+	 * 
+	 * @return String 邮编
+	 */
+	public String getGuestpost() {
+		return guestpost;
+	}
+
+	/**
+	 * 地址的取得
+	 * 
+	 * @return String 地址
+	 */
+	public String getGuestadd() {
+		return guestadd;
+	}
+
+	/**
+	 * 电话的取得
+	 * 
+	 * @return String 电话
+	 */
+	public String getGuesttel() {
+		return guesttel;
+	}
+
+	/**
+	 * 邮件地址的取得
+	 * 
+	 * @return String 邮件地址
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * 单位编号的取得
+	 * 
+	 * @return String 单位编号
+	 */
+	public String getGuestno() {
+		return guestno;
+	}
+
+	/**
+	 * 钱包账户 (账户余额)的取得
+	 * 
+	 * @return BigDecimal 钱包账户 (账户余额)
+	 */
+	public BigDecimal getCardbal() {
+		return cardbal;
+	}
+
+	/**
+	 * 充值金额的取得
+	 * 
+	 * @return BigDecimal 充值金额
+	 */
+	public BigDecimal getCardinc() {
+		return cardinc;
+	}
+
+	/**
+	 * 消费金额的取得
+	 * 
+	 * @return BigDecimal 消费金额
+	 */
+	public BigDecimal getCarddec() {
+		return carddec;
+	}
+
+	/**
+	 * 启用日期的取得
+	 * 
+	 * @return Timestamp 启用日期
+	 */
+	public Timestamp getBegdate() {
+		return begdate;
+	}
+
+	/**
+	 * 有效日期 的取得
+	 * 
+	 * @return Timestamp 有效日期
+	 */
+	public Timestamp getEnddate() {
+		return enddate;
+	}
+
+	/**
+	 * 押金的取得
+	 * 
+	 * @return BigDecimal 押金
+	 */
+	public BigDecimal getDeposit() {
+		return deposit;
+	}
+
+	/**
+	 * 气瓶编号的取得
+	 * 
+	 * @return String 气瓶编号
+	 */
+	public String getCylindersNo() {
+		return cylindersNo;
+	}
+
+	/**
+	 * 网点的取得
+	 * 
+	 * @return String 网点
+	 */
+	public String getStationno() {
+		return stationno;
+	}
+
+	/**
+	 * 限制油品的取得
+	 * 
+	 * @return String 限制油品
+	 */
+	public String getXoil() {
+		return xoil;
+	}
+
+	/**
+	 * 限制区站标识的取得
+	 * 
+	 * @return String 限制区站标识
+	 */
+	public String getXeareflag() {
+		return xeareflag;
+	}
+
+	/**
+	 * 限制区站的取得
+	 * 
+	 * @return String 限制区站
+	 */
+	public String getXeare() {
+		return xeare;
+	}
+
+	/**
+	 * 限每次加油量的取得
+	 * 
+	 * @return String 限每次加油量
+	 */
+	public String getXvol() {
+		return xvol;
+	}
+
+	/**
+	 * 限每天加油次数的取得
+	 * 
+	 * @return String 限每天加油次数
+	 */
+	public String getXcount() {
+		return xcount;
+	}
+
+	/**
+	 * 限每天加油金额的取得
+	 * 
+	 * @return String 限每天加油金额
+	 */
+	public String getXamn() {
+		return xamn;
+	}
+
+	/**
+	 * 限车号的取得
+	 * 
+	 * @return String 限车号
+	 */
+	public String getXcarno() {
+		return xcarno;
+	}
+
+	/**
+	 * 密码的取得
+	 * 
+	 * @return String 密码
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * 记录标识的取得
+	 * 
+	 * @return String 记录标识
+	 */
+	public String getLostflag() {
+		return lostflag;
+	}
+
+	/**
+	 * 备用的取得
+	 * 
+	 * @return String 备用
+	 */
+	public String getBz() {
+		return bz;
+	}
+
+	/**
+	 * 预分配金额的取得
+	 * 
+	 * @return BigDecimal 预分配金额
+	 */
+	public BigDecimal getPre() {
+		return pre;
+	}
+
+	/**
+	 * 创建日期 （日期）的取得
+	 * 
+	 * @return Timestamp 创建日期 （日期）
+	 */
+	public Timestamp getCreateDate() {
+		return createDate;
+	}
+
+	/**
+	 * 更新时间的取得
+	 * 
+	 * @return Timestamp 更新时间
+	 */
+	public Timestamp getUpdateDate() {
+		return updateDate;
+	}
+
+	/**
+	 * 操作员编号的取得
+	 * 
+	 * @return Integer 操作员编号
+	 */
+	public Integer getUserid() {
+		return userid;
+	}
+
+	/**
+	 * ID的设定
+	 * 
+	 * @param newInteger ID
+	 */
+	public void setId(Integer newId) {
+		id = newId;
+	}
+
+	/**
+	 * 印刷号的设定
+	 * 
+	 * @param newString 印刷号
+	 */
+	public void setCardexno(String newCardexno) {
+		cardexno = newCardexno;
+	}
+
+	/**
+	 * 卡号的设定
+	 * 
+	 * @param newString 卡号
+	 */
+	public void setCardno(String newCardno) {
+		cardno = newCardno;
+	}
+
+	/**
+	 * 卡状态的设定
+	 * 
+	 * @param newString 卡状态
+	 */
+	public void setCardstatus(String newCardstatus) {
+		cardstatus = newCardstatus;
+	}
+
+	/**
+	 * 卡类型的设定
+	 * 
+	 * @param newString 卡类型
+	 */
+	public void setCardtype(String newCardtype) {
+		cardtype = newCardtype;
+	}
+
+	/**
+	 * 持卡人的设定
+	 * 
+	 * @param newString 持卡人
+	 */
+	public void setGuestname(String newGuestname) {
+		guestname = newGuestname;
+	}
+
+	/**
+	 * 证件类型 的设定
+	 * 
+	 * @param newString 证件类型
+	 */
+	public void setGuesttype(String newGuesttype) {
+		guesttype = newGuesttype;
+	}
+
+	/**
+	 * 证件号的设定
+	 * 
+	 * @param newString 证件号
+	 */
+	public void setGuestnum(String newGuestnum) {
+		guestnum = newGuestnum;
+	}
+
+	/**
+	 * 邮编的设定
+	 * 
+	 * @param newString 邮编
+	 */
+	public void setGuestpost(String newGuestpost) {
+		guestpost = newGuestpost;
+	}
+
+	/**
+	 * 地址的设定
+	 * 
+	 * @param newString 地址
+	 */
+	public void setGuestadd(String newGuestadd) {
+		guestadd = newGuestadd;
+	}
+
+	/**
+	 * 电话的设定
+	 * 
+	 * @param newString 电话
+	 */
+	public void setGuesttel(String newGuesttel) {
+		guesttel = newGuesttel;
+	}
+
+	/**
+	 * 邮件地址的设定
+	 * 
+	 * @param newString 邮件地址
+	 */
+	public void setEmail(String newEmail) {
+		email = newEmail;
+	}
+
+	/**
+	 * 单位编号的设定
+	 * 
+	 * @param newString 单位编号
+	 */
+	public void setGuestno(String newGuestno) {
+		guestno = newGuestno;
+	}
+
+	/**
+	 * 钱包账户 (账户余额)的设定
+	 * 
+	 * @param newBigDecimal 钱包账户 (账户余额)
+	 */
+	public void setCardbal(BigDecimal newCardbal) {
+		cardbal = newCardbal;
+	}
+
+	/**
+	 * 充值金额的设定
+	 * 
+	 * @param newBigDecimal 充值金额
+	 */
+	public void setCardinc(BigDecimal newCardinc) {
+		cardinc = newCardinc;
+	}
+
+	/**
+	 * 消费金额的设定
+	 * 
+	 * @param newBigDecimal 消费金额
+	 */
+	public void setCarddec(BigDecimal newCarddec) {
+		carddec = newCarddec;
+	}
+
+	/**
+	 * 启用日期的设定
+	 * 
+	 * @param newTimestamp 启用日期
+	 */
+	public void setBegdate(Timestamp newBegdate) {
+		begdate = newBegdate;
+	}
+
+	/**
+	 * 有效日期 的设定
+	 * 
+	 * @param newTimestamp 有效日期
+	 */
+	public void setEnddate(Timestamp newEnddate) {
+		enddate = newEnddate;
+	}
+
+	/**
+	 * 押金的设定
+	 * 
+	 * @param newBigDecimal 押金
+	 */
+	public void setDeposit(BigDecimal newDeposit) {
+		deposit = newDeposit;
+	}
+
+	/**
+	 * 气瓶编号的设定
+	 * 
+	 * @param newString 气瓶编号
+	 */
+	public void setCylindersNo(String newCylindersNo) {
+		cylindersNo = newCylindersNo;
+	}
+
+	/**
+	 * 网点的设定
+	 * 
+	 * @param newString 网点
+	 */
+	public void setStationno(String newStationno) {
+		stationno = newStationno;
+	}
+
+	/**
+	 * 限制油品的设定
+	 * 
+	 * @param newString 限制油品
+	 */
+	public void setXoil(String newXoil) {
+		xoil = newXoil;
+	}
+
+	/**
+	 * 限制区站标识的设定
+	 * 
+	 * @param newString 限制区站标识
+	 */
+	public void setXeareflag(String newXeareflag) {
+		xeareflag = newXeareflag;
+	}
+
+	/**
+	 * 限制区站的设定
+	 * 
+	 * @param newString 限制区站
+	 */
+	public void setXeare(String newXeare) {
+		xeare = newXeare;
+	}
+
+	/**
+	 * 限每次加油量的设定
+	 * 
+	 * @param newString 限每次加油量
+	 */
+	public void setXvol(String newXvol) {
+		xvol = newXvol;
+	}
+
+	/**
+	 * 限每天加油次数的设定
+	 * 
+	 * @param newString 限每天加油次数
+	 */
+	public void setXcount(String newXcount) {
+		xcount = newXcount;
+	}
+
+	/**
+	 * 限每天加油金额的设定
+	 * 
+	 * @param newString 限每天加油金额
+	 */
+	public void setXamn(String newXamn) {
+		xamn = newXamn;
+	}
+
+	/**
+	 * 限车号的设定
+	 * 
+	 * @param newString 限车号
+	 */
+	public void setXcarno(String newXcarno) {
+		xcarno = newXcarno;
+	}
+
+	/**
+	 * 密码的设定
+	 * 
+	 * @param newString 密码
+	 */
+	public void setPassword(String newPassword) {
+		password = newPassword;
+	}
+
+	/**
+	 * 记录标识的设定
+	 * 
+	 * @param newString 记录标识
+	 */
+	public void setLostflag(String newLostflag) {
+		lostflag = newLostflag;
+	}
+
+	/**
+	 * 备用的设定
+	 * 
+	 * @param newString 备用
+	 */
+	public void setBz(String newBz) {
+		bz = newBz;
+	}
+
+	/**
+	 * 预分配金额的设定
+	 * 
+	 * @param newBigDecimal 预分配金额
+	 */
+	public void setPre(BigDecimal newPre) {
+		pre = newPre;
+	}
+
+	/**
+	 * 创建日期 （日期）的设定
+	 * 
+	 * @param newTimestamp 创建日期 （日期）
+	 */
+	public void setCreateDate(Timestamp newCreateDate) {
+		createDate = newCreateDate;
+	}
+
+	/**
+	 * 更新时间的设定
+	 * 
+	 * @param newTimestamp 更新时间
+	 */
+	public void setUpdateDate(Timestamp newUpdateDate) {
+		updateDate = newUpdateDate;
+	}
+
+	/**
+	 * 操作员编号的设定
+	 * 
+	 * @param newInteger 操作员编号
+	 */
+	public void setUserid(Integer newUserid) {
+		userid = newUserid;
+	}
+
+	@Override
+	public String toString() {
+		return "FkTCardEntity [id=" + id + ", cardexno=" + cardexno + ", cardno=" + cardno + ", cardstatus=" + cardstatus
+				+ ", cardtype=" + cardtype + ", guestname=" + guestname + ", guesttype=" + guesttype + ", guestnum=" + guestnum
+				+ ", guestpost=" + guestpost + ", guestadd=" + guestadd + ", guesttel=" + guesttel + ", email=" + email
+				+ ", guestno=" + guestno + ", cardbal=" + cardbal + ", cardinc=" + cardinc + ", carddec=" + carddec
+				+ ", begdate=" + begdate + ", enddate=" + enddate + ", deposit=" + deposit + ", cylindersNo=" + cylindersNo
+				+ ", stationno=" + stationno + ", xoil=" + xoil + ", xeareflag=" + xeareflag + ", xeare=" + xeare + ", xvol="
+				+ xvol + ", xcount=" + xcount + ", xamn=" + xamn + ", xcarno=" + xcarno + ", password=" + password
+				+ ", lostflag=" + lostflag + ", bz=" + bz + ", pre=" + pre + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", userid=" + userid + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((begdate == null) ? 0 : begdate.hashCode());
+		result = prime * result + ((bz == null) ? 0 : bz.hashCode());
+		result = prime * result + ((cardbal == null) ? 0 : cardbal.hashCode());
+		result = prime * result + ((carddec == null) ? 0 : carddec.hashCode());
+		result = prime * result + ((cardexno == null) ? 0 : cardexno.hashCode());
+		result = prime * result + ((cardinc == null) ? 0 : cardinc.hashCode());
+		result = prime * result + ((cardno == null) ? 0 : cardno.hashCode());
+		result = prime * result + ((cardstatus == null) ? 0 : cardstatus.hashCode());
+		result = prime * result + ((cardtype == null) ? 0 : cardtype.hashCode());
+		result = prime * result + ((createDate == null) ? 0 : createDate.hashCode());
+		result = prime * result + ((cylindersNo == null) ? 0 : cylindersNo.hashCode());
+		result = prime * result + ((deposit == null) ? 0 : deposit.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((enddate == null) ? 0 : enddate.hashCode());
+		result = prime * result + ((guestadd == null) ? 0 : guestadd.hashCode());
+		result = prime * result + ((guestname == null) ? 0 : guestname.hashCode());
+		result = prime * result + ((guestno == null) ? 0 : guestno.hashCode());
+		result = prime * result + ((guestnum == null) ? 0 : guestnum.hashCode());
+		result = prime * result + ((guestpost == null) ? 0 : guestpost.hashCode());
+		result = prime * result + ((guesttel == null) ? 0 : guesttel.hashCode());
+		result = prime * result + ((guesttype == null) ? 0 : guesttype.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((lostflag == null) ? 0 : lostflag.hashCode());
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((pre == null) ? 0 : pre.hashCode());
+		result = prime * result + ((stationno == null) ? 0 : stationno.hashCode());
+		result = prime * result + ((updateDate == null) ? 0 : updateDate.hashCode());
+		result = prime * result + ((userid == null) ? 0 : userid.hashCode());
+		result = prime * result + ((xamn == null) ? 0 : xamn.hashCode());
+		result = prime * result + ((xcarno == null) ? 0 : xcarno.hashCode());
+		result = prime * result + ((xcount == null) ? 0 : xcount.hashCode());
+		result = prime * result + ((xeare == null) ? 0 : xeare.hashCode());
+		result = prime * result + ((xeareflag == null) ? 0 : xeareflag.hashCode());
+		result = prime * result + ((xoil == null) ? 0 : xoil.hashCode());
+		result = prime * result + ((xvol == null) ? 0 : xvol.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		FkTCardEntity other = (FkTCardEntity) obj;
+		if (begdate == null) {
+			if (other.begdate != null) {
+				return false;
+			}
+		} else if (!begdate.equals(other.begdate)) {
+			return false;
+		}
+		if (bz == null) {
+			if (other.bz != null) {
+				return false;
+			}
+		} else if (!bz.equals(other.bz)) {
+			return false;
+		}
+		if (cardbal == null) {
+			if (other.cardbal != null) {
+				return false;
+			}
+		} else if (!cardbal.equals(other.cardbal)) {
+			return false;
+		}
+		if (carddec == null) {
+			if (other.carddec != null) {
+				return false;
+			}
+		} else if (!carddec.equals(other.carddec)) {
+			return false;
+		}
+		if (cardexno == null) {
+			if (other.cardexno != null) {
+				return false;
+			}
+		} else if (!cardexno.equals(other.cardexno)) {
+			return false;
+		}
+		if (cardinc == null) {
+			if (other.cardinc != null) {
+				return false;
+			}
+		} else if (!cardinc.equals(other.cardinc)) {
+			return false;
+		}
+		if (cardno == null) {
+			if (other.cardno != null) {
+				return false;
+			}
+		} else if (!cardno.equals(other.cardno)) {
+			return false;
+		}
+		if (cardstatus == null) {
+			if (other.cardstatus != null) {
+				return false;
+			}
+		} else if (!cardstatus.equals(other.cardstatus)) {
+			return false;
+		}
+		if (cardtype == null) {
+			if (other.cardtype != null) {
+				return false;
+			}
+		} else if (!cardtype.equals(other.cardtype)) {
+			return false;
+		}
+		if (createDate == null) {
+			if (other.createDate != null) {
+				return false;
+			}
+		} else if (!createDate.equals(other.createDate)) {
+			return false;
+		}
+		if (cylindersNo == null) {
+			if (other.cylindersNo != null) {
+				return false;
+			}
+		} else if (!cylindersNo.equals(other.cylindersNo)) {
+			return false;
+		}
+		if (deposit == null) {
+			if (other.deposit != null) {
+				return false;
+			}
+		} else if (!deposit.equals(other.deposit)) {
+			return false;
+		}
+		if (email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!email.equals(other.email)) {
+			return false;
+		}
+		if (enddate == null) {
+			if (other.enddate != null) {
+				return false;
+			}
+		} else if (!enddate.equals(other.enddate)) {
+			return false;
+		}
+		if (guestadd == null) {
+			if (other.guestadd != null) {
+				return false;
+			}
+		} else if (!guestadd.equals(other.guestadd)) {
+			return false;
+		}
+		if (guestname == null) {
+			if (other.guestname != null) {
+				return false;
+			}
+		} else if (!guestname.equals(other.guestname)) {
+			return false;
+		}
+		if (guestno == null) {
+			if (other.guestno != null) {
+				return false;
+			}
+		} else if (!guestno.equals(other.guestno)) {
+			return false;
+		}
+		if (guestnum == null) {
+			if (other.guestnum != null) {
+				return false;
+			}
+		} else if (!guestnum.equals(other.guestnum)) {
+			return false;
+		}
+		if (guestpost == null) {
+			if (other.guestpost != null) {
+				return false;
+			}
+		} else if (!guestpost.equals(other.guestpost)) {
+			return false;
+		}
+		if (guesttel == null) {
+			if (other.guesttel != null) {
+				return false;
+			}
+		} else if (!guesttel.equals(other.guesttel)) {
+			return false;
+		}
+		if (guesttype == null) {
+			if (other.guesttype != null) {
+				return false;
+			}
+		} else if (!guesttype.equals(other.guesttype)) {
+			return false;
+		}
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		if (lostflag == null) {
+			if (other.lostflag != null) {
+				return false;
+			}
+		} else if (!lostflag.equals(other.lostflag)) {
+			return false;
+		}
+		if (password == null) {
+			if (other.password != null) {
+				return false;
+			}
+		} else if (!password.equals(other.password)) {
+			return false;
+		}
+		if (pre == null) {
+			if (other.pre != null) {
+				return false;
+			}
+		} else if (!pre.equals(other.pre)) {
+			return false;
+		}
+		if (stationno == null) {
+			if (other.stationno != null) {
+				return false;
+			}
+		} else if (!stationno.equals(other.stationno)) {
+			return false;
+		}
+		if (updateDate == null) {
+			if (other.updateDate != null) {
+				return false;
+			}
+		} else if (!updateDate.equals(other.updateDate)) {
+			return false;
+		}
+		if (userid == null) {
+			if (other.userid != null) {
+				return false;
+			}
+		} else if (!userid.equals(other.userid)) {
+			return false;
+		}
+		if (xamn == null) {
+			if (other.xamn != null) {
+				return false;
+			}
+		} else if (!xamn.equals(other.xamn)) {
+			return false;
+		}
+		if (xcarno == null) {
+			if (other.xcarno != null) {
+				return false;
+			}
+		} else if (!xcarno.equals(other.xcarno)) {
+			return false;
+		}
+		if (xcount == null) {
+			if (other.xcount != null) {
+				return false;
+			}
+		} else if (!xcount.equals(other.xcount)) {
+			return false;
+		}
+		if (xeare == null) {
+			if (other.xeare != null) {
+				return false;
+			}
+		} else if (!xeare.equals(other.xeare)) {
+			return false;
+		}
+		if (xeareflag == null) {
+			if (other.xeareflag != null) {
+				return false;
+			}
+		} else if (!xeareflag.equals(other.xeareflag)) {
+			return false;
+		}
+		if (xoil == null) {
+			if (other.xoil != null) {
+				return false;
+			}
+		} else if (!xoil.equals(other.xoil)) {
+			return false;
+		}
+		if (xvol == null) {
+			if (other.xvol != null) {
+				return false;
+			}
+		} else if (!xvol.equals(other.xvol)) {
+			return false;
+		}
+		return true;
+	}
+
+}

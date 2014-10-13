@@ -1,0 +1,99 @@
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	var readFlag=false;
+	$(document).ready(function(){
+		$("#personalCard_add").click(function(){
+		$('#saleCardIFrame')[0].src= server_context + '/view/card/customer/salePersonalCard.jsp'; 
+        	$('#saleCardDialog').form('clear');
+        	readFlag=false;
+            $('#saleCardDialog').dialog({
+                closed : false,
+                title : '个人记名卡售卡',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '读卡',
+                    id : 'readBtn',
+                    handler:function() {
+                    	alert("读卡");
+                    	readFlag=true;
+                    }
+                }, {
+                    text : '售卡',
+                    id : 'saleBtn',
+                    handler : function() {
+                    	alert("个人记名卡 readFlag is "+readFlag);
+                    	if(readFlag){
+                    		var pDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                        	var flag = validatePersFieldValue(pDocument);
+                        	var salePersonalCard_form = pDocument.getElementsByTagName('form');
+                        	alert("个人记名卡 flag is "+flag);
+                        	alert($(salePersonalCard_form).serialize());
+                        	if(flag){
+                        		alert("个人记名卡验证通过");
+                        		$.ajax({
+                        			data:$(salePersonalCard_form).serialize(),
+                        			url:encodeURI("registCustomer/saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+    	                			success:function(data){
+    	                				$("#saleCardDialog").dialog("close");
+                        				alert("数据传输成功");
+                        				$('#printCardIFrame')[0].src= server_context + '/view/card/customer/printPersonalCard.jsp?cardNo='+
+                        				pDocument.getElementById('cardNo').value+'&cardAmount='+pDocument.getElementById('cardAmount').value+
+                        				'&deposit='+pDocument.getElementById('deposit').value+
+                        				'&amount='+(parseInt(pDocument.getElementById('cardAmount').value,0)+parseInt(pDocument.getElementById('deposit').value,0))+
+                        				'&guestName='+pDocument.getElementById('guestName').value+'&billType='+pDocument.getElementById('billType').value;
+    	                				$('#printCardDialog').dialog({
+    	                					 closed : false,
+    	                		                title : '个人记名卡打印',
+    	                		                shadow : true,
+    	                		                modal : true,
+    	                		                collapsible : true,
+    	                		                buttons : [{
+    	                		                	text : '返回',
+    	                		                    id : 'returnBtn',
+    	                		                    handler:function(){
+    	                		                    	$("#printCardDialog").dialog("close");
+    	                		                    }
+    	                		                }]
+    	                				});
+    	    	        			},
+    	    	        			error:function(){
+    	    	        				$.messager.alert('错误','个人记名卡信息保存失败，请重试!');
+    	    	        			}
+    	            		});
+                        	}
+                    	}
+                      }
+                }, {
+                    text : '重置',
+                    id : 'resetBtn',
+                    handler : function() {
+                    	alert("重置");
+                    	var pDocument = document.getElementById("saleCardIFrame").contentWindow.document;
+                    	pDocument.getElementById('salePersonalCard_form').reset();
+                    }
+                } ]
+        });
+	
+	});
+	});
+
+	function validatePersFieldValue(pDocument){
+		alert("进入validatePersFieldValue");
+    	var cardNo = pDocument.getElementById('cardNo');
+		var cardType = pDocument.getElementById('cardType');
+		var deposit = pDocument.getElementById('deposit');
+		var guestName = pDocument.getElementById('guestName');
+		var guestType = pDocument.getElementById('guestType');
+		var guestNum = pDocument.getElementById('guestNum');
+		var guestTel = pDocument.getElementById('guestTel');
+		if (check(cardNo) || check(cardType) || check(deposit) || check(guestName)||check(guestType)||check(guestNum)||check(guestTel)){
+			return false;
+		}else{
+			return true;
+		}
+	}
+		

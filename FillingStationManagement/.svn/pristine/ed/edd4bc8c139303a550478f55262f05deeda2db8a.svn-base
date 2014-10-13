@@ -1,0 +1,65 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib uri="/struts-tags" prefix="s"%>
+<%@ page import="java.util.*"%>
+
+<html>
+
+<head>
+<%@include file="../../../common/common.jsp" %>
+<script type="text/javascript" src="<%=basePath%>js/system/plugins/jquery.edatagrid.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/card/card/displayCorpCard.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/card/card/updateSubCard.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/card/card/updateCorpCard.js"></script>
+</head>
+<body>
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 100%; height: 76%">
+		<tr>
+			<td width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+			<span class="pageFontStyle">卡片信息一览</span>
+			<hr class="lineColor">
+			<table style="font-size: 12px;width: 100%; height: 50px; font-weight: bold;" class="tableContent">
+				<tr>
+					<td height="3px" width="60px">主卡号:
+					<td height="30px" width="100px">
+						<input type="text" name="updateCardInfoBean.mainCardNo" id="mainCardNo"  maxlength="20" style="width:150px">
+					</td>
+					<td height="30px" width="100px"><input type='button' value='&nbsp;读&nbsp;卡' id="read_card"></td>
+					<td height="30px" width="100px"><input type='button' value='&nbsp;查&nbsp;询' id="search_card" disabled="disabled"></td>
+				</tr>
+			</table>
+			<hr class="lineColor">
+			<table class="tableContent">
+				<tr>
+					<td><input type='button' value='&nbsp;更改子卡信息' id="changeDrivercardInfo" disabled="disabled"></td>
+					<td><input type='button' value='&nbsp;更改单位信息' id="changeGuestInfo" disabled="disabled"></td>
+				</tr>
+			</table>
+			<br>
+			<table id="viceCardTable" title="副卡信息" style="width: auto;height: auto;" class="tableContent">
+				<tr style="display:none">
+					<td>
+						<select  id="cardStatus" style="width:150px">
+							<option selected>   </option>
+							<c:forEach var="cardStatus" items="${cardStatus}">
+							<option value="${cardStatus.key}">${cardStatus.value}
+							</option>
+							</c:forEach>
+						</select>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</TABLE>
+	 <div id="changeDriverCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 800px; height: 400px;">
+		    <iframe scrolling="auto" id='changeDriverCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	    </div>
+	 <div id="changeGuestInfoDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 800px; height: 400px;">
+		    <iframe scrolling="auto" id='changeGuestInfoIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	    </div>
+</body>
+</html>

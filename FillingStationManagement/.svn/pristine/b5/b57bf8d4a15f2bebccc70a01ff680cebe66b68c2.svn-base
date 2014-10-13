@@ -1,0 +1,88 @@
+package com.fr.station.common.data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fr.station.common.entity.card.CardStorageDetailEntity;
+
+public class ApplicationContext {
+
+	public static ApplicationContext instance;
+
+	private ApplicationContext() {
+
+	}
+
+	private String stationNum;
+
+	// the station name which the uers is login
+	private String stationName;
+
+	// login user name
+	private String userName;
+
+	// 角色名称
+	private String roleName;
+
+	// card detail which include startNum endNum and amount
+	private List<CardStorageDetailEntity> cardDetailList = new ArrayList<CardStorageDetailEntity>();
+
+	// operator number which is save in the table fkt_employeeInfo
+	private String operatorNo;
+
+	public static ApplicationContext getInstance() {
+		if (instance == null) {
+			instance = new ApplicationContext();
+		}
+		return instance;
+	}
+
+	public String getStationNum() {
+		return this.stationNum;
+	}
+
+	public void setStationNum(String stationNum) {
+		this.stationNum = stationNum;
+	}
+
+	public String getUserName() {
+		return this.userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getRoleName() {
+		return this.roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public String getStationName() {
+		return this.stationName;
+	}
+
+	public void setStationName(String stationName) {
+		this.stationName = stationName;
+	}
+
+	public List<CardStorageDetailEntity> getCardDetailList() {
+		return this.cardDetailList;
+	}
+
+	public void setCardDetailList(List<CardStorageDetailEntity> cardDetailList) {
+		this.cardDetailList = cardDetailList;
+	}
+
+	public String getOperatorNo() {
+		return this.operatorNo;
+	}
+
+	public void setOperatorNo(String operatorNo) {
+		this.operatorNo = operatorNo;
+	}
+
+}

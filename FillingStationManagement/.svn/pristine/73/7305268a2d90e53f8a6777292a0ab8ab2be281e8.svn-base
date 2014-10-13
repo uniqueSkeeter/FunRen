@@ -1,0 +1,149 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CardStorageBean;
+import com.fr.station.common.entity.card.FkTCardInOutEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.dao.CardStorageDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ * 
+ * @author hjq
+ */
+@Repository
+public class CardStorageDaoImpl extends AbstractBaseDAO<FkTCardInOutEntity> implements CardStorageDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardStorageDaoImpl.class);
+
+	private static final String CARD_TYPE = "cardgg";
+
+	private static final String RECEIPT_TYPE = "stype";
+
+	private static final String RECEIPT_STATUS = "sstatus";
+
+	private static final String APPLY_DATE = "workdate";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String selectOperateLogViewSql = "SELECT cio.inoutno, cio.cardgg, cio.cardsum, cio.outno,"
+			+ " cio.outdate, cio.inno, cio.indate, cio.sstatus, cio.workdate, cio.userid,"
+			+ " cio.note FROM FK_T_CARDINOUT cio WHERE ";
+
+	private final String selectAllCountOperateLogViewSql = "SELECT count(*) FROM FK_T_CARDINOUT cio WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * inherited java doc.
+	 */
+	@Override
+	public List<CardStorageBean> getAllCardStorageRecords(CardStorageBean operateLogBean) throws Exception {
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardStorageBean> getCardStorageRecordsByCriteria(CardStorageBean cardStorageBean, int startPage, int number) {
+		List<CardStorageBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(selectOperateLogViewSql);
+		builderForTotalResult.append(selectAllCountOperateLogViewSql);
+
+		try {
+			StringBuilder builder = validateInputCriteria(cardStorageBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+	private StringBuilder validateInputCriteria(CardStorageBean cardStorageBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(cardStorageBean.getCardType())) {
+			builder.append(CARD_TYPE).append(" = '").append(cardStorageBean.getCardType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardStorageBean.getReceiptType())) {
+			builder.append(" AND ").append(RECEIPT_TYPE).append(" = '").append(cardStorageBean.getReceiptType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardStorageBean.getReceiptStatus())) {
+			builder.append(" AND ").append(RECEIPT_STATUS).append(" = '").append(cardStorageBean.getReceiptStatus())
+					.append("'");
+		}
+		String startDate = cardStorageBean.getStartDate();
+		if (StringUtils.isNotEmpty(startDate)) {
+			builder.append(" AND ").append(APPLY_DATE).append(" >= '").append(startDate).append("'");
+		}
+		String endDate = cardStorageBean.getEndDate();
+
+		if (StringUtils.isNotEmpty(endDate)) {
+			builder.append(" AND ").append(APPLY_DATE).append(" <= '").append(endDate).append("'");
+		}
+		return builder;
+	}
+
+	private List<CardStorageBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardStorageBean> cardStorageBeanList = new ArrayList<CardStorageBean>();
+		CardStorageBean cardStorageBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardStorageBean = new CardStorageBean();
+			cardStorageBean.setRecepitNum(String.valueOf(dataRow[0]));
+			cardStorageBean.setCardType(String.valueOf(dataRow[1]));
+			cardStorageBean.setCardSum(Integer.valueOf(String.valueOf(dataRow[2])));
+			cardStorageBean.setSupplier(String.valueOf(dataRow[3]));
+			cardStorageBean.setSupplyDate(String.valueOf(dataRow[4]));
+			cardStorageBean.setReceiver(String.valueOf(dataRow[5]));
+			cardStorageBean.setReceiveDate(String.valueOf(dataRow[6]));
+			cardStorageBean.setReceiptStatus(String.valueOf(dataRow[7]));
+			cardStorageBean.setApplyDate(String.valueOf(dataRow[8]));
+			cardStorageBean.setUserId(String.valueOf(dataRow[9]));
+			cardStorageBean.setNote(String.valueOf(dataRow[10]));
+			cardStorageBean.setTotalData(totalAccount);
+			cardStorageBeanList.add(cardStorageBean);
+		}
+		return cardStorageBeanList;
+	}
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

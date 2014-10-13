@@ -1,0 +1,141 @@
+	//include in displayCustomerDepositCharge.jsp
+	$(document).ready(function(){
+		$("#readCard").click(function(){
+			alert("读卡");
+		});
+		$("#search").click(function(){
+			alert("查询");
+			var mainCardNo = $("#mainCardNo").val();
+			var guestNo = $("#guestNo").val();
+			if(mainCardNo == '' && guestNo == ''){
+				$.messager.alert('错误', '至少要输入主卡号或者客户编号');
+				return;
+			}
+			//提交表单
+			document.customAccount_form.submit();
+		});
+		$("#depositCharge").click(function(){
+			alert("备用金充值");
+			//判断是否经过查询
+			var cardNo = $("#cardNo").text();
+			var guestNo = $("#companyGuestNo").text();
+			alert('$'+cardNo+'$');
+			alert('$'+guestNo+'$');
+			if(!(cardNo != '' && guestNo != '')){
+				$.messager.alert('错误', '请先查询!');
+				return;
+			}
+			//判断卡状态
+			var cardStatus = $("#cardStatus").text().split(" ")[0];
+			alert('$'+cardStatus+'$');
+			if(cardStatus != '启用'){
+				alert("卡状态必须是启用");
+				return;
+			}
+			//判断客户状态
+			var guestStatus = $("#guestStatus").text().split(" ")[0];
+			alert('$'+guestStatus.split(" ")[0]+'$');
+			if(guestStatus != '使用中'){
+				alert("客户状态必须是使用中");
+				return;
+			}
+			//判断单位账户
+			var spareAccount = $("#spareAccount").text();
+			alert('$'+spareAccount+'$');
+			if(spareAccount == ''){
+				alert("单位账户不能为空");
+				return;
+			}
+			//判断缴费总和
+			var rechargeAmount = $("#rechargeAmount").text();
+			alert('$'+rechargeAmount+'$');
+			if(rechargeAmount == ''){
+				alert("缴费总和不能为空");
+				return;
+			}
+			//判断充值金额是否为空
+			var chargeAmount = $("#chargeAmount").val();
+			if(chargeAmount == ''){
+				$.messager.alert('错误', '充值额不能为空!');
+				return;
+			}
+			//判断交易类型是否是充值
+			var tradeType = $("#tradeType").find("option:selected").text();
+			alert(tradeType);
+			if(tradeType != '充值'){
+				$.messager.alert('错误', '交易类型只能是充值!');
+				return;
+			}
+			alert("做备用金充值");
+			doDepositCharge();
+		});
+		$("#reset").click(function(){
+			alert("重置");
+			document.customAccount_form.reset();
+		});
+		$("#payType").change(function(){
+			if(this.value == '12'||this.value == '13'){
+				$("#bankSerialNum").show();
+				$("#serialNumLabel").show();
+			}
+			else{
+				$("#bankSerialNum").hide();
+				$("#serialNumLabel").hide();
+			}
+		});
+	});
+	//备用金充值
+	function doDepositCharge(){
+		$.ajax({
+			type : 'post',
+			url : server_context+'/customerCharge/saveCustomChargeInfo',
+			data : {
+				"customerChargeBean.id" : $("#guestAccId").val(),
+				"customerChargeBean.cardNo" : $("#cardNo").text().split(" ")[0],
+				"customerChargeBean.guestNo" : $("#companyGuestNo").text().split(" ")[0],
+				"customerChargeBean.guestName" : $("#companyName").text().split(" ")[0],
+				"customerChargeBean.spareAccount" : $("#spareAccount").text().split(" ")[0],
+				"customerChargeBean.rechargeAmount" : $("#rechargeAmount").text().split(" ")[0],
+				"customerChargeBean.chargeAmount" : $("#chargeAmount").val(),
+				"customerChargeBean.payType" : $("#payType").val(),
+				"customerChargeBean.tradeType" : $("#tradeType").val(),
+				"customerChargeBean.bankSerialNum" : $("#bankSerialNum").val()
+			},
+			cache : false,
+			dataType : 'json',
+			success : function(){
+				$.messager.alert('成功', '已充值!');
+				$('#printCardIFrame')[0].src= server_context + '/view/card/card/cardCharge/printCustomerCharge.jsp'
+				+'?cardNo='+$("#cardNo").text()
+				+'&cardType='+encodeURI(encodeURI($("#cardType").text()))
+				+'&cardStatus='+encodeURI(encodeURI($("#cardStatus").text()))
+				+'&guestNo='+$("#companyGuestNo").text()
+				+'&guestName='+encodeURI(encodeURI($("#companyName").text()))
+				+'&guestStatus='+encodeURI(encodeURI($("#guestStatus").text()))
+				+'&chargeAmount='+document.getElementById("chargeAmount").value
+				+'&payType='+encodeURI(encodeURI($("#payType").find("option:selected").text()))
+				+'&spareAccount='+(parseFloat($("#spareAccount").text().split(" ")[0])+parseFloat(document.getElementById("chargeAmount").value));
+				$('#printCardDialog').dialog({
+						closed : false,
+		                title : '备用金充值凭证打印',
+		                shadow : true,
+		                modal : true,
+		                collapsible : true,
+		                buttons : [{
+		                	text : '返回',
+		                    id : 'returnBtn',
+		                    handler:function(){
+		                    	alert("返回");
+		                    	$("#printCardDialog").dialog("close");
+		                    	//更新查询
+		        				document.customAccount_form.submit();
+		                    }
+		                }]
+				});
+				
+			},
+			error : function(){
+				$.messager.alert('错误', '充值失败!');
+			}
+		});
+	}

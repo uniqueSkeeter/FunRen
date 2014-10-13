@@ -1,0 +1,45 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.card.CardStorageDetailBean;
+import com.fr.station.common.entity.card.CardStorageDetailEntity;
+import com.fr.station.component.card.dao.CardStorageDetailDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+@Repository
+public class CardStorageDetailDaoImpl extends AbstractBaseDAO<CardStorageDetailEntity> implements CardStorageDetailDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardStorageDaoImpl.class);
+
+	private final String selectShiftChangeNumSql = "SELECT co.create_date, ci.MaxNo, co.id FROM (SELECT MAX (class_no) AS MaxNo FROM [dbo].[CLASS_INFO]) ci INNER JOIN CLASS_INFO co ON co.class_no = ci.MaxNo";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<CardStorageDetailBean> getCardStorageRecordsByCriteria(CardStorageDetailBean cardStorageDetialBean,
+			int startPage, int number) {
+		List<CardStorageDetailBean> resultList = null;
+		return resultList;
+
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

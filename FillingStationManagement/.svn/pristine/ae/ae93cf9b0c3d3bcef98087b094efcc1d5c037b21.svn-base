@@ -1,0 +1,75 @@
+package com.fr.station.component.card.service.impl;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.UpdateCardInfoBean;
+import com.fr.station.common.entity.base.BaseEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.component.card.dao.CorpInfoDAO;
+import com.fr.station.component.card.service.CorpInfoService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询卡片明细
+ * 
+ * @author yy
+ */
+@Service
+public class CorpInfoServiceImpl extends AbstractBaseService<BaseEntity> implements CorpInfoService {
+
+	protected static Logger log = Logger.getLogger(CorpInfoServiceImpl.class);
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CorpInfoDAO guestInfoDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CorpInfoServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 更改客户信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveCorpInfo(UpdateCardInfoBean updateCardInfoBean) {
+		log.info("Persist guestInfoBean entity begain");
+		this.guestInfoDaoImpl.saveGuestInfo(updateCardInfoBean);
+		log.info("Succefully guestInfo entity into DB");
+	}
+
+	/**
+	 * 查找客户信息
+	 * 
+	 */
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public UpdateCardInfoBean getCorpInfo(UpdateCardInfoBean updateCardInfoBean) throws Exception {
+		CommonUtility.countPaginationNumber(updateCardInfoBean);
+		return this.guestInfoDaoImpl.getCorpInfo(updateCardInfoBean);
+	}
+
+	@Override
+	@Autowired
+	public void setCorpInfoDAO(CorpInfoDAO reportGuestInfoDaoImpl) {
+		super.setBaseDao(reportGuestInfoDaoImpl);
+		this.guestInfoDaoImpl = reportGuestInfoDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+}

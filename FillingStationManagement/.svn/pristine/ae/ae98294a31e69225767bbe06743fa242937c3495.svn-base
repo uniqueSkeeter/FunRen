@@ -1,0 +1,50 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%@include file="../../../common/common.jsp" %>
+<html>
+<head>
+<!-- css -->
+<!-- js -->
+<title>增加部门</title>
+</head>
+<body id="department_body">
+<p style="color: #2874ff; font-size: 14px; text-align: right">
+当前站点:<span>${stationName}</span>
+当前班次 :<span>${classNo}</span>
+</p>
+<hr class="lineColor">
+<form id="department_form" method="post" action="saveDepartment">
+<table style="font-size: 9px; font-family: Arial; table-layout: fixed;">
+	<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">单位客户编号<span style="color:red;">*</span></td>
+		<td>
+			<input name="registerCustomerBean.guestNo" id="guestNo" value="${registerCustomerBean.guestNo}" readonly ="readonly">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">部门名称<span style="color:red;">*</span></td>
+		<td>
+			<input name="registerCustomerBean.depName" id="depName" maxlength="7" value="${registerCustomerBean.depName}">
+		</td>
+		<td style="height: 40px; width: 85px; text-align: center;">联系人</td>
+		<td>
+			<input name="registerCustomerBean.depMaster" id="depMaster" maxlength="10" value="${registerCustomerBean.depMaster}">
+		</td>
+	</tr>
+	<tr>
+		<td style="height: 40px; width: 85px; text-align: center;">联系人电话</td>
+		<td>
+			<input name="registerCustomerBean.depTel" id="depTel" maxlength="20" onkeyup="value=value.replace(/[^\d]/g,'')" value="${registerCustomerBean.depTel}">
+		</td>
+		<td>
+			<input name="registerCustomerBean.deptNo" style="display:none" id="deptNo" value="${registerCustomerBean.deptNo}">
+			<input name="registerCustomerBean.id" style="display:none" id="id" value="${registerCustomerBean.id}">
+		</td>
+	</tr>
+</table>
+</form>
+<hr class="lineColor">
+</body>
+</html>

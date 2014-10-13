@@ -1,0 +1,303 @@
+package com.fr.station.component.card.action;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.CardMaintainBean;
+import com.fr.station.common.utility.DateJsonValueProcessor;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.service.CardMaintainService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for user CRUD. It handles the user different request,including add crate,update,delete user. Mainly
+ * responsible to handle user request
+ * 
+ * @author yy
+ */
+@Namespace("/cardMaintain")
+@ParentPackage("custom-default")
+public class CardMaintainAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	protected static Logger log = Logger.getLogger(CardMaintainAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	@Autowired
+	protected CardMaintainService cardMaintainService;
+
+	protected CardMaintainBean cardMaintainBean;
+
+	private String jsonData;
+
+	// ------- Instance Methods (public) ---------------------------------------
+	public CardMaintainBean getCardMaintainBean() {
+		return cardMaintainBean;
+	}
+
+	public void setCardMaintainBean(CardMaintainBean cardMaintainBean) {
+		this.cardMaintainBean = cardMaintainBean;
+	}
+
+	public String getJsonData() {
+		return jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	/**
+	 * 
+	 * 卡片挂失
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardLost", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardLost.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardLost() {
+		try {
+			// jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+			// currfunc).get(0));
+			// System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * do the action of cardLost
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "doCardLost", results = { @Result(name = "success", location = "/view/card/success.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String doCardLost() {
+		log.info("Starting to load card maintain infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<CardMaintainBean> cardMaintainBeanList = null;
+		try {
+			cardMaintainBeanList = cardMaintainService.cardLostByCriteria(cardMaintainBean);
+			if (!cardMaintainBeanList.isEmpty()) {
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(DateUtil.DATE_PATTERN_2));
+				map.put("total", cardMaintainBeanList.get(0).getTotalData());
+				map.put("rows", cardMaintainBeanList);
+				jsonData = JSONObject.fromObject(map).toString();
+			} else {
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading card maintain data from DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+
+		if (flag) {
+			log.info("Successfully load card maintain data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 卡片维护
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardMaintainList", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cardMaintain.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardMaintain() {
+		return SUCCESS;
+	}
+
+	@Action(value = "showCardMaintainList", results = { @Result(name = "success", type = "json"), })
+	public String showUser() {
+		log.info("Starting to load card maintain infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<CardMaintainBean> cardMaintainBeanList = null;
+		try {
+			cardMaintainBeanList = cardMaintainService.findCardMaintainRecordsByCriteria(cardMaintainBean);
+			if (!cardMaintainBeanList.isEmpty()) {
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(DateUtil.DATE_PATTERN_2));
+				// this.getShiftChangeJsonArray().addAll(shiftChangeBeanList, config);
+				map.put("total", cardMaintainBeanList.get(0).getTotalData());
+				map.put("rows", cardMaintainBeanList);
+				jsonData = JSONObject.fromObject(map).toString();
+			} else {
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading card maintain data from DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+
+		if (flag) {
+			log.info("Successfully load card maintain data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 卡片解挂
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardFound", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardFound.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardFound() {
+		try {
+			// jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+			// currfunc).get(0));
+			// System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * 卡片挂失
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardDelete", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardDelete.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardDelete() {
+		try {
+			// jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+			// currfunc).get(0));
+			// System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * 销卡
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardUnlock", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardUnlock.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardUnlock() {
+		try {
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * 密码修改
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "changePass", results = { @Result(name = "success", location = "/view/card/cardMaintain/changePass.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String changePass() {
+		try {
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * 卡片详细
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardDetail", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardDetail.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardDetail() {
+		try {
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 * @throws com.fr.station.card.ICCard.exception.ICCardException
+	 */
+
+	/**
+	 * 
+	 * Dealing with create new user for special station
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardStorage", results = { @Result(name = "success", location = "/view/card/success.jsp"),
+			@Result(name = "input", location = "/view/card/cardStorage.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardStorage() {
+		try {
+			// jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+			// currfunc).get(0));
+			// System.out.println(DataCollections.dicMenuTree.get(currfunc).get(0));
+		} catch (Exception e) {
+			log.info(ErrorLogUtil.printInfo(e));
+		}
+		return INPUT;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+}

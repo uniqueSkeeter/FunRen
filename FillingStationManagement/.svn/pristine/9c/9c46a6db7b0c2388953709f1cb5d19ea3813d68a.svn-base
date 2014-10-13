@@ -1,0 +1,157 @@
+package com.fr.station.component.report.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.QueryException;
+import org.hibernate.criterion.ProjectionList;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.OperateLogBean;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.dao.RefuelRecordsDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites.
+ * Mainly responsible to handle user login
+ * 
+ * @author _wsq
+ */
+@Repository
+public class RefuelRecordsDaoImpl extends AbstractBaseDAO<OperatelogEntity> implements RefuelRecordsDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RefuelRecordsDaoImpl.class);
+
+	private static final String OIL_GUN_NUM = "NZN";
+	private static final String CARD_NUM = "asn";
+	private static final String POS_TTC = "POS_TTC";
+	private static final String STATION_NUM = "stationno";
+	private static final String COMPANY_NAME = "UNIT";
+	private static final String TRADE_TYPE = "T_TYPE";
+	private static final String OIL_TYPE = "G_CODE";
+	private static final String PAY_TYPE = "Paytype";
+	private static final String CREATE_DATE = "sTIME";
+	
+	// ------- Static Variables (static) ---------------------------------------
+	
+	// ------- Instance Variables (private) ------------------------------------
+	
+	private String selectOperateLogViewSql = "SELECT operV.NZN, CONVERT(varchar(100), operV.sTIME, 21), operV.oilname, operV.PRC,"
+			+ " operV.VOL, operV.AMN, operV.ASN, operV.G_CODE, operV.V_TOT, operV.ASN, operV.CTC, operV.BAL, operV.POS_P,"
+			+ " operV.POS_TTC FROM view_all_operatelog operV WHERE ";
+	
+	
+	// ------- Constructors ----------------------------------------------------
+	
+	public RefuelRecordsDaoImpl() {
+		super();
+	}
+	
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	/**
+	 *  inherited java doc.
+	 */
+	@Override
+	public List<OperatelogEntity> getAllGasRecords(OperateLogBean operateLogBean) throws Exception {
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<OperateLogBean> getGasRecordsByCriteria(OperateLogBean operateLogBean, Object... args) {
+		List<OperateLogBean> resultList = null;
+		StringBuilder builder = new StringBuilder();
+		builder.append(selectOperateLogViewSql);
+		try {
+			this.validateInputCriteria(builder, operateLogBean);
+			List<Object[]> result = (List<Object[]>) this.findBySql(builder.toString());
+			resultList = convertDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" +
+					e.getMessage() + "\n" + ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" +
+					e.getMessage() + "\n" + ErrorLogUtil.printInfo(e));
+		}   
+        return resultList;
+	}
+	
+	// ------- Instance Methods (protected) ------------------------------------
+
+	private ProjectionList idicateReturnColumn() {
+		//TODO
+		return CommonUtility.setReturnColumns("nzn");
+	}
+	
+	private void validateInputCriteria(StringBuilder builder, OperateLogBean operateLogBean) {
+		if(operateLogBean.getTradeType() != null){
+			builder.append(TRADE_TYPE).append(" = ").append(operateLogBean.getTradeType());
+		}
+		if(operateLogBean.getOilGunNum() != null){
+			builder.append(" AND ").append(OIL_GUN_NUM).append(" = ").append(operateLogBean.getOilGunNum());
+		}
+		if(StringUtils.isNotEmpty(operateLogBean.getCardNum())){
+			builder.append(" AND ").append(CARD_NUM).append(" = ").append(operateLogBean.getCardNum());
+		}
+		if(operateLogBean.getPosTTC() != null){
+			builder.append(" AND ").append(POS_TTC).append(" = ").append(operateLogBean.getPosTTC());
+		}
+		if(operateLogBean.getStationNum() != null){
+			builder.append(" AND ").append(STATION_NUM).append(" = ").append(operateLogBean.getStationNum());
+		}
+		if(StringUtils.isNotEmpty(operateLogBean.getGasType())){
+			builder.append(" AND ").append(OIL_TYPE).append(" = ").append(operateLogBean.getGasType());
+		}
+		if(StringUtils.isNotEmpty(operateLogBean.getPayType())){
+			builder.append(" AND ").append(PAY_TYPE).append(" = ").append(operateLogBean.getPayType());
+		}
+		if(StringUtils.isNotEmpty(operateLogBean.getCompanyName())){
+			builder.append(" AND ").append(COMPANY_NAME).append(" = ").append(operateLogBean.getCompanyName());
+		}
+		if (operateLogBean.getStartDate() != null && operateLogBean.getEndDate() != null) {
+			String startDate = DateUtil.formatDate(operateLogBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+			String endDate = DateUtil.formatDate(operateLogBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+		    builder.append(" AND ").append(CREATE_DATE).append(" BETWEEN '").append(startDate).append("' AND '").append(endDate).append("'");
+		} else if (operateLogBean.getStartDate() != null && operateLogBean.getEndDate() == null) {
+		    builder.append(" AND ").append(CREATE_DATE).append(" > ").append(operateLogBean.getStartDate());
+		} else if (operateLogBean.getStartDate() == null && operateLogBean.getEndDate() != null) {
+			builder.append(" AND ").append(CREATE_DATE).append(" < ").append(operateLogBean.getEndDate());
+		}
+	}
+	
+	private List<OperateLogBean> convertDataToBean(List<Object[]> dataResult){
+		List<OperateLogBean> operateLogBeanList = new ArrayList<OperateLogBean>();
+		OperateLogBean operateLogBean = null;
+		
+		for(Object[] dataRow : dataResult){
+			operateLogBean = new OperateLogBean();
+			operateLogBean.setOilGunNum(Integer.valueOf(String.valueOf(dataRow[0])));
+			operateLogBean.setTradeTime((String)dataRow[1]);
+			operateLogBean.setOilName((String) dataRow[2]);
+			operateLogBean.setPrice((BigDecimal) dataRow[3]);
+			operateLogBean.setAccount((BigDecimal) dataRow[4]);
+			operateLogBean.setTradeAmount((BigDecimal) dataRow[5]);
+			operateLogBean.setCarNum((String) dataRow[6]);
+			operateLogBean.setTradeType(Integer.valueOf(String.valueOf(dataRow[7])));
+			operateLogBean.setTotalAccount((BigDecimal) dataRow[8]);
+			operateLogBean.setCardNum((String) dataRow[9]);
+			operateLogBean.setCardTradeNum((String) dataRow[10]);
+			operateLogBean.setCardLeftMoney((BigDecimal) dataRow[11]);
+			operateLogBean.setTradeLocation(String.valueOf(dataRow[12]));
+			operateLogBean.setTradeNum((Integer.parseInt((dataRow[13].toString()))));
+			operateLogBeanList.add(operateLogBean);
+		}
+		return operateLogBeanList;
+	}
+
+}

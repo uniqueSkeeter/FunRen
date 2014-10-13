@@ -1,0 +1,37 @@
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+$(document).ready(function(){
+	$("#department_delete").click(function() {
+		alert("删除部门了！！！");
+		var registerCustomerBean = $('#dg').datagrid('getSelected');
+		 if (!registerCustomerBean){
+			  $.messager.alert('错误','请选择记录!');
+			  return;
+		  }
+		 alert(registerCustomerBean.id);
+		 var depId = registerCustomerBean.id;
+		 deleteDepartment(depId);
+	});
+});
+
+function deleteDepartment(depId){
+	var yz = $.ajax({
+		type : 'post',
+		url :'deleteDepartment',
+		data : {
+			"registerCustomerBean.id" : depId,
+		},
+		cache : false,
+		dataType : 'json',
+		success : function(){
+			alert("删除成功");
+			searchData();
+			alert("sss");
+		},
+		error : function(){
+			alert("删除失败");
+		}
+	});
+}

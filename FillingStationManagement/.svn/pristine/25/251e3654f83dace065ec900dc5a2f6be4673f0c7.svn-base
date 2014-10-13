@@ -1,0 +1,120 @@
+/**
+ * this js works for modifing card storage records
+ */
+
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+
+$(document).ready(function(){
+	$("#card_modify").click(function() {
+		$('#applyCardDialog').form('clear');
+	  var cardStorageBean = $('#cardListTable').datagrid('getSelected');
+	  if (!cardStorageBean){
+		  $.messager.alert('错误','请选择记录!');
+	  }else{
+		  	if(cardStorageBean.receiptStatus=='2'){
+		  		$.messager.alert('错误','已入库记录不可编辑');
+		  		return false;
+		  	}
+			$('#applyCardIFrame')[0].src= server_context + '/cardStorage/refreshCardOrder?cardStorageBean.id='+cardStorageBean.id;
+	        	$('#applyCardDialog').dialog({
+	        		closed : false,
+	                title : '申请修改',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '保存',
+	                    iconCls : 'icon-save',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	saveTotalInformation();
+	                    	
+	                    }
+	                }, {
+	                    text : '取消',
+	                    id : 'cBtn',
+	                    handler : function() {
+	                        $('#applyCardDialog').dialog('close');
+	                    }
+	                } ]
+	        });
+	  }
+  });
+});		
+	function validateCardValue(rDocument){
+		var cardSum = rDocument.getElementById('cardSum');
+		
+		var supplier = rDocument.getElementById('supplier');
+		
+		if(check(cardSum)){
+			alert("数量不能为空！");
+			return false;
+		}
+		if(check(supplier)){
+			alert("供货方不能为空！");
+			return false;
+		}
+		return true;
+	}
+	// 表单验证
+	var check = function (input) {
+	    if (input.value == '') {
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	    };
+	};
+	
+function savetable(cardDetail){
+	
+	$.ajax({
+		type : 'post',
+		url : "cardStorageDetail/saveCardDetailOrder",
+		data : {
+			"cardStorageDetailBean.cardDetail" : cardDetail.join('\n')
+			},
+		success:function(data){
+			$.messager.alert('成功','保存卡片详细信息成功!');
+			$('#applyCardDialog').dialog('close');
+		},
+		error:function(){
+			$.messager.alert('错误','保存失败，请重试!');
+		}
+	});
+}
+	
+function saveTotalInformation(){
+	var rDocument = document.getElementById("applyCardIFrame").contentWindow.document;
+	var flag = validateCardValue(rDocument);
+	var addEmplform = rDocument.getElementsByTagName('form');
+	
+	if(flag){
+		var row =document.getElementById("applyCardIFrame").contentWindow.window.$("#tt").datagrid('getRows');
+		 for ( var i = 0; i < row.length; i++) {
+			 document.getElementById("applyCardIFrame").contentWindow.window.$("#tt").datagrid('endEdit', i);
+		}
+
+		var cardDetail = [];
+		
+		for(var i=0; i<row.length; i++){
+		    cardDetail.push(row[i].startNo + ":" + row[i].endNo + ":" + row[i].note + ";");
+		}
+		
+		$.ajax({
+			data:$(addEmplform).serialize(),
+			url:encodeURI("cardStorage/saveCardOrder"),type:'POST',timeout:3000,dataType:'html',
+			success:function(data){
+				savetable(cardDetail);
+			},
+			error:function(){
+				$.messager.alert('错误','请重试!');
+			}
+		});
+		
+		
+	}
+}

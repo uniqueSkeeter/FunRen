@@ -1,0 +1,126 @@
+package com.fr.station.component.customer.action;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.utility.DateJsonValueProcessor;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.service.RegisterCustomerService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for registerCustomer
+ * 
+ * @author WR
+ */
+@Namespace("/registCustomer")
+@ParentPackage("custom-default")
+public class RegistCustomerAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = Logger.getLogger(RegistCustomerAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	@Autowired
+	protected RegisterCustomerService registerCustomerServiceImpl;
+
+	protected RegisterCustomerBean registerCustomerBean;
+
+	private String jsonData;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegistCustomerAction() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * action for link to displayRegisterCustomer.jsp
+	 */
+	@Action(value = "registerCustomerInit", results = {
+			@Result(name = "success", location = "/view/card/customer/displayRegisterCustomer.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String registerCustomerInit() {
+
+		return SUCCESS;
+	}
+
+	/**
+	 * action for click search button in displayRegisterCustomer.jsp to display the search results
+	 */
+	@Action(value = "showCustomerList", results = { @Result(name = "success", type = "json"), })
+	public String showCustomerList() {
+		log.info("Starting to load registerCustomer records from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<RegisterCustomerBean> registerCustomerBeanList = null;
+		try {
+			registerCustomerBeanList = registerCustomerServiceImpl.findRegisterCustomerRecordsByCriteria(registerCustomerBean);
+			if (!registerCustomerBeanList.isEmpty()) {
+				JsonConfig config = new JsonConfig();
+				config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(DateUtil.DATE_PATTERN_2));
+				map.put("total", registerCustomerBeanList.get(0).getTotalData());
+				map.put("rows", registerCustomerBeanList);
+				jsonData = JSONObject.fromObject(map).toString();
+			} else {
+				map.clear();
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading registerCustomer data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			log.info("Successfully load registerCustomer records from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	public RegisterCustomerBean getRegisterCustomerBean() {
+		return registerCustomerBean;
+	}
+
+	public void setRegisterCustomerBean(RegisterCustomerBean registerCustomerBean) {
+		this.registerCustomerBean = registerCustomerBean;
+	}
+
+	public String getJsonData() {
+		return jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+}

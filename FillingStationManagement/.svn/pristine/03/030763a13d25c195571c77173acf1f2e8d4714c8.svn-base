@@ -1,0 +1,163 @@
+/*
+ * \ * 服务器启动时候、加载数据存放位置
+ *
+ * 更新履历： guyj 2014/05/26 新规作成
+ */
+
+package com.fr.station.common.data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fr.station.common.bean.system.NodeBean;
+import com.fr.station.common.entity.system.FunctionInfoEntity;
+
+/**
+ * 加载数据
+ *
+ * @author guyejun
+ */
+public interface DataCollections extends Serializable {
+
+	/**
+     *
+     */
+	public static List<FunctionInfoEntity> nodeList = new ArrayList<FunctionInfoEntity>();
+
+	/**
+	 * 字典_用户类型
+	 */
+	public static Map<String, String> dicUseType = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 字典_证件类型
+	 */
+	public static Map<String, String> dicCredType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 字典_单位类型
+	 */
+	public static Map<String, String> companyType = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 字典_银行编号
+	 */
+	public static Map<String, String> dicBank = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 字典_支付方式
+	 */
+	public static Map<String, String> dicPayType = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 字典_画面主MENU
+	 */
+	public static Map<String, String> dicMenu = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 字典_画面tree
+	 */
+	public static Map<Integer, List<NodeBean>> dicMenuTree = Collections
+			.synchronizedMap(new LinkedHashMap<Integer, List<NodeBean>>());
+
+	/**
+	 * 字典_画面btn
+	 */
+	public static Map<Integer, List<NodeBean>> dicMenuBtn = Collections
+			.synchronizedMap(new LinkedHashMap<Integer, List<NodeBean>>());
+
+	/**
+	 * 字典_客户状态类型
+	 */
+	public static Map<String, String> dicCustomStats = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+
+	/**
+	 * 岗位类型
+	 */
+	public static Map<String, String> shiftType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 岗位类型
+	 */
+	public static Map<String, String> shiftStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 卡充值 交易类型
+	 */
+	public static Map<String, String> chargeTradeType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 文化程度
+	 */
+	public static Map<String, String> educationType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 政治面貌
+	 */
+	public static Map<String, String> poliStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 登录状态
+	 */
+	public static Map<String, String> loginStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 油气类型
+	 */
+	public static Map<String, String> oilType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 网点号
+	 */
+	public static Map<String, String> stationNum = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 限制加油站
+	 */
+	public static Map<String, String> stationLimit = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 交易
+	 */
+	public static Map<String, String> tradeType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 卡片类型
+	 */
+	public static Map<String, String> cardCategory = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 卡状态
+	 */
+	public static Map<String, String> cardStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 开票类型
+	 */
+	public static Map<String, String> billType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 单据类型
+	 */
+	public static Map<String, String> receiptType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 单据状态
+	 */
+	public static Map<String, String> receiptStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 班结状态
+	 */
+	public static Map<String, String> classStatus = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+	/**
+	 * 分配类型
+	 */
+	public static Map<String, String> allocateType = Collections.synchronizedMap((new LinkedHashMap<String, String>()));
+
+}

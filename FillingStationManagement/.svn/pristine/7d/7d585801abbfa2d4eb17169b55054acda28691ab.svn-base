@@ -1,0 +1,83 @@
+package com.fr.station.component.card.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CardStorageBean;
+import com.fr.station.common.entity.card.FkTCardInOutEntity;
+import com.fr.station.component.card.dao.CardStorageDAO;
+import com.fr.station.component.card.service.CardStorageService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询所有卡片进出库记录
+ * 
+ * Mainly responsible to handle different scenario search
+ * 
+ * @author hjq
+ */
+@Service
+public class CardStorageServiceImpl extends AbstractBaseService<FkTCardInOutEntity> implements CardStorageService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private CardStorageDAO reportRecordsDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public CardStorageServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * inherited java doc.
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	@Override
+	public List<FkTCardInOutEntity> findAllShiftChangeRecords() throws Exception {
+		List<FkTCardInOutEntity> fktCardInOutEntity = findAll();
+		return fktCardInOutEntity;
+	}
+
+	/**
+	 * inherited java doc.
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardStorageBean> findCardStorageRecordsByCriteria(CardStorageBean cardStorageBean) {
+		int pageNumber = cardStorageBean.getPageNumber();
+		int pageSize = cardStorageBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return reportRecordsDaoImpl.getCardStorageRecordsByCriteria(cardStorageBean, start, number);
+	}
+
+	@Autowired
+	public void setCardStorageDAO(CardStorageDAO reportRecordsDaoImpl) {
+		super.setBaseDao(reportRecordsDaoImpl);
+		this.reportRecordsDaoImpl = reportRecordsDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

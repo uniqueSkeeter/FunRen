@@ -1,0 +1,353 @@
+﻿/*
+ * 灰卡
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+
+
+package com.fr.station.common.entity.card;
+
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.system.StandardBean;
+
+
+/**
+ * 灰卡
+ * 
+ * @version 1.0
+ * @authorguyj
+ */
+ @Entity
+ @Table(name = "ASHCARD")
+public class AshcardEntity implements StandardBean {
+
+
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ID
+     */
+     @Id
+     @Column(name = "`ID`")
+     @GeneratedValue
+    private Integer id;
+
+    /**
+     * 卡号
+     */
+     @Column(name = "`ASN`")
+    private String asn;
+
+    /**
+     * 余额
+     */
+     @Column(name = "`BAL`")
+    private BigDecimal bal;
+
+    /**
+     * 金额
+     */
+     @Column(name = "`AMN`")
+    private BigDecimal amn;
+
+    /**
+     * CTC
+     */
+     @Column(name = "`CTC`")
+    private Integer ctc;
+
+    /**
+     * 扣款来源
+     */
+     @Column(name = "`DS`")
+    private Integer ds;
+
+    /**
+     * 日期
+     */
+     @Column(name = "`SDATETIME`")
+    private Timestamp sdatetime;
+
+    /**
+     * GMAC
+     */
+     @Column(name = "`GMAC`")
+    private String gmac;
+
+    /**
+     * PSAM_TID
+     */
+     @Column(name = "`PSAM_TID`")
+    private String psamTid;
+
+    /**
+     * PSAM_TTC
+     */
+     @Column(name = "`PSAM_TTC`")
+    private Integer psamTtc;
+
+    /**
+     * 网点号
+     */
+     @Column(name = "`STATIONNO`")
+    private Integer stationno;
+
+    /**
+     * 日结号
+     */
+     @Column(name = "`RJID`")
+    private Integer rjid;
+
+
+
+    /**
+     * ID的取得
+     *
+     * @return Integer ID
+     */
+    public Integer getId() {
+        return id;
+    }
+
+
+    /**
+     * 卡号的取得
+     *
+     * @return String 卡号
+     */
+    public String getAsn() {
+        return asn;
+    }
+
+
+    /**
+     * 余额的取得
+     *
+     * @return BigDecimal 余额
+     */
+    public BigDecimal getBal() {
+        return bal;
+    }
+
+
+    /**
+     * 金额的取得
+     *
+     * @return BigDecimal 金额
+     */
+    public BigDecimal getAmn() {
+        return amn;
+    }
+
+
+    /**
+     * CTC的取得
+     *
+     * @return Integer CTC
+     */
+    public Integer getCtc() {
+        return ctc;
+    }
+
+
+    /**
+     * 扣款来源的取得
+     *
+     * @return Integer 扣款来源
+     */
+    public Integer getDs() {
+        return ds;
+    }
+
+
+    /**
+     * 日期的取得
+     *
+     * @return Timestamp 日期
+     */
+    public Timestamp getSdatetime() {
+        return sdatetime;
+    }
+
+
+    /**
+     * GMAC的取得
+     *
+     * @return String GMAC
+     */
+    public String getGmac() {
+        return gmac;
+    }
+
+
+    /**
+     * PSAM_TID的取得
+     *
+     * @return String PSAM_TID
+     */
+    public String getPsamTid() {
+        return psamTid;
+    }
+
+
+    /**
+     * PSAM_TTC的取得
+     *
+     * @return Integer PSAM_TTC
+     */
+    public Integer getPsamTtc() {
+        return psamTtc;
+    }
+
+
+    /**
+     * 网点号的取得
+     *
+     * @return Integer 网点号
+     */
+    public Integer getStationno() {
+        return stationno;
+    }
+
+
+    /**
+     * 日结号的取得
+     *
+     * @return Integer 日结号
+     */
+    public Integer getRjid() {
+        return rjid;
+    }
+
+
+    /**
+     * ID的设定
+     *
+     * @param newInteger ID
+     */
+    public void setId(Integer newId) {
+        this.id = newId;
+    }
+
+
+    /**
+     * 卡号的设定
+     *
+     * @param newString 卡号
+     */
+    public void setAsn(String newAsn) {
+        this.asn = newAsn;
+    }
+
+
+    /**
+     * 余额的设定
+     *
+     * @param newBigDecimal 余额
+     */
+    public void setBal(BigDecimal newBal) {
+        this.bal = newBal;
+    }
+
+
+    /**
+     * 金额的设定
+     *
+     * @param newBigDecimal 金额
+     */
+    public void setAmn(BigDecimal newAmn) {
+        this.amn = newAmn;
+    }
+
+
+    /**
+     * CTC的设定
+     *
+     * @param newInteger CTC
+     */
+    public void setCtc(Integer newCtc) {
+        this.ctc = newCtc;
+    }
+
+
+    /**
+     * 扣款来源的设定
+     *
+     * @param newInteger 扣款来源
+     */
+    public void setDs(Integer newDs) {
+        this.ds = newDs;
+    }
+
+
+    /**
+     * 日期的设定
+     *
+     * @param newTimestamp 日期
+     */
+    public void setSdatetime(Timestamp newSdatetime) {
+        this.sdatetime = newSdatetime;
+    }
+
+
+    /**
+     * GMAC的设定
+     *
+     * @param newString GMAC
+     */
+    public void setGmac(String newGmac) {
+        this.gmac = newGmac;
+    }
+
+
+    /**
+     * PSAM_TID的设定
+     *
+     * @param newString PSAM_TID
+     */
+    public void setPsamTid(String newPsamTid) {
+        this.psamTid = newPsamTid;
+    }
+
+
+    /**
+     * PSAM_TTC的设定
+     *
+     * @param newInteger PSAM_TTC
+     */
+    public void setPsamTtc(Integer newPsamTtc) {
+        this.psamTtc = newPsamTtc;
+    }
+
+
+    /**
+     * 网点号的设定
+     *
+     * @param newInteger 网点号
+     */
+    public void setStationno(Integer newStationno) {
+        this.stationno = newStationno;
+    }
+
+
+    /**
+     * 日结号的设定
+     *
+     * @param newInteger 日结号
+     */
+    public void setRjid(Integer newRjid) {
+        this.rjid = newRjid;
+    }
+}

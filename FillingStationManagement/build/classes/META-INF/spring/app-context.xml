@@ -1,0 +1,44 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>The application context configuration for JPA and Hibernate.</description>
+	<context:annotation-config />
+	
+	<!-- component initialize -->
+	<!-- card initialize -->
+	<context:component-scan base-package="com.fr.station.component.card" />
+	<!-- customer initialize -->
+	<context:component-scan base-package="com.fr.station.component.customer" />
+	<!-- dailyBusiness initialize -->
+	<context:component-scan base-package="com.fr.station.component.dailyBusiness" />
+	<!-- dataCenter initialize -->
+	<context:component-scan base-package="com.fr.station.component.dataCenter" />
+	<!-- report initialize -->
+	<context:component-scan base-package="com.fr.station.component.report" />
+	<!-- system initialize -->
+	<context:component-scan base-package="com.fr.station.component.system" />
+	
+ 	<!-- common bean initialize -->
+ 	<context:component-scan base-package="com.fr.station.common.entity.base" />
+ 	<context:component-scan base-package="com.fr.station.common.entity.card" />
+ 	<context:component-scan base-package="com.fr.station.common.entity.customer" />
+ 	<context:component-scan base-package="com.fr.station.common.entity.dataCenter" />
+ 	<context:component-scan base-package="com.fr.station.common.entity.report" />
+ 	<context:component-scan base-package="com.fr.station.common.entity.system" />
+ 	
+ 	<!-- data listener initialize -->
+	<bean class="com.fr.station.common.listener.CacheDataListener" />
+	
+</beans>

@@ -1,0 +1,198 @@
+//此JS用于卡片维护界面的补卡操作
+function judge(){
+	if(window.ActiveXObject)//判断浏览器是否属于IE
+	{
+	    var browser=navigator.appName;
+	    var b_version=navigator.appVersion;
+	    var version=b_version.split(";");
+	    var trim_Version=version[1].replace(/[ ]/g,"");
+	    if(browser=="Microsoft Internet Explorer" && trim_Version=="MSIE8.0")
+	    {
+	    	return true;
+	    }
+	}
+	else
+		return false;
+}
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(document).ready(function() {
+	$("#cardMaintain_replace").click(function(){
+		$('#replaceCardDialog').form('clear');
+		var cardMaintainBean = $('#card_dg').datagrid('getSelected');
+		  if (!cardMaintainBean){
+			  alert('请选择记录!');
+		  }else{
+			  $('#replaceCardIFrame')[0].src= server_context + '/cardMaintain/showReplaceCard?cardMaintainBean.cardNo='+cardMaintainBean.cardNo;
+			  if(cardMaintainBean.cardType=="13"){
+				  alert('不记名卡不能补卡!');
+				  return ;
+			  }
+			  if(cardMaintainBean.cardStatus!="2"){
+				  alert('未挂失的卡不能补卡!');
+				  return ;
+			  }
+			  $('#replaceCardDialog').dialog({
+	        		closed : false,
+	        		title: "补卡",
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '读新卡',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	alert("读新卡！");
+	                    }
+	                }, {
+	                    text : '确认补卡',
+	                    id : 'qBtn',
+	                    handler : function() {
+	                    	var rDocument = document.getElementById("replaceCardIFrame").contentWindow.document;
+	                    	validateFieldValue(rDocument);
+	                    }
+	                }],
+			  		onBeforeClose:function(){
+			  			updateTable();
+			  	}
+	        });
+		  }
+	});
+	function validateFieldValue(rDocument){
+		var lostTimeFlag=rDocument.getElementById("lostTimeFlag").value;
+		 if(lostTimeFlag=="false"){
+			  alert("挂失时间未满24小时！！");
+			  return ;
+		  }
+		if (rDocument.getElementById("newCardNo").value == '') {
+			alert("新卡号不能为空！");
+			return;
+		}
+		if (rDocument.getElementById("newCardPreAccount").value == '') {
+			alert("新卡押金不能为空！");
+			return;
+		}
+		if (rDocument.getElementById("newPrintNumber").value == '') {
+			alert("新卡印刷号不能为空！");
+			return;
+		}
+		replaceCard(rDocument);
+		}
+});
+
+function replaceCard(rDocument) {
+	//IE8
+	if(judge())
+	{
+	    	var yz = $.ajax({
+	    		url:encodeURI(server_context+'/cardMaintain/replaceCard'),type:'POST',timeout:3000,dataType:'html',
+	    		data : {
+	    			"cardMaintainBean.cardNo" : rDocument.getElementById("cardNo").innerText,
+	    			"cardMaintainBean.newCardNo" : rDocument.getElementById("newCardNo").value,
+	    			"cardMaintainBean.newCardPreAccount":rDocument.getElementById("newCardPreAccount").value,
+	    			"cardMaintainBean.newPrintNumber":rDocument.getElementById("newPrintNumber").value
+	    		},
+	    		cache : false,
+	    		success : function(data) {
+	    			$("#replaceCardDialog").dialog("close");
+	    			alert("补卡成功");
+	    			$('#printReplaceCardIFrame')[0].src= server_context + '/view/card/card/maintain/printReplaceCard.jsp?cardNo='+
+	    			rDocument.getElementById('cardNo').innerText+'&guestName='+encodeURI(encodeURI(rDocument.getElementById('guestName').innerText))
+	    			+'&guestNo='+rDocument.getElementById('guestNo').innerText+'&deposit='+rDocument.getElementById('deposit').value
+	    			+'&newCardPreAccount='+rDocument.getElementById('newCardPreAccount').value+'&newCardNo='+rDocument.getElementById('newCardNo').value
+	    			+'&guestNum='+rDocument.getElementById('guestNum').innerText;
+	    			$('#printReplaceCardDialog').dialog({
+	    				 closed : false,
+	    	                title : '补卡凭证',
+	    	                shadow : true,
+	    	                modal : true,
+	    	                collapsible : true,
+	    	                buttons : [{
+	    	                	text : '返回',
+	    	                    id : 'returnBtn',
+	    	                    handler:function(){
+	    	                    	$("#printReplaceCardDialog").dialog("close");
+	    	                    }
+	    	                }],
+	    	                onBeforeClose:function(){
+	    	                	updateTable();
+	    	                }
+	    			});
+	    		
+	    		},
+	    		error : function() {
+	    		}
+	    	});
+  }
+	//不是IE8
+	else {
+	var yz = $.ajax({
+		url:encodeURI(server_context+'/cardMaintain/replaceCard'),type:'POST',timeout:3000,dataType:'html',
+		data : {
+			"cardMaintainBean.cardNo" : rDocument.getElementById("cardNo").textContent,
+			"cardMaintainBean.newCardNo" : rDocument.getElementById("newCardNo").value,
+			"cardMaintainBean.newCardPreAccount":rDocument.getElementById("newCardPreAccount").value,
+			"cardMaintainBean.newPrintNumber":rDocument.getElementById("newPrintNumber").value
+		},
+		cache : false,
+		success : function(data) {
+			$("#replaceCardDialog").dialog("close");
+			alert("补卡成功");
+			$('#printReplaceCardIFrame')[0].src= server_context + '/view/card/card/maintain/printReplaceCard.jsp?cardNo='+
+			rDocument.getElementById('cardNo').textContent+'&guestName='+encodeURI(encodeURI(rDocument.getElementById('guestName').textContent))
+			+'&guestNo='+rDocument.getElementById('guestNo').textContent+'&deposit='+rDocument.getElementById('deposit').value
+			+'&newCardPreAccount='+rDocument.getElementById('newCardPreAccount').value+'&newCardNo='+rDocument.getElementById('newCardNo').value
+			+'&guestNum='+rDocument.getElementById('guestNum').textContent;
+			$('#printReplaceCardDialog').dialog({
+				 closed : false,
+	                title : '补卡凭证',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '返回',
+	                    id : 'returnBtn',
+	                    handler:function(){
+	                    	$("#printReplaceCardDialog").dialog("close");
+	                    }
+	                }]
+			});
+		
+		},
+		error : function() {
+		}
+	});
+	}
+}
+//更新查询
+function updateTable(){
+	var pageSize=$('#card_dg').datagrid('getPager').data("pagination").options.pageSize;
+	var pageNumber=$('#card_dg').datagrid('getPager').data("pagination").options.pageNumber;
+	var yz = $.ajax({
+		type : 'post',
+		url : server_context+'/cardMaintain/showCardMaintainList',
+		data : {
+			"cardMaintainBean.cardNo" : $("#cardNo").val(),
+			"cardMaintainBean.guestName" : $("#guestName").val(),
+			"cardMaintainBean.guestNo" : $("#guestNo").val(),
+			"cardMaintainBean.guestType" :$("#guestType").val(),
+			"cardMaintainBean.guestNum" :$("#guestNum").val(),
+			"cardMaintainBean.pageNumber" : pageNumber,
+			"cardMaintainBean.pageSize" : pageSize
+			},
+		cache : false,
+		dataType : 'json',
+		success : function(loaddata) {
+			gridData = loaddata.jsonData;
+			if(gridData == null){
+				$('#card_dg').datagrid('loadData',{total:0,rows:[]});
+			}
+			var data = $.parseJSON(gridData);    
+			$('#card_dg').datagrid('loadData', data);
+		},
+		error : function() {
+		}
+	});
+}

@@ -1,0 +1,265 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.customer.TransferAccountsBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCreditEntity;
+import com.fr.station.common.entity.card.PreAllocatedDetailEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.customer.dao.TransferAccountsDAO;
+import com.fr.station.component.customer.service.TransferAccountsService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+@SuppressWarnings("rawtypes")
+@Service
+public class TransferAccountsServiceImpl extends AbstractBaseService implements TransferAccountsService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private static Logger log = Logger.getLogger(TransferAccountsServiceImpl.class);
+
+	private TransferAccountsDAO transferAccountsDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public TransferAccountsServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	/**
+	 * 根据页面获得查询条件，查询主卡下的所有副卡记录
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<TransferAccountsBean> findViceCardsRecordsByCriteria(TransferAccountsBean transferAccountsBean) {
+		CommonUtility.countPaginationNumber(transferAccountsBean);
+		return this.transferAccountsDaoImpl.getViceCardsRecordsByCriteria(transferAccountsBean);
+
+	}
+
+	/**
+	 * 根据页面获得查询条件，获得主副卡账户信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<TransferAccountsBean> findAccountsInfoByCriteria(TransferAccountsBean transferAccountsBean) {
+		return this.transferAccountsDaoImpl.getAccountsInfoByCriteria(transferAccountsBean);
+
+	}
+
+	/**
+	 * 保存账户分配记录，在FK_T_CARDPRE表中插入一条记录，同时更新FK_T_GUESTACC和FK_T_CardTZ表
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveAllocateRecords(TransferAccountsBean transferAccountsBean) {
+
+		log.info("Persist preAllocate entity begain...");
+		PreAllocatedDetailEntity preAllocatedDetailEntity = this.converDataToEntity(transferAccountsBean);
+
+		preAllocatedDetailEntity.setBjid(ApplicationContext.getInstance().getClassChangeBean().getClassNo());
+		// Object[] resultArray = this.transferAccountsDaoImpl.getClassNum();
+		// this.initializeClassInfoData(preAllocatedDetailEntity, null, resultArray);
+
+		this.saveOrUpdate(preAllocatedDetailEntity);
+		this.transferAccountsDaoImpl.updateAccounts(transferAccountsBean);
+		log.info("Succefully saved preAllocate entity...");
+	}
+
+	/**
+	 * 保存账户汇总记录，在FK_T_CREDIT表中插入一条记录，同时更新FK_T_GUESTACC和FK_T_CardTZ表
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveGatherRecords(TransferAccountsBean transferAccountsBean) {
+
+		log.info("Persist gather entity begain...");
+		if (transferAccountsBean.getAllocateType().equals("0")) {
+			FkTCreditEntity creditEntity = this.converDataToCreditEntity(transferAccountsBean);
+			creditEntity.setAccNo(ApplicationContext.getInstance().getClassChangeBean().getClassNo());
+			// Object[] resultArray = this.transferAccountsDaoImpl.getClassNum();
+			// this.initializeClassInfoData(null, creditEntity, resultArray);
+			this.saveOrUpdate(creditEntity);
+		}
+		this.transferAccountsDaoImpl.updateAccountsForGather(transferAccountsBean);
+		log.info("Succefully saved gather entity...");
+	}
+
+	/**
+	 * 保存圈存记录，在FK_T_CREDIT表中插入一条记录，同时更新FK_T_CardTZ表
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveCreditForLoadRecords(TransferAccountsBean transferAccountsBean) {
+
+		log.info("Persist credit entity begain...");
+		FkTCreditEntity creditEntity = this.converDataToCreditForLoadEntity(transferAccountsBean);
+
+		creditEntity.setAccNo(ApplicationContext.getInstance().getClassChangeBean().getClassNo());
+		// Object[] resultArray = this.transferAccountsDaoImpl.getClassNum();
+		// this.initializeClassInfoData(null, creditEntity, resultArray);
+
+		this.saveOrUpdate(creditEntity);
+		this.transferAccountsDaoImpl.updateAccountsForCreditForLoad(transferAccountsBean);
+		log.info("Succefully saved credit entity...");
+	}
+
+	@Autowired
+	public void setTransferAccountsDAO(TransferAccountsDAO transferAccountsDaoImpl) {
+		super.setBaseDao(transferAccountsDaoImpl);
+		this.transferAccountsDaoImpl = transferAccountsDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 
+	 * 在Entity中保存班结号
+	 * 
+	 * @param preAllocatedDetailEntity
+	 * @param creditEntity
+	 * @param resultArray
+	 */
+	// private void initializeClassInfoData(PreAllocatedDetailEntity preAllocatedDetailEntity, FkTCreditEntity
+	// creditEntity,
+	// Object[] resultArray) {
+	// if (resultArray != null && resultArray.length == 3) {
+	// if (preAllocatedDetailEntity != null) {
+	// preAllocatedDetailEntity.setBjid((String) resultArray[1]);
+	// } else if (creditEntity != null) {
+	// creditEntity.setAccNo(String.valueOf(resultArray[1]));
+	// }
+	// }
+	// }
+
+	/**
+	 * 
+	 * 将bean中的数据保存到Entity中
+	 * 
+	 * @param transferAccountsBean
+	 * @return
+	 */
+	private PreAllocatedDetailEntity converDataToEntity(TransferAccountsBean transferAccountsBean) {
+		PreAllocatedDetailEntity preEntity = new PreAllocatedDetailEntity();
+		if (transferAccountsBean.getGuestNo() != null) {
+			preEntity.setGuestno(transferAccountsBean.getGuestNo());
+		}
+		if (transferAccountsBean.getViceCardNo() != null) {
+			preEntity.setCardno(transferAccountsBean.getViceCardNo());
+		}
+		if (transferAccountsBean.getAllocateAmount() != null) {
+			preEntity.setPre(transferAccountsBean.getAllocateAmount());
+		}
+		if (transferAccountsBean.getAllocateType() != null) {
+			preEntity.setBillType(transferAccountsBean.getAllocateType());
+		}
+		preEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		preEntity.setCreateDate(DateUtil.currentTimestamp());
+		preEntity.setUserid(Integer.valueOf(ApplicationContext.getInstance().getOperatorNo()));
+		Integer billNo = this.transferAccountsDaoImpl.getBillNo();
+		preEntity.setBillsNo(String.valueOf(billNo));
+		this.transferAccountsDaoImpl.updateBillNo();
+		return preEntity;
+	}
+
+	/**
+	 * 
+	 * 将bean中的数据保存到Entity中
+	 * 
+	 * @param transferAccountsBean
+	 * @return
+	 */
+	private FkTCreditEntity converDataToCreditEntity(TransferAccountsBean transferAccountsBean) {
+		FkTCreditEntity creditEntity = new FkTCreditEntity();
+		if (transferAccountsBean.getViceCardGuestName() != null) {
+			creditEntity.setGuestname(transferAccountsBean.getViceCardGuestName());
+		}
+		if (transferAccountsBean.getViceCardNo() != null) {
+			creditEntity.setCardno(transferAccountsBean.getViceCardNo());
+		}
+		if (transferAccountsBean.getGatherAmount() != null) {
+			creditEntity.setCardinc(transferAccountsBean.getGatherAmount());
+		}
+		if (transferAccountsBean.getViceCardProvisionAccount() != null) {
+			creditEntity.setCardbeg(transferAccountsBean.getViceCardProvisionAccount());
+			creditEntity.setCardbal(creditEntity.getCardbeg().subtract(creditEntity.getCardinc()));
+		}
+		if (transferAccountsBean.getTradeType() != null) {
+			creditEntity.setInctype(transferAccountsBean.getTradeType());
+		}
+		if (transferAccountsBean.getPayType() != null) {
+			creditEntity.setRectype(transferAccountsBean.getPayType());
+		}
+		// creditEntity.setInctype("4");
+		// creditEntity.setRectype("14");
+		creditEntity.setTransferType(transferAccountsBean.getAllocateType());
+		creditEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		creditEntity.setUserid(Integer.valueOf(ApplicationContext.getInstance().getOperatorNo()));
+		creditEntity.setCreateDate(DateUtil.currentTimestamp());
+		Integer tradeNo = this.transferAccountsDaoImpl.getTradeNo();
+		creditEntity.setIncno(String.valueOf(tradeNo));
+		this.transferAccountsDaoImpl.updateTradeNo();
+		return creditEntity;
+	}
+
+	/**
+	 * 
+	 * 将bean中的数据保存到Entity中
+	 * 
+	 * @param transferAccountsBean
+	 * @return
+	 */
+	private FkTCreditEntity converDataToCreditForLoadEntity(TransferAccountsBean transferAccountsBean) {
+		FkTCreditEntity creditEntity = new FkTCreditEntity();
+		if (transferAccountsBean.getViceCardGuestName() != null) {
+			creditEntity.setGuestname(transferAccountsBean.getViceCardGuestName());
+		}
+		if (transferAccountsBean.getViceCardNo() != null) {
+			creditEntity.setCardno(transferAccountsBean.getViceCardNo());
+		}
+		if (transferAccountsBean.getGatherAmount() != null) {
+			creditEntity.setCardinc(transferAccountsBean.getGatherAmount());
+		}
+		if (transferAccountsBean.getViceCardBalance() != null) {
+			creditEntity.setCardbeg(transferAccountsBean.getViceCardBalance());
+			creditEntity.setCardbal(creditEntity.getCardbeg().add(creditEntity.getCardinc()));
+		}
+		if (transferAccountsBean.getTradeType() != null) {
+			creditEntity.setInctype(transferAccountsBean.getTradeType());
+		}
+		if (transferAccountsBean.getPayType() != null) {
+			creditEntity.setRectype(transferAccountsBean.getPayType());
+		}
+		// creditEntity.setInctype("4");
+		// creditEntity.setRectype("14");
+		creditEntity.setTransferType(transferAccountsBean.getAllocateType());
+		creditEntity.setStationno(ApplicationContext.getInstance().getStationNum());
+		creditEntity.setUserid(Integer.valueOf(ApplicationContext.getInstance().getOperatorNo()));
+		creditEntity.setCreateDate(DateUtil.currentTimestamp());
+		Integer tradeNo = this.transferAccountsDaoImpl.getTradeNo();
+		creditEntity.setIncno(String.valueOf(tradeNo));
+		this.transferAccountsDaoImpl.updateTradeNo();
+		return creditEntity;
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="card" extends="struts-default" namespace="">
+    	<!-- add user action -->
+    	<action name="addUserInfo" class="com.fr.station.actions.card.EmployeeAction" method="addUser">
+           <result name="input">index.jsp</result>
+            <result name="success">/success.jsp</result>
+        </action>
+        <action name="testLink" class="com.fr.station.actions.card.RedirectLinkAction" method="test">
+            <result name="test">/404.jsp</result>
+        </action>
+        <action name="addEmployee" class="com.fr.station.actions.card.RedirectEmployeeAction" method="addEE">
+            <result name="success" type="redirect">listEmployee</result>
+        </action>
+     	<action name="listEmployee" class="com.fr.station.actions.card.RedirectEmployeeAction" method="listEmployee" >
+        	<result name="success">/index.jsp</result>
+     	</action>
+	</package>
+
+	<package name="exportShiftChange" extends="struts-default" namespace="">
+	
+		<action name="shiftChangeReport" class="com.fr.station.component.report.action.ShiftChangeReportAction">
+			<result name="success" type="stream">
+				<param name="contentLength">${fileLength}</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="contentDisposition">attachment;filename="${fileName}"</param>
+				<param name="inputName">inputStream</param>			
+			</result>
+		</action>
+		
+		<action name="download" class="com.fr.station.component.report.action.FileDownLoad">
+			<result name="success" type="stream">
+				<param name="contentLength">${fileLength}</param>
+				<param name="contentType">text/plain;charset=UTF-8</param>
+				<param name="contentDisposition">attachment;filename="${fileName}"</param>
+				<param name="inputName">inputStream</param>			
+			</result>
+		</action>
+	
+	</package>	
+</struts>

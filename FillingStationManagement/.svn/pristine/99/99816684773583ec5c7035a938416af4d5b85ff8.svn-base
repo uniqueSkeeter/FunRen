@@ -1,0 +1,18 @@
+.customerListTh{
+	height: 30px; 
+	width: 80px; 
+	text-align:left
+}
+.customerListTd{
+	height: 30px; 
+	width: 80px
+}
+.cardListTh{
+	height: 30px; 
+	width: 60px; 
+	text-align:left
+}
+.cardListTd{
+	height: 30px; 
+	width: 60px
+}

@@ -1,0 +1,33 @@
+package com.fr.station.component.card.dao;
+
+import java.util.List;
+
+import com.fr.station.common.bean.CardMaintainBean;
+
+/**
+ * The interface for get Gas trading records .
+ * 
+ * @trace FR.ICCardManagement.OperatorLogEntity.Table
+ * 
+ * @author _yy
+ */
+public interface CardMaintainDAO {
+
+	/**
+	 * 
+	 * @param cardMaintainBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<CardMaintainBean> getAllCardMaintainRecords(CardMaintainBean cardMaintainBean) throws Exception;
+
+	/**
+	 * get cardMaintain records
+	 */
+	public List<CardMaintainBean> getCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean, int startPage, int number);
+
+	/**
+	 * change the cardstatus when card lost
+	 */
+	public List<CardMaintainBean> changeCardLostByCriteria(CardMaintainBean cardMaintainBean, int startPage, int number);
+}

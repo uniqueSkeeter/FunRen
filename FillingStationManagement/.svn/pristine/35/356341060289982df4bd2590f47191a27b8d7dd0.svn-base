@@ -1,0 +1,87 @@
+package com.fr.station.component.report.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CardTradeReportBean;
+import com.fr.station.common.entity.card.FkTCreditEntity;
+import com.fr.station.component.report.dao.CardTradeReportDAO;
+import com.fr.station.component.report.service.CardTradeReportService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+@Service
+public class CardTradeReportServiceImpl extends AbstractBaseService<FkTCreditEntity> implements CardTradeReportService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CardTradeReportDAO cardTradeDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public CardTradeReportServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardTradeReportBean> findCardTradeRecordsByCriteria(CardTradeReportBean cardTradeBean) {
+		int startNumber = 0;
+		int totalNumber = 0;
+		this.getPaginationNumber(startNumber, totalNumber, cardTradeBean);
+		return this.cardTradeDaoImpl.getCardTradeRecordsByCriteria(cardTradeBean, startNumber, totalNumber);
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardTradeReportBean> findGuestCreditRecordsByCriteria(CardTradeReportBean cardTradeBean) {
+		int startNumber = 0;
+		int totalNumber = 0;
+		this.getPaginationNumber(startNumber, totalNumber, cardTradeBean);
+		return this.cardTradeDaoImpl.getGuestCreditRecordsByCriteria(cardTradeBean, startNumber, totalNumber);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardTradeReportBean> findCardPredistributionRecordsByCriteria(CardTradeReportBean cardTradeBean) {
+		int startNumber = 0;
+		int totalNumber = 0;
+		this.getPaginationNumber(startNumber, totalNumber, cardTradeBean);
+		return this.cardTradeDaoImpl.getCardPredistributionRecordsByCriteria(cardTradeBean, startNumber, totalNumber);
+
+	}
+
+	@Autowired
+	public void setCardTradeDAO(CardTradeReportDAO cardTradeDaoImpl) {
+		super.setBaseDao(cardTradeDaoImpl);
+		this.cardTradeDaoImpl = cardTradeDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private void getPaginationNumber(int startNumber, int totalNumber, CardTradeReportBean cardTradeBean) {
+		int pageNumber = cardTradeBean.getPageNumber();
+		int pageSize = cardTradeBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		totalNumber = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		startNumber = (intPage - 1) * totalNumber;
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

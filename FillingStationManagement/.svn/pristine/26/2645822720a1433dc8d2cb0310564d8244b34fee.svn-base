@@ -1,0 +1,711 @@
+package com.fr.station.common.bean.card;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.fr.station.common.bean.system.CommonBean;
+import com.fr.station.common.bean.system.StandardBean;
+
+public class UpdateCardInfoBean extends CommonBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public UpdateCardInfoBean() {
+		super();
+	}
+
+	/**
+	 * ID 主键 FK_T_CARD(卡信息表)||cardId 卡编号 FK_T_CARDACC(卡账信息表)
+	 */
+	private Integer id;
+
+	/**
+	 * 持卡人姓名(guestname) FK_T_CARD(卡信息表) || 客户名称/单位名称(guestname) FK_T_GUEST(客户信息表)
+	 */
+	private String guestName;
+
+	/**
+	 * 所属客户编号(guestNo) FK_T_CARD(卡信息表) || 客户编号(guestNo)FK_T_GUEST(客户信息表)||客户编号(guestNo)
+	 * FK_T_GUESTDEP(客户下属表)||客户编号(guestNo) FK_T_GUESTACC(客户账户信息表)
+	 */
+	private String guestNo;
+
+	/**
+	 * 卡号(cardno) FK_T_CARD(卡信息表)
+	 */
+	private String cardNo;
+
+	/**
+	 * 主卡号(mainCardno) FK_T_CARD(卡信息表)
+	 */
+	private String mainCardNo;
+
+	/**
+	 * 联系人证件编号(idnum) FKT_GUEST(客户信息表)
+	 */
+	private String contactNum;
+
+	/**
+	 * 联系人生日(birthday) FKT_GUEST(客户信息表)
+	 */
+	private String contactBir;
+
+	/**
+	 * 银行编号(bankno)银行类型的字典值 FKT_GUEST(客户信息表)
+	 */
+	private String bankType;
+
+	/**
+	 * 银行帐号(bankacc) FKT_GUEST(客户信息表)
+	 */
+	private String bankAcc;
+
+	/**
+	 * 税号(taxno) FKT_GUEST(客户信息表)
+	 */
+	private String taxNum;
+
+	/**
+	 * 卡状态(cardstatus) FK_T_CARD(卡信息表)
+	 */
+	private String cardStatus;
+
+	/**
+	 * 证件类型(guesttype) FK_T_CARD(卡信息表)
+	 */
+	private String guestType;
+
+	/**
+	 * 是否主卡(cardFlag) FK_T_CARD(卡信息表)
+	 */
+	private String cardFlag;
+
+	/**
+	 * 联系人证件(guesttype) FK_T_GUSET(客户信息表)
+	 */
+	private String contactType;
+
+	/**
+	 * 证件号(guestnum) FK_T_CARD(卡信息表)
+	 */
+	private String guestNum;
+
+	/**
+	 * 联系电话(guesttel) FK_T_CARD(卡信息表) || 电话 (tel) FK_T_GUEST(客户信息表)
+	 */
+	private String guestTel;
+
+	/**
+	 * 创建日期(create_date) FK_T_CARD(卡信息表)||FK_T_GUEST(客户信息表)||FK_T_GUESTACC(客户账户信息表)||FK_T_CARDTZ(卡账户信息表)
+	 */
+	private String createDate;
+
+	/**
+	 * 更新日期(update_date) FK_T_CARD(卡信息表)||FK_T_GUEST(客户信息表)||FK_T_GUESTACC(客户账户信息表)||FK_T_CARDTZ(卡账户信息表)
+	 */
+	private String updateDate;
+
+	/**
+	 * 印刷号(cardexno) FK_T_CARD(卡信息表)
+	 */
+	private String printNumber;
+
+	/**
+	 * 网点编号(stationno) FK_T_CARD(卡信息表)||FK_T_GUEST(客户信息表)
+	 */
+	private String stationNo;
+
+	/**
+	 * 卡片类型(cardtype) FK_T_CARD(卡信息表)
+	 */
+	private String cardType;
+
+	/**
+	 * 押金(deposit) FK_T_CARD(卡信息表)
+	 */
+	private BigDecimal deposit;
+
+	/**
+	 * 卡内金额(cardbal) FK_T_CARD(卡信息表)||钱包账户(cardbal) FK_T_CARDTZ(卡帳信息表) ||卡内余额(cardbal) FK_T_CARD(卡信息表)
+	 */
+	private BigDecimal cardAmount;
+
+	/**
+	 * 密码(password) FK_T_CARD(卡信息表)
+	 */
+	private String cardPass;
+
+	/**
+	 * 密码标志位(passFlag) FK_T_CARD(卡信息表)
+	 */
+	private String passFlag;
+
+	/**
+	 * 限每次加油量(xvol) FK_T_CARD(卡信息表)
+	 */
+	private String refuelLimit;
+
+	/**
+	 * 限每天加油次数(xcount) FK_T_CARD(卡信息表)
+	 */
+	private String refuelTimes;
+
+	/**
+	 * 限每天加油金额(xamn) FK_T_CARD(卡信息表)
+	 */
+	private String consumeAmount;
+
+	/**
+	 * 限制油品(xoil) FK_T_CARD(卡信息表)
+	 */
+	private String oilTypeLimit;
+
+	/**
+	 * 开票类型(billType) FK_T_CARD(卡信息表)
+	 */
+	private String billType;
+
+	/**
+	 * 启用日期(begDate) FK_T_CARD(卡信息表)
+	 */
+	private String effectiveDate;
+
+	/**
+	 * 有效日期(endDate) FK_T_CARD(卡信息表)
+	 */
+	private String disEffectiveDate;
+
+	/**
+	 * 限制区站(xeare) FK_T_CARD(卡信息表)
+	 */
+	private List<String> stationInfoLimit;
+
+	/**
+	 * 电子邮箱(email) FK_T_CARD(卡信息表) || 邮件 (email) FK_T_GUEST(客户信息表)
+	 */
+	private String email;
+
+	/**
+	 * 邮编(guestpost) FK_T_CARD(卡信息表) || 邮编(post) FK_T_GUEST(客户信息表)
+	 */
+	private String zipCode;
+
+	/**
+	 * 客户地址(guestadd) FK_T_CARD(卡信息表) || 地址(addr) FK_T_GUEST(客户信息表)
+	 */
+	private String customerAddr;
+
+	/**
+	 * guestname(单位名称) FK_T_GUEST(客户信息表)
+	 */
+	private String companyName;
+
+	/**
+	 * score(账户积分) FK_T_CARD(卡信息表)
+	 */
+	private String score;
+
+	/**
+	 * 车号限制(xcarno) FK_T_CARD(卡信息表)
+	 */
+	private String carNoConstr;
+
+	/**
+	 * 性别(gender) FK_T_CARD(卡信息表)
+	 */
+	private String gender;
+
+	/**
+	 * 备注(bz) FK_T_CARD(卡信息表)
+	 */
+	private String remark;
+
+	/**
+	 * bal(备付账户余额 ) FK_T_GUESTACC(客户信息表)
+	 */
+	private String provisionAccount;
+
+	/**
+	 * score(备付账户积分 ) FK_T_GUESTACC(客户信息表)
+	 */
+	private String provisionScore;
+
+	/**
+	 * 联系人姓名(idname) FKT_GUEST(客户信息表)
+	 */
+	private String contactName;
+
+	/**
+	 * 部门名称
+	 */
+
+	private String depName;
+
+	/**
+	 * pre(备用金) FK_T_CARDTZ( 卡帐信息表)
+	 */
+
+	private BigDecimal pre;
+
+	/**
+	 * guestAdd(联系人地址) FK_T_CARD(卡信息表)
+	 */
+	private String guestAdd;
+
+	/**
+	 * 客户状态(stats) FKT_GUEST(客户信息表)
+	 */
+	private String guestStatus;
+
+	/**
+	 * datagrid控制
+	 */
+	private int pageNumber;
+
+	/**
+	 * datagrid控制
+	 */
+	private int pageSize;
+
+	/**
+	 * datagrid控制
+	 */
+	private int totalData;
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getGuestName() {
+		return this.guestName;
+	}
+
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	public String getGuestNo() {
+		return this.guestNo;
+	}
+
+	public void setGuestNo(String guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	public String getCardNo() {
+		return this.cardNo;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public String getContactBir() {
+		return this.contactBir;
+	}
+
+	public void setContactBir(String contactBir) {
+		this.contactBir = contactBir;
+	}
+
+	public String getCardStatus() {
+		return this.cardStatus;
+	}
+
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	public String getContactType() {
+		return this.contactType;
+	}
+
+	public void setContactType(String contactType) {
+		this.contactType = contactType;
+	}
+
+	public String getGuestType() {
+		return this.guestType;
+	}
+
+	public void setGuestType(String guestType) {
+		this.guestType = guestType;
+	}
+
+	public String getGuestNum() {
+		return this.guestNum;
+	}
+
+	public void setGuestNum(String guestNum) {
+		this.guestNum = guestNum;
+	}
+
+	public String getCreateDate() {
+		return this.createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getStationNo() {
+		return this.stationNo;
+	}
+
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	public String getCardType() {
+		return this.cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public BigDecimal getDeposit() {
+		return this.deposit;
+	}
+
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
+	}
+
+	public BigDecimal getCardAmount() {
+		return this.cardAmount;
+	}
+
+	public void setCardAmount(BigDecimal cardAmount) {
+		this.cardAmount = cardAmount;
+	}
+
+	public String getCardPass() {
+		return this.cardPass;
+	}
+
+	public void setCardPass(String cardPass) {
+		this.cardPass = cardPass;
+	}
+
+	public String getRefuelLimit() {
+		return this.refuelLimit;
+	}
+
+	public void setRefuelLimit(String refuelLimit) {
+		this.refuelLimit = refuelLimit;
+	}
+
+	public String getRefuelTimes() {
+		return this.refuelTimes;
+	}
+
+	public void setRefuelTimes(String refuelTimes) {
+		this.refuelTimes = refuelTimes;
+	}
+
+	public String getConsumeAmount() {
+		return this.consumeAmount;
+	}
+
+	public void setConsumeAmount(String consumeAmount) {
+		this.consumeAmount = consumeAmount;
+	}
+
+	public String getOilTypeLimit() {
+		return this.oilTypeLimit;
+	}
+
+	public void setOilTypeLimit(String oilTypeLimit) {
+		this.oilTypeLimit = oilTypeLimit;
+	}
+
+	public String getEffectiveDate() {
+		return this.effectiveDate;
+	}
+
+	public void setEffectiveDate(String effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+
+	public List<String> getStationInfoLimit() {
+		return this.stationInfoLimit;
+	}
+
+	public void setStationInfoLimit(List<String> stationInfoLimit) {
+		this.stationInfoLimit = stationInfoLimit;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getCustomerAddr() {
+		return this.customerAddr;
+	}
+
+	public void setCustomerAddr(String customerAddr) {
+		this.customerAddr = customerAddr;
+	}
+
+	public String getCompanyName() {
+		return this.companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getScore() {
+		return this.score;
+	}
+
+	public void setScore(String score) {
+		this.score = score;
+	}
+
+	public String getUpdateDate() {
+		return this.updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public String getDisEffectiveDate() {
+		return this.disEffectiveDate;
+	}
+
+	public void setDisEffectiveDate(String disEffectiveDate) {
+		this.disEffectiveDate = disEffectiveDate;
+	}
+
+	public String getZipCode() {
+		return this.zipCode;
+	}
+
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getGuestTel() {
+		return this.guestTel;
+	}
+
+	public void setGuestTel(String guestTel) {
+		this.guestTel = guestTel;
+	}
+
+	public String getPrintNumber() {
+		return this.printNumber;
+	}
+
+	public void setPrintNumber(String printNumber) {
+		this.printNumber = printNumber;
+	}
+
+	public String getProvisionAccount() {
+		return this.provisionAccount;
+	}
+
+	public void setProvisionAccount(String provisionAccount) {
+		this.provisionAccount = provisionAccount;
+	}
+
+	public String getCarNoConstr() {
+		return this.carNoConstr;
+	}
+
+	public void setCarNoConstr(String carNoConstr) {
+		this.carNoConstr = carNoConstr;
+	}
+
+	public String getProvisionScore() {
+		return this.provisionScore;
+	}
+
+	public void setProvisionScore(String provisionScore) {
+		this.provisionScore = provisionScore;
+	}
+
+	public BigDecimal getPre() {
+		return this.pre;
+	}
+
+	public void setPre(BigDecimal pre) {
+		this.pre = pre;
+	}
+
+	public String getGuestAdd() {
+		return this.guestAdd;
+	}
+
+	public void setGuestAdd(String guestAdd) {
+		this.guestAdd = guestAdd;
+	}
+
+	public String getGender() {
+		return this.gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getBillType() {
+		return this.billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
+	public String getPassFlag() {
+		return this.passFlag;
+	}
+
+	public void setPassFlag(String passFlag) {
+		this.passFlag = passFlag;
+	}
+
+	public String getMainCardNo() {
+		return this.mainCardNo;
+	}
+
+	public String getContactNum() {
+		return this.contactNum;
+	}
+
+	public void setContactNum(String contactNum) {
+		this.contactNum = contactNum;
+	}
+
+	public String getBankType() {
+		return this.bankType;
+	}
+
+	public void setBankType(String bankType) {
+		this.bankType = bankType;
+	}
+
+	public String getBankAcc() {
+		return this.bankAcc;
+	}
+
+	public void setBankAcc(String bankAcc) {
+		this.bankAcc = bankAcc;
+	}
+
+	public String getCardFlag() {
+		return this.cardFlag;
+	}
+
+	public void setCardFlag(String cardFlag) {
+		this.cardFlag = cardFlag;
+	}
+
+	public String getTaxNum() {
+		return this.taxNum;
+	}
+
+	public void setTaxNum(String taxNum) {
+		this.taxNum = taxNum;
+	}
+
+	public String getContactName() {
+		return this.contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public void setMainCardNo(String mainCardNo) {
+		this.mainCardNo = mainCardNo;
+	}
+
+	public String getDepName() {
+		return this.depName;
+	}
+
+	public void setDepName(String depName) {
+		this.depName = depName;
+	}
+
+	public String getGuestStatus() {
+		return this.guestStatus;
+	}
+
+	public void setGuestStatus(String guestStatus) {
+		this.guestStatus = guestStatus;
+	}
+
+	@Override
+	public int getPageNumber() {
+		return this.pageNumber;
+	}
+
+	@Override
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	@Override
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	@Override
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	@Override
+	public int getTotalData() {
+		return this.totalData;
+	}
+
+	@Override
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	@Override
+	public String toString() {
+		return "UpdateCardInfoBean [id=" + this.id + ", guestName=" + this.guestName + ", guestNo=" + this.guestNo
+				+ ", cardNo=" + this.cardNo + ", mainCardNo=" + this.mainCardNo + ", contactNum=" + this.contactNum
+				+ ", contactBir=" + this.contactBir + ", bankType=" + this.bankType + ", bankAcc=" + this.bankAcc + ", taxNum="
+				+ this.taxNum + ", cardStatus=" + this.cardStatus + ", guestType=" + this.guestType + ", cardFlag="
+				+ this.cardFlag + ", contactType=" + this.contactType + ", guestNum=" + this.guestNum + ", guestTel="
+				+ this.guestTel + ", createDate=" + this.createDate + ", updateDate=" + this.updateDate + ", printNumber="
+				+ this.printNumber + ", stationNo=" + this.stationNo + ", cardType=" + this.cardType + ", deposit="
+				+ this.deposit + ", cardAmount=" + this.cardAmount + ", cardPass=" + this.cardPass + ", passFlag="
+				+ this.passFlag + ", refuelLimit=" + this.refuelLimit + ", refuelTimes=" + this.refuelTimes
+				+ ", consumeAmount=" + this.consumeAmount + ", oilTypeLimit=" + this.oilTypeLimit + ", billType="
+				+ this.billType + ", effectiveDate=" + this.effectiveDate + ", disEffectiveDate=" + this.disEffectiveDate
+				+ ", stationInfoLimit=" + this.stationInfoLimit + ", email=" + this.email + ", zipCode=" + this.zipCode
+				+ ", customerAddr=" + this.customerAddr + ", companyName=" + this.companyName + ", score=" + this.score
+				+ ", carNoConstr=" + this.carNoConstr + ", gender=" + this.gender + ", remark=" + this.remark
+				+ ", provisionAccount=" + this.provisionAccount + ", provisionScore=" + this.provisionScore + ", contactName="
+				+ this.contactName + ", depName=" + this.depName + ", pre=" + this.pre + ", guestAdd=" + this.guestAdd
+				+ ", guestStatus=" + this.guestStatus + ", pageNumber=" + this.pageNumber + ", pageSize=" + this.pageSize
+				+ ", totalData=" + this.totalData + "]";
+	}
+
+}

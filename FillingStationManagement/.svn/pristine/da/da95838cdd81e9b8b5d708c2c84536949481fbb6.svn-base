@@ -1,0 +1,51 @@
+//此JS用于单位卡维护的更改卡信息操作
+//绝对路径
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(function(){
+	
+});
+$(document).ready(function(){
+	$('#changeDrivercardInfo').click(function(){
+		var updateCardInfoBean=$('#viceCardTable').datagrid('getSelected');
+		if (!updateCardInfoBean){
+			  alert('请选择记录!');
+		  }else{
+			  $('#changeDriverCardIFrame')[0].src= server_context + '/updateCardInfo/loadDriver?updateCardInfoBean.id='+updateCardInfoBean.id;
+			  var iframe = document.getElementById("changeDriverCardIFrame").contentWindow;
+			  $('#changeDriverCardDialog').dialog({
+	        		closed : false,
+	                title : '司机信息修改',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '保存并写卡',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	var rDocument = document.getElementById("changeDriverCardIFrame").contentWindow.document;
+	                		$.ajax({
+	                			data:$(rDocument.driverForm).serialize(),
+	                			url:encodeURI(server_context+"/updateCardInfo/saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+	                			success:function(data){
+	                				alert("保存成功！");
+	                				$('#changeDriverCardDialog').dialog('close');
+	                			},
+	                			error:function(){
+	                				alert("保存失败，请重试！");
+	                			}
+	                		});
+	                    }
+	                }, {
+	                    text : '取消',
+	                    id : 'cBtn',
+	                    handler : function() {
+	                        $('#changeDriverCardDialog').dialog('close');
+	                    }
+	                } ]
+	        });
+		  }
+	});
+});

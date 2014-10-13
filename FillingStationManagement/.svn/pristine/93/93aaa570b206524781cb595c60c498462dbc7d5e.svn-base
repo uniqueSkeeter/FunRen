@@ -1,0 +1,200 @@
+package com.fr.station.component.customer.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * this DaoImpl is for find registerCustomer records from DB to display in displayRegisterCustomer.jsp by implements
+ * getRegisterCustomerRecordsByCriteria() method
+ * 
+ * @author WR
+ */
+@Repository
+public class RegisterCustomerDaoImpl extends AbstractBaseDAO<FkTCardEntity> implements RegisterCustomerDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RegisterCustomerDaoImpl.class);
+
+	private static final String CARD_NO = "fkt_card.cardNo";
+
+	private static final String GUEST_NAME = "fkt_card.guestName";
+
+	private static final String CARD_EXNO = "fkt_card.cardExno";
+
+	private static final String CARD_TYPE = "fkt_card.cardType";
+
+	private static final String GUEST_TYPE = "fkt_card.guestType";
+
+	private static final String GUEST_NUM = "fkt_card.guestNum";
+
+	private static final String STATION_NO = "fkt_card.stationNo";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	/**
+	 * 查询客户一览SQL 2014-7-25
+	 */
+	private final String registerCustomerSql = "SELECT fkt_card.guestName,fkt_card.guestNo,fkt_card.cardNo,fkt_card.cardStatus,fkt_card.guestType,"
+			+ "fkt_card.guestNum, fkt_card.guestTel,CONVERT(varchar(100), fkt_card.create_date, 21),fkt_card.stationNo FROM FK_T_CARD fkt_card WHERE ";
+
+	/**
+	 * 统计客户一览SQL 2014-7-25
+	 */
+	private final String countRegisterCustomerSql = "SELECT count(*) FROM FK_T_CARD fkt_card WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegisterCustomerDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 查询客户编号 2014-7-24
+	 */
+	@Override
+	public Integer getGuestNo() {
+		Integer guestNo = 0;
+		try {
+			guestNo = (Integer) this.findBySql("SELECT attriValue FROM stationParameter WHERE attriName = 'guestNo' ").get(0);
+		} catch (Exception e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			e.printStackTrace();
+		}
+		return guestNo;
+	}
+
+	/**
+	 * 根据查询条件查询客户一览 2014-7-24
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RegisterCustomerBean> getRegisterCustomerRecordsByCriteria(RegisterCustomerBean registerCustomerBean,
+			int startPage, int number) {
+		List<RegisterCustomerBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.registerCustomerSql);
+		builderForTotalResult.append(this.countRegisterCustomerSql);
+		try {
+			StringBuilder builder = this.validateInputCriteria(registerCustomerBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 客户一览查询条件 2014-7-26
+	 */
+	private StringBuilder validateInputCriteria(RegisterCustomerBean registerCustomerBean) {
+		StringBuilder builder = new StringBuilder();
+		boolean searchFlag = false;
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardNo())) {
+			searchFlag = true;
+			builder.append(CARD_NO).append(" = '").append(registerCustomerBean.getCardNo()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestName())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_NAME).append(" = '").append(registerCustomerBean.getGuestName()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardExno())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(CARD_EXNO).append(" = '").append(registerCustomerBean.getCardExno()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getCardType())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(CARD_TYPE).append(" = '").append(registerCustomerBean.getCardType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestType())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_TYPE).append(" = '").append(registerCustomerBean.getGuestType()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(registerCustomerBean.getGuestNum())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(GUEST_NUM).append(" = '").append(registerCustomerBean.getGuestNum()).append("'");
+		}
+
+		if (StringUtils.isNotEmpty(ApplicationContext.getInstance().getStationNum())) {
+			searchFlag = this.indicateSearchFlag(builder, searchFlag);
+			builder.append(STATION_NO).append(" = '").append(ApplicationContext.getInstance().getStationNum()).append("'");
+		}
+		return builder;
+	}
+
+	/**
+	 * 判断是否加AND 2014-7-26
+	 */
+	private boolean indicateSearchFlag(StringBuilder builder, boolean searchFlag) {
+		if (searchFlag) {
+			builder.append(" AND ");
+		} else {
+			searchFlag = true;
+		}
+		return searchFlag;
+	}
+
+	/**
+	 * 把客户一览查询结果覆盖到RegisterCustomerBean 2014-7-26
+	 */
+	private List<RegisterCustomerBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<RegisterCustomerBean> registerCustomerBeanList = new ArrayList<RegisterCustomerBean>();
+		RegisterCustomerBean registerCustomerBean = null;
+		for (Object[] dataRow : dataResult) {
+			registerCustomerBean = new RegisterCustomerBean();
+			registerCustomerBean.setGuestName(String.valueOf(dataRow[0]));
+			registerCustomerBean.setGuestNo(String.valueOf(dataRow[1]));
+			registerCustomerBean.setCardNo(String.valueOf(dataRow[2]));
+			registerCustomerBean.setCardStatus(String.valueOf(dataRow[3]));
+			registerCustomerBean.setGuestType(String.valueOf(dataRow[4]));
+			registerCustomerBean.setGuestNum(String.valueOf(dataRow[5]));
+			registerCustomerBean.setGuestTel(String.valueOf(dataRow[6]));
+			registerCustomerBean.setCreate_date(String.valueOf(dataRow[7]));
+			registerCustomerBean.setStationNo(String.valueOf(dataRow[8]));
+			registerCustomerBean.setTotalData(totalAccount);
+			registerCustomerBeanList.add(registerCustomerBean);
+		}
+		return registerCustomerBeanList;
+	}
+
+}

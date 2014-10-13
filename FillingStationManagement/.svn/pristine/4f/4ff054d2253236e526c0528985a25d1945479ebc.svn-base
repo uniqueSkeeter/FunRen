@@ -1,0 +1,149 @@
+package com.fr.station.component.report.service.impl;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.report.ShiftChangeBean;
+import com.fr.station.common.bean.system.ReportTypeEnum;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.dao.RefuelDiagramDAO;
+import com.fr.station.component.report.service.RefuelDiagramService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get station trade logs for each car.
+ * Mainly responsible to handle different scenario search
+ * 
+ * @author henry
+ */
+@SuppressWarnings("rawtypes")
+@Service
+public class RefuelDiagramServiceImpl extends AbstractBaseService implements RefuelDiagramService {
+	
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RefuelDiagramServiceImpl.class);
+	
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private RefuelDiagramDAO ReportDiagramDAOImpl;
+	
+	// ------- Constructors ----------------------------------------------------
+	
+	public RefuelDiagramServiceImpl() {
+		super();
+	}
+	
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	/**
+	 *  inherited java doc.
+	 *  
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public JFreeChart genChartRepForOilRecords(ShiftChangeBean shiftChangeBean) {
+		JFreeChart chart = null;
+		ReportTypeEnum reportType = getEnumReportType(shiftChangeBean);
+		log.info("String to generate diagram chart...");
+		try {
+			List<ShiftChangeBean> resultList = this.ReportDiagramDAOImpl.getTotalOilRecordsForReport(shiftChangeBean, reportType);
+			chart = this.createDiagramBarChart(resultList, reportType);
+		} catch (Exception e) {
+			log.info("Generate diagram report data occured error, more detail please see the detail log" +
+					e.getMessage() + "\n" + ErrorLogUtil.printInfo(e));
+		}
+		log.info("Successfully generate diagram chart...");
+		return chart;
+	}
+
+	@Autowired
+	public void setDataCenterDAOImpl(RefuelDiagramDAO ReportDiagramDAOImpl) {
+		super.setBaseDao(ReportDiagramDAOImpl);
+		this.ReportDiagramDAOImpl = ReportDiagramDAOImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	
+	private ReportTypeEnum getEnumReportType(ShiftChangeBean shiftChangeBean) {
+		ReportTypeEnum reportType = null;
+		if(shiftChangeBean.getReportType().trim().equals("1")){
+			reportType = ReportTypeEnum.DAY_REPORT;
+		}else if(shiftChangeBean.getReportType().trim().equals("2")){
+			reportType = ReportTypeEnum.MONTH_REPORT;
+		}
+		return reportType;
+	}
+	
+	private JFreeChart createDiagramBarChart(List<ShiftChangeBean> resultList, ReportTypeEnum reportType) {
+		CategoryDataset dataset = null;
+		
+		switch(reportType){
+			case DAY_REPORT:
+				dataset = getDataSetForDayDiagram(resultList);  
+				break;
+			case MONTH_REPORT:
+				dataset = getDataSetForMonthDiagram(resultList);  
+				break;
+			default :
+				break;
+		}
+		
+        JFreeChart chart = initalBarChart(dataset);  
+        return chart;  
+	}
+	
+	private static CategoryDataset getDataSetForDayDiagram(List<ShiftChangeBean> resultList) {  
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for(ShiftChangeBean shiftChangeBean : resultList){
+        	dataset.addValue(shiftChangeBean.getTotalNum(), shiftChangeBean.getOilName(), DateUtil.formatDate(shiftChangeBean.getTradeDate(), DateUtil.DATE_PATTERN_24));
+        }
+        return dataset;  
+    }
+	
+	private static CategoryDataset getDataSetForMonthDiagram(List<ShiftChangeBean> resultList) {  
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for(ShiftChangeBean shiftChangeBean : resultList){
+        	dataset.addValue(shiftChangeBean.getTotalNum(), shiftChangeBean.getOilName(), shiftChangeBean.getDisplayDate());
+        }
+        return dataset;  
+    }
+
+	private JFreeChart initalBarChart(CategoryDataset dataset) {
+		JFreeChart chart = ChartFactory.createBarChart3D(
+	        "油气销量图",   
+	        "加油时间",  
+	        "数量(L)",  
+	        dataset, // 数据集  
+	        PlotOrientation.VERTICAL, // 图表方向：水平、垂直  
+	        true,   // 是否显示图例(对于简单的柱状图必须是false)  
+	        true,   // 是否生成工具  
+	        true    // 是否生成URL链接
+	        
+	        );
+		String sFont = "宋体";
+	    chart.setBorderVisible(true);
+	    chart.setBorderPaint(new Color(0xFF,0x66,0x00));
+	    chart.setBackgroundPaint(new Color(0xFF,0xF3,0xDE));
+	    chart.getTitle().setPaint(Color.red);
+	    chart.getTitle().setFont(new Font(sFont,Font.BOLD,14));
+		return chart;
+	}
+	
+}

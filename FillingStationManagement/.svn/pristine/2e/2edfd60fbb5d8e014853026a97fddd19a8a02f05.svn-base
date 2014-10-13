@@ -1,0 +1,39 @@
+package com.fr.station.component.dataCenter.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.QueryException;
+import org.hibernate.criterion.ProjectionList;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.system.OperateLogBean;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.dataCenter.dao.DataCenterDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites.
+ * Mainly responsible to handle user login
+ * 
+ * @author _wsq
+ */
+@Repository
+public class DataCenterDaoImpl extends AbstractBaseDAO<OperatelogEntity> implements DataCenterDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	// ------- Static Variables (static) ---------------------------------------
+	
+	// ------- Instance Variables (private) ------------------------------------
+	
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	// ------- Instance Methods (protected) ------------------------------------
+
+}

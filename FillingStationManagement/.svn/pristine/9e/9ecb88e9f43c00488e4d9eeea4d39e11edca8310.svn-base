@@ -1,0 +1,226 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CustomerDeleteBean;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.customer.dao.CustomerDeleteDAO;
+import com.fr.station.component.customer.service.CustomerDeleteService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The customerDeleteServiceImpl for delete customer
+ * 
+ * @author WR
+ */
+@Service
+public class CustomerDeleteServiceImpl extends AbstractBaseService implements CustomerDeleteService {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CustomerDeleteServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CustomerDeleteDAO customerDeleteDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+	public CustomerDeleteServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+	@Autowired
+	public void setCustomerDeleteDAO(CustomerDeleteDAO customerDeleteDaoImpl) {
+		super.setBaseDao(customerDeleteDaoImpl);
+		this.customerDeleteDaoImpl = customerDeleteDaoImpl;
+	}
+
+	/**
+	 * @Inherited doc 返回对应的客户信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CustomerDeleteBean> findCustomerRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		List<CustomerDeleteBean> customerDeleteBeanList = null;
+		log.info("start find customer  records by criteria");
+		if (customerDeleteBean == null) {
+			log.info("customerDeleteBean is null");
+			return null;
+		}
+		customerDeleteBeanList = this.customerDeleteDaoImpl.getCustomerRecordsByCriteria(customerDeleteBean);
+		if (customerDeleteBeanList == null) {
+			customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+			log.info("customerDeleteBeanList is null");
+		}
+		log.info("end find customer  records by criteria");
+		return customerDeleteBeanList;
+	}
+
+	/**
+	 * @Inherited doc 返回对应的客户下的所有卡片信息和单位的信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public CustomerDeleteBean findAllCardRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		CustomerDeleteBean customerDeleteBeanList = null;
+		log.info("start find all card records by criteria");
+		if (customerDeleteBean == null) {
+			log.info("customerDeleteBean is null");
+			return null;
+		}
+		customerDeleteBeanList = this.customerDeleteDaoImpl.getAllCardRecordsByCriteria(customerDeleteBean);
+		if (customerDeleteBeanList == null) {
+
+			log.info("customerDeleteBeanList is null");
+			return null;
+		}
+		log.info("end find all card records by criteria");
+		return customerDeleteBeanList;
+	}
+
+	/**
+	 * @Inherited doc 返回对应的单用户卡用户信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CustomerDeleteBean> findCardRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		List<CustomerDeleteBean> customerDeleteBeanList = null;
+		log.info("start find personal card  records by criteria");
+		if (customerDeleteBean == null) {
+			log.info("customerDeleteBean is null");
+			return null;
+		}
+		customerDeleteBeanList = this.customerDeleteDaoImpl.getCardRecordsByCriteria(customerDeleteBean);
+		if (customerDeleteBeanList == null) {
+			customerDeleteBeanList = new ArrayList<CustomerDeleteBean>();
+			log.info("customerDeleteBeanList is null");
+		}
+		log.info("end find personal card  records by criteria");
+		return customerDeleteBeanList;
+	}
+
+	/**
+	 * @Inherited doc 返回对应的司机卡信息
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CustomerDeleteBean> findDriverRecordsByCriteria(CustomerDeleteBean customerDeleteBean) {
+		log.info("start find driver card  records by criteria");
+		int pageNumber = customerDeleteBean.getPageNumber();
+		int pageSize = customerDeleteBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		log.info("end find driver card  records by criteria");
+		return this.customerDeleteDaoImpl.getDriverRecordsByCriteria(customerDeleteBean, start, number);
+	}
+
+	/**
+	 * @Inherited doc 单位卡有卡销户
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateMultiCustomer(CustomerDeleteBean customerDeleteBean) {
+		log.info("start to update multiCustomer into DB");
+
+		// 把单位客户状态变为销户
+		this.customerDeleteDaoImpl.updateGuestStatus(customerDeleteBean);
+
+		// 把单位卡卡状态变为注销(包括主卡和子卡)
+		this.customerDeleteDaoImpl.updateCardStatus(customerDeleteBean);
+
+		// 把所有卡的卡余额,备份账户余额,积分转到单位客户账户的备份账户,客户积分，然后将卡余额,备份账户余额,积分清零
+		this.customerDeleteDaoImpl.updateGuestAccount(customerDeleteBean);
+
+		log.info("Succefully to update multiCustomer into DB");
+	}
+
+	/**
+	 * @Inherited doc 单用户卡有卡销户
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updatePersonalCard(CustomerDeleteBean customerDeleteBean) {
+		log.info("start to update personal card into DB");
+
+		// 把单用户卡状态变为注销
+		this.customerDeleteDaoImpl.updateCardStatus(customerDeleteBean);
+
+		log.info("Succefully to update personal card into DB");
+	}
+
+	/**
+	 * @Inherited doc 司机卡有卡销户
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateDriverCard(CustomerDeleteBean customerDeleteBean) {
+		log.info("start to update driver card into DB");
+
+		// 把司机卡卡状态变为注销
+		this.customerDeleteDaoImpl.updateCardStatusByCardNo(customerDeleteBean);
+		// 把司机卡的卡余额,备用金余额,卡积分全部转到单位账户,然后将卡账户清零
+		this.customerDeleteDaoImpl.updateCardAccount(customerDeleteBean);
+
+		log.info("Succefully to update driver card into DB");
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	/**
+	 * @Inherited doc 判断单卡挂失时间是否满足48小时
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public boolean judgeBlackCardTime(CustomerDeleteBean customerDeleteBean) {
+		log.info("start to judgeBlackCardTime");
+		Date cardTime = this.customerDeleteDaoImpl.getBlackCardTime(customerDeleteBean);
+		// 判断是否经过48小时
+		if ((DateUtil.currentTimestamp().getTime() - cardTime.getTime()) >= 48 * 60 * 60 * 1000) {
+			return true;
+		}
+		log.info(" end to judgeBlackCardTime");
+		return false;
+	}
+
+	/**
+	 * @Inherited doc 判断所有卡挂失时间是否满足48小时
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public boolean judgeAllBlackCardTime(CustomerDeleteBean customerDeleteBean) {
+		log.info("start to judgeAllBlackCardTime");
+		List<Date> cardTimeList = this.customerDeleteDaoImpl.getAllBlackCardTime(customerDeleteBean);
+		// 循环判断是否所有卡都满足48小时挂失时间
+		for (Date dataRow : cardTimeList) {
+			if ((DateUtil.currentTimestamp().getTime() - dataRow.getTime()) < 48 * 60 * 60 * 1000) {
+				log.info(" end to judgeAllBlackCardTime");
+				return false;
+			}
+		}
+		log.info(" end to judgeAllBlackCardTime");
+		return true;
+	}
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

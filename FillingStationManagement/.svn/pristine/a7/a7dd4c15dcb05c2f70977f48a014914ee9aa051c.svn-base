@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<!-- base -->
+		<mapping class="com.fr.station.common.entity.base.BaseEntity"></mapping>
+		<!-- card -->
+		<mapping class="com.fr.station.common.entity.system.EmployeeEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.DictionaryEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTGuestEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTCardEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.CardStorageDetailEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.CardStorageEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FKTGuestAcc"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FKTGuestDep"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FKTMaintain"></mapping>
+		<mapping class="com.fr.station.common.entity.card.CardStorageAccountEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FKTCardTZEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FKTCardTZEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.BlackcardEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTCreditEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTtGuestcreditEntity"></mapping>
+		<!-- system -->
+		<mapping class="com.fr.station.common.entity.system.OperatorEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.RoleInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.StationEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.RoleFunctionInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.system.FunctionInfoEntity"></mapping>
+		<!-- report -->
+		<mapping class="com.fr.station.common.entity.report.OilManageEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.card.FkTCardInOutEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.report.ClassInfoEntity"></mapping>
+		<mapping class="com.fr.station.common.entity.report.DayExchangeEntity"></mapping>
+		
+		<mapping resource="classpath:../../META-INF/hibernate/iccardSql.hbm.xml" />  
+	</session-factory>
+</hibernate-configuration>

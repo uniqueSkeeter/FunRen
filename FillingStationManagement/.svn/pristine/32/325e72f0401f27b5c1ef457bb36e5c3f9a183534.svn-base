@@ -1,0 +1,76 @@
+package com.fr.station.common.bean.system;
+
+/**
+ * @author _wsq
+ *
+ */
+public abstract class CommonBean {
+
+	public CommonBean() {
+		super();
+	}
+
+	/**
+	 * for pagination start
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	private int totalNumber;
+
+	private int startNumber;
+
+	/**
+	 * for pagination end
+	 */
+
+	public int getPageNumber() {
+		return this.pageNumber;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalData() {
+		return this.totalData;
+	}
+
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	public int getTotalNumber() {
+		return this.totalNumber;
+	}
+
+	public void setTotalNumber(int totalNumber) {
+		this.totalNumber = totalNumber;
+	}
+
+	public int getStartNumber() {
+		return this.startNumber;
+	}
+
+	public void setStartNumber(int startNumber) {
+		this.startNumber = startNumber;
+	}
+
+	@Override
+	public String toString() {
+		return "CommonBean [pageNumber=" + this.pageNumber + ", pageSize=" + this.pageSize + ", totalData=" + this.totalData
+				+ ", totalNumber=" + this.totalNumber + ", startNumber=" + this.startNumber + "]";
+	}
+
+}

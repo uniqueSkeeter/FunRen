@@ -1,0 +1,975 @@
+package com.fr.station.common.bean;
+
+import java.math.BigDecimal;
+
+/**
+ * 用于客户管理模块的开户售卡子模块的信息流传递
+ * 
+ * @author WR
+ * 
+ */
+public class RegisterCustomerBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public RegisterCustomerBean() {
+		super();
+	}
+
+	/**
+	 * ID 主键 FKT_CARD(卡信息表)||cardId 卡编号 FKT_CARDACC(卡账信息表)
+	 */
+	private Integer id;
+
+	/**
+	 * 持卡人姓名(guestname) FKT_CARD(卡信息表) || 客户名称/单位名称(guestname) FKT_GUEST(客户信息表)
+	 */
+	private String guestName;
+
+	/**
+	 * 所属客户编号(guestNo) FKT_CARD(卡信息表) || 客户编号(guestNo)FKT_GUEST(客户信息表)||客户编号(guestNo) FKT_GUESTDEP(客户下属表)||客户编号(guestNo)
+	 * FKT_GUESTACC(客户账户信息表)
+	 */
+	private String guestNo;
+
+	/**
+	 * 卡号(cardno) FKT_CARD(卡信息表)
+	 */
+	private String cardNo;
+
+	/**
+	 * 卡状态(cardstatus) FKT_CARD(卡信息表)
+	 */
+	private String cardStatus;
+
+	/**
+	 * 证件类型(guesttype) FKT_CARD(卡信息表)
+	 */
+	private String guestType;
+
+	/**
+	 * 证件号(guestnum) FKT_CARD(卡信息表)
+	 */
+	private String guestNum;
+
+	/**
+	 * 联系电话(guesttel) FKT_CARD(卡信息表) || 电话 (tel) FKT_GUEST(客户信息表)
+	 */
+	private String guestTel;
+
+	/**
+	 * 创建日期(create_date) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)||FKT_GUESTACC(客户账户信息表)||FKT_CARDTZ(卡账户信息表)
+	 */
+	private String create_date;
+
+	/**
+	 * 网点编号(stationno) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)
+	 */
+	private String stationNo;
+
+	/**
+	 * 印刷号(cardexno) FKT_CARD(卡信息表)
+	 */
+	private String cardExno;
+
+	/**
+	 * 卡片类型(cardtype) FKT_CARD(卡信息表)
+	 */
+	private String cardType;
+
+	/**
+	 * 押金(deposit) FKT_CARD(卡信息表)
+	 */
+	private BigDecimal deposit;
+
+	/**
+	 * 卡内金额(cardbal) FKT_CARD(卡信息表)||钱包账户(cardbal) FKT_CARDTZ(卡帳信息表) ||卡内余额(cardbal) FKT_CARD(卡信息表)
+	 */
+	private BigDecimal cardAmount;
+
+	/**
+	 * 密码(password) FKT_CARD(卡信息表)
+	 */
+	private String cardPass;
+
+	/**
+	 * 限每次加油量(xvol) FKT_CARD(卡信息表)
+	 */
+	private String refuelLimit;
+
+	/**
+	 * 限每天加油次数(xcount) FKT_CARD(卡信息表)
+	 */
+	private String refuelTimes;
+
+	/**
+	 * 限每天加油金额(xamn) FKT_CARD(卡信息表)
+	 */
+	private String consumeAmount;
+
+	/**
+	 * 限制油品(xoil) FKT_CARD(卡信息表)
+	 */
+	private String oilTypeLimit;
+
+	/**
+	 * 启用日期(begDate) FKT_CARD(卡信息表)
+	 */
+	private String effectiveDate;
+
+	/**
+	 * 有效日期(endDate) FKT_CARD(卡信息表)
+	 */
+	private String disEffectiveDate;
+
+	/**
+	 * 限制区站(xeare) FKT_CARD(卡信息表)
+	 */
+	private String stationInfoLimit;
+
+	/**
+	 * 备注(bz) FKT_CARD(卡信息表)
+	 */
+	private String remark;
+
+	/**
+	 * 性别(gender) FKT_CARD(卡信息表)
+	 */
+	private String gender;
+
+	/**
+	 * 电子邮箱(email) FKT_CARD(卡信息表) || 邮件 (email) FKT_GUEST(客户信息表)
+	 */
+	private String email;
+
+	/**
+	 * 邮编(guestpost) FKT_CARD(卡信息表) || 邮编(post) FKT_GUEST(客户信息表)
+	 */
+	private String zipCode;
+
+	/**
+	 * 客户地址(guestadd) FKT_CARD(卡信息表) || 地址(addr) FKT_GUEST(客户信息表)
+	 */
+	private String customerAddr;
+
+	/**
+	 * 车号限制(xcardno) FKT_CARD(卡信息表)
+	 */
+	private String carNoConstr;
+
+	/**
+	 * 开票类型 字典值(billtype) FKT_CARD(卡信息表)
+	 */
+	private String billType;
+
+	/**
+	 * 客户状态(stats) FKT_GUEST(客户信息表)
+	 */
+	private String guestStatus;
+
+	/**
+	 * 所属客户部门(depno) FKT_CARD(卡信息表)||部门编号(depno) FKT_GUESTDEP(客户下属表)
+	 */
+	private String deptNo;
+
+	/**
+	 * 联系人姓名(idname) FKT_GUEST(客户信息表)
+	 */
+	private String contactName;
+
+	/**
+	 * 联系人证件类型(idtype) FKT_GUEST(客户信息表)
+	 */
+	private String contactType;
+
+	/**
+	 * 联系人证件编号(idnum) FKT_GUEST(客户信息表)
+	 */
+	private String contactNum;
+
+	/**
+	 * 联系人生日(birthday) FKT_GUEST(客户信息表)
+	 */
+	private String contactBir;
+
+	/**
+	 * 银行编号(bankno)银行类型的字典值 FKT_GUEST(客户信息表)
+	 */
+	private String bankType;
+
+	/**
+	 * 银行帐号(bankacc) FKT_GUEST(客户信息表)
+	 */
+	private String bankAcc;
+
+	/**
+	 * 税号(taxno) FKT_GUEST(客户信息表)
+	 */
+	private String taxNum;
+
+	/**
+	 * 备注(beizhu1) FKT_GUEST(客户信息表)
+	 */
+	private String guestRemark;
+
+	/**
+	 * 部门名称(depName) FKT_GUESTDEP(客户下属表)
+	 */
+	private String depName;
+
+	/**
+	 * 部门负责人(depMaster) FKT_GUESTDEP(客户下属表)
+	 */
+	private String depMaster;
+
+	/**
+	 * 部门电话(depTel) FKT_GUESTDEP(客户下属表)
+	 */
+	private String depTel;
+
+	/**
+	 * 定点油站(limitStation) FKT_GUESTDEP(客户下属表)
+	 */
+	private String limitStation;
+
+	/**
+	 * guestType(单位类型) FKT_GUEST(客户信息表)
+	 */
+	private String corpType;
+
+	/**
+	 * passflag(密码启用标识) FKT_CARD(卡信息表)
+	 */
+	private String passFlag;
+
+	/**
+	 * cardNo(主卡卡号) FKT_GUEST(客户信息表)只有是司机用户的时候才不为空
+	 */
+	private String mainCardNo;
+
+	/**
+	 * datagrid控制
+	 */
+	private int pageNumber;
+
+	/**
+	 * datagrid控制
+	 */
+	private int pageSize;
+
+	/**
+	 * datagrid控制
+	 */
+	private int totalData;
+
+	/**
+	 * ID 主键 FKT_CARD(卡信息表)||cardId 卡编号 FKT_CARDACC(卡账信息表)
+	 */
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * ID 主键 FKT_CARD(卡信息表)||cardId 卡编号 FKT_CARDACC(卡账信息表)
+	 */
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * 持卡人姓名(guestname) FKT_CARD(卡信息表) || 客户名称/单位名称(guestname) FKT_GUEST(客户信息表)
+	 */
+	public String getGuestName() {
+		return this.guestName;
+	}
+
+	/**
+	 * 持卡人姓名(guestname) FKT_CARD(卡信息表) || 客户名称/单位名称(guestname) FKT_GUEST(客户信息表)
+	 */
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	/**
+	 * 卡号(cardno) FKT_CARD(卡信息表)
+	 */
+	public String getCardNo() {
+		return this.cardNo;
+	}
+
+	/**
+	 * 卡号(cardno) FKT_CARD(卡信息表)
+	 */
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	/**
+	 * 卡状态(cardstatus) FKT_CARD(卡信息表)
+	 */
+	public String getCardStatus() {
+		return this.cardStatus;
+	}
+
+	/**
+	 * 卡状态(cardstatus) FKT_CARD(卡信息表)
+	 */
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	/**
+	 * 证件类型(guesttype) FKT_CARD(卡信息表)
+	 */
+	public String getGuestType() {
+		return this.guestType;
+	}
+
+	/**
+	 * 证件类型(guesttype) FKT_CARD(卡信息表)
+	 */
+	public void setGuestType(String guestType) {
+		this.guestType = guestType;
+	}
+
+	/**
+	 * 证件号(guestnum) FKT_CARD(卡信息表)
+	 */
+	public String getGuestNum() {
+		return this.guestNum;
+	}
+
+	/**
+	 * 证件号(guestnum) FKT_CARD(卡信息表)
+	 */
+	public void setGuestNum(String guestNum) {
+		this.guestNum = guestNum;
+	}
+
+	/**
+	 * 联系电话(guesttel) FKT_CARD(卡信息表) || 电话 (tel) FKT_GUEST(客户信息表)
+	 */
+	public String getGuestTel() {
+		return this.guestTel;
+	}
+
+	/**
+	 * 联系电话(guesttel) FKT_CARD(卡信息表) || 电话(tel) FKT_GUEST(客户信息表)
+	 */
+	public void setGuestTel(String guestTel) {
+		this.guestTel = guestTel;
+	}
+
+	/**
+	 * 创建日期(create_date) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)||FKT_GUESTACC(客户账户信息表)||FKT_CARDTZ(卡账户信息表)
+	 */
+	public String getCreate_date() {
+		return this.create_date;
+	}
+
+	/**
+	 * 创建日期(create_date) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)||FKT_GUESTACC(客户账户信息表)||FKT_CARDTZ(卡账户信息表)
+	 */
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
+	}
+
+	/**
+	 * 网点编号(stationno) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)
+	 */
+	public String getStationNo() {
+		return this.stationNo;
+	}
+
+	/**
+	 * 网点编号(stationno) FKT_CARD(卡信息表)||FKT_GUEST(客户信息表)
+	 */
+	public void setStationNo(String stationNo) {
+		this.stationNo = stationNo;
+	}
+
+	/**
+	 * 印刷号(cardexno) FKT_CARD(卡信息表)
+	 */
+	public String getCardExno() {
+		return this.cardExno;
+	}
+
+	/**
+	 * 印刷号(cardexno) FKT_CARD(卡信息表)
+	 */
+	public void setCardExno(String cardExno) {
+		this.cardExno = cardExno;
+	}
+
+	/**
+	 * 卡片类型(cardtype) FKT_CARD(卡信息表)
+	 */
+	public String getCardType() {
+		return this.cardType;
+	}
+
+	/**
+	 * 卡片类型(cardtype) FKT_CARD(卡信息表)
+	 */
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public int getPageNumber() {
+		return this.pageNumber;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public int getTotalData() {
+		return this.totalData;
+	}
+
+	/**
+	 * datagrid控制
+	 */
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	/**
+	 * 所属客户编号(guestNo) FKT_CARD(卡信息表) || 客户编号(guestNo)FKT_GUEST(客户信息表)||客户编号(guestNo) FKT_GUESTDEP(客户下属表)||客户编号(guestNo)
+	 * FKT_GUESTACC(客户账户信息表)
+	 */
+	public String getGuestNo() {
+		return this.guestNo;
+	}
+
+	/**
+	 * 所属客户编号(guestNo) FKT_CARD(卡信息表) || 客户编号(guestNo)FKT_GUEST(客户信息表)||客户编号(guestNo) FKT_GUESTDEP(客户下属表)||客户编号(guestNo)
+	 * FKT_GUESTACC(客户账户信息表)
+	 */
+	public void setGuestNo(String guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	/**
+	 * 押金(deposit) FKT_CARD(卡信息表)
+	 */
+	public BigDecimal getDeposit() {
+		return this.deposit;
+	}
+
+	/**
+	 * 押金(deposit) FKT_CARD(卡信息表)
+	 */
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
+	}
+
+	/**
+	 * 卡内金额(cardbal) FKT_CARD(卡信息表)||钱包账户(cardbal) FKT_CARDTZ(卡帳信息表) ||卡内余额(cardbal) FKT_CARD(卡信息表)
+	 */
+	public BigDecimal getCardAmount() {
+		return this.cardAmount;
+	}
+
+	/**
+	 * 卡内金额(cardbal) FKT_CARD(卡信息表)||钱包账户(cardbal) FKT_CARDTZ(卡帳信息表) ||卡内余额(cardbal) FKT_CARD(卡信息表)
+	 */
+	public void setCardAmount(BigDecimal cardAmount) {
+		this.cardAmount = cardAmount;
+	}
+
+	/**
+	 * 密码(password) FKT_CARD(卡信息表)
+	 */
+	public String getCardPass() {
+		return this.cardPass;
+	}
+
+	/**
+	 * 密码(password) FKT_CARD(卡信息表)
+	 */
+	public void setCardPass(String cardPass) {
+		this.cardPass = cardPass;
+	}
+
+	/**
+	 * 限每次加油量(xvol) FKT_CARD(卡信息表)
+	 */
+	public String getRefuelLimit() {
+		return this.refuelLimit;
+	}
+
+	/**
+	 * 限每次加油量(xvol) FKT_CARD(卡信息表)
+	 */
+	public void setRefuelLimit(String refuelLimit) {
+		this.refuelLimit = refuelLimit;
+	}
+
+	/**
+	 * 限每天加油次数(xcount) FKT_CARD(卡信息表)
+	 */
+	public String getRefuelTimes() {
+		return this.refuelTimes;
+	}
+
+	/**
+	 * 限每天加油次数(xcount) FKT_CARD(卡信息表)
+	 */
+	public void setRefuelTimes(String refuelTimes) {
+		this.refuelTimes = refuelTimes;
+	}
+
+	/**
+	 * 限每天加油金额(xamn) FKT_CARD(卡信息表)
+	 */
+	public String getConsumeAmount() {
+		return this.consumeAmount;
+	}
+
+	/**
+	 * 限每天加油金额(xamn) FKT_CARD(卡信息表)
+	 */
+	public void setConsumeAmount(String consumeAmount) {
+		this.consumeAmount = consumeAmount;
+	}
+
+	/**
+	 * 限制油品(xoil) FKT_CARD(卡信息表)
+	 */
+	public String getOilTypeLimit() {
+		return this.oilTypeLimit;
+	}
+
+	/**
+	 * 限制油品(xoil) FKT_CARD(卡信息表)
+	 */
+	public void setOilTypeLimit(String oilTypeLimit) {
+		this.oilTypeLimit = oilTypeLimit;
+	}
+
+	/**
+	 * 启用日期(begDate) FKT_CARD(卡信息表)
+	 */
+	public String getEffectiveDate() {
+		return this.effectiveDate;
+	}
+
+	/**
+	 * 启用日期(begDate) FKT_CARD(卡信息表)
+	 */
+	public void setEffectiveDate(String effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+
+	/**
+	 * 有效日期(endDate) FKT_CARD(卡信息表)
+	 */
+	public String getDisEffectiveDate() {
+		return this.disEffectiveDate;
+	}
+
+	/**
+	 * 有效日期(endDate) FKT_CARD(卡信息表)
+	 */
+	public void setDisEffectiveDate(String disEffectiveDate) {
+		this.disEffectiveDate = disEffectiveDate;
+	}
+
+	/**
+	 * 限制区站(xeare) FKT_CARD(卡信息表)
+	 */
+	public String getStationInfoLimit() {
+		return this.stationInfoLimit;
+	}
+
+	/**
+	 * 限制区站(xeare) FKT_CARD(卡信息表)
+	 */
+	public void setStationInfoLimit(String stationInfoLimit) {
+		this.stationInfoLimit = stationInfoLimit;
+	}
+
+	/**
+	 * 备注(bz) FKT_CARD(卡信息表)
+	 */
+	public String getRemark() {
+		return this.remark;
+	}
+
+	/**
+	 * 备注(bz) FKT_CARD(卡信息表)
+	 */
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	/**
+	 * 性别(gender) FKT_CARD(卡信息表)
+	 */
+	public String getGender() {
+		return this.gender;
+	}
+
+	/**
+	 * 性别(gender) FKT_CARD(卡信息表)
+	 */
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	/**
+	 * 电子邮箱(email) FKT_CARD(卡信息表) || 邮件 (email) FKT_GUEST(客户信息表)
+	 */
+	public String getEmail() {
+		return this.email;
+	}
+
+	/**
+	 * 电子邮箱(email) FKT_CARD(卡信息表) || 邮件 (email) FKT_GUEST(客户信息表)
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	/**
+	 * 邮编(guestpost) FKT_CARD(卡信息表) || 邮编(post) FKT_GUEST(客户信息表)
+	 */
+	public String getZipCode() {
+		return this.zipCode;
+	}
+
+	/**
+	 * 邮编(guestpost) FKT_CARD(卡信息表) || 邮编(post) FKT_GUEST(客户信息表)
+	 */
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	/**
+	 * 客户地址(guestadd) FKT_CARD(卡信息表) || 地址(addr) FKT_GUEST(客户信息表)
+	 */
+	public String getCustomerAddr() {
+		return this.customerAddr;
+	}
+
+	/**
+	 * 客户地址(guestadd) FKT_CARD(卡信息表) || 地址(addr) FKT_GUEST(客户信息表)
+	 */
+	public void setCustomerAddr(String customerAddr) {
+		this.customerAddr = customerAddr;
+	}
+
+	/**
+	 * 车号限制(xcardno) FKT_CARD(卡信息表)
+	 */
+	public String getCarNoConstr() {
+		return this.carNoConstr;
+	}
+
+	/**
+	 * 车号限制(xcardno) FKT_CARD(卡信息表)
+	 */
+	public void setCarNoConstr(String carNoConstr) {
+		this.carNoConstr = carNoConstr;
+	}
+
+	/**
+	 * 开票类型 字典值(billtype) FKT_CARD(卡信息表)
+	 */
+	public String getBillType() {
+		return this.billType;
+	}
+
+	/**
+	 * 开票类型 字典值(billtype) FKT_CARD(卡信息表)
+	 */
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
+	/**
+	 * 客户状态(stats) FKT_GUEST(客户信息表)
+	 */
+	public String getGuestStatus() {
+		return this.guestStatus;
+	}
+
+	/**
+	 * 客户状态(stats) FKT_GUEST(客户信息表)
+	 */
+	public void setGuestStatus(String guestStatus) {
+		this.guestStatus = guestStatus;
+	}
+
+	/**
+	 * 所属客户部门(depno) FKT_CARD(卡信息表)||部门编号(depno) FKT_GUESTDEP(客户下属表)
+	 */
+	public String getDeptNo() {
+		return this.deptNo;
+	}
+
+	/**
+	 * 所属客户部门(depno) FKT_CARD(卡信息表)||部门编号(depno) FKT_GUESTDEP(客户下属表)
+	 */
+	public void setDeptNo(String deptNo) {
+		this.deptNo = deptNo;
+	}
+
+	/**
+	 * 联系人姓名(idname) FKT_GUEST(客户信息表)
+	 */
+	public String getContactName() {
+		return this.contactName;
+	}
+
+	/**
+	 * 联系人姓名(idname) FKT_GUEST(客户信息表)
+	 */
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	/**
+	 * 联系人证件类型(idtype) FKT_GUEST(客户信息表)
+	 */
+	public String getContactType() {
+		return this.contactType;
+	}
+
+	/**
+	 * 联系人证件类型(idtype) FKT_GUEST(客户信息表)
+	 */
+	public void setContactType(String contactType) {
+		this.contactType = contactType;
+	}
+
+	/**
+	 * 联系人证件编号(idnum) FKT_GUEST(客户信息表)
+	 */
+	public String getContactNum() {
+		return this.contactNum;
+	}
+
+	/**
+	 * 联系人证件编号(idnum) FKT_GUEST(客户信息表)
+	 */
+	public void setContactNum(String contactNum) {
+		this.contactNum = contactNum;
+	}
+
+	/**
+	 * 联系人生日(birthday) FKT_GUEST(客户信息表)
+	 */
+	public String getContactBir() {
+		return this.contactBir;
+	}
+
+	/**
+	 * 联系人生日(birthday) FKT_GUEST(客户信息表)
+	 */
+	public void setContactBir(String contactBir) {
+		this.contactBir = contactBir;
+	}
+
+	/**
+	 * 银行编号(bankno)银行类型的字典值 FKT_GUEST(客户信息表)
+	 */
+	public String getBankType() {
+		return this.bankType;
+	}
+
+	/**
+	 * 银行编号(bankno)银行类型的字典值 FKT_GUEST(客户信息表)
+	 */
+	public void setBankType(String bankType) {
+		this.bankType = bankType;
+	}
+
+	/**
+	 * 银行帐号(bankacc) FKT_GUEST(客户信息表)
+	 */
+	public String getBankAcc() {
+		return this.bankAcc;
+	}
+
+	/**
+	 * 银行帐号(bankacc) FKT_GUEST(客户信息表)
+	 */
+	public void setBankAcc(String bankAcc) {
+		this.bankAcc = bankAcc;
+	}
+
+	/**
+	 * 税号(taxno) FKT_GUEST(客户信息表)
+	 */
+	public String getTaxNum() {
+		return this.taxNum;
+	}
+
+	/**
+	 * 税号(taxno) FKT_GUEST(客户信息表)
+	 */
+	public void setTaxNum(String taxNum) {
+		this.taxNum = taxNum;
+	}
+
+	/**
+	 * 备注(beizhu1) FKT_GUEST(客户信息表)
+	 */
+	public String getGuestRemark() {
+		return this.guestRemark;
+	}
+
+	/**
+	 * 备注(beizhu1) FKT_GUEST(客户信息表)
+	 */
+	public void setGuestRemark(String guestRemark) {
+		this.guestRemark = guestRemark;
+	}
+
+	/**
+	 * 部门名称(depName) FKT_GUESTDEP(客户下属表)
+	 */
+	public String getDepName() {
+		return this.depName;
+	}
+
+	/**
+	 * 部门名称(depName) FKT_GUESTDEP(客户下属表)
+	 */
+	public void setDepName(String depName) {
+		this.depName = depName;
+	}
+
+	/**
+	 * 部门负责人(depMaster) FKT_GUESTDEP(客户下属表)
+	 */
+	public String getDepMaster() {
+		return this.depMaster;
+	}
+
+	/**
+	 * 部门负责人(depMaster) FKT_GUESTDEP(客户下属表)
+	 */
+	public void setDepMaster(String depMaster) {
+		this.depMaster = depMaster;
+	}
+
+	/**
+	 * 部门电话(depTel) FKT_GUESTDEP(客户下属表)
+	 */
+	public String getDepTel() {
+		return this.depTel;
+	}
+
+	/**
+	 * 部门电话(depTel) FKT_GUESTDEP(客户下属表)
+	 */
+	public void setDepTel(String depTel) {
+		this.depTel = depTel;
+	}
+
+	/**
+	 * 定点油站(limitStation) FKT_GUESTDEP(客户下属表)
+	 */
+	public String getLimitStation() {
+		return this.limitStation;
+	}
+
+	/**
+	 * guestType(单位类型) FKT_GUEST(客户信息表)
+	 */
+	public String getCorpType() {
+		return this.corpType;
+	}
+
+	/**
+	 * guestType(单位类型) FKT_GUEST(客户信息表)
+	 */
+
+	public void setCorpType(String corpType) {
+		this.corpType = corpType;
+	}
+
+	/**
+	 * 定点油站(limitStation) FKT_GUESTDEP(客户下属表)
+	 */
+	public void setLimitStation(String limitStation) {
+		this.limitStation = limitStation;
+	}
+
+	/**
+	 * passflag(密码启用标识) FKT_CARD(卡信息表)
+	 */
+	public String getPassFlag() {
+		return this.passFlag;
+	}
+
+	/**
+	 * passflag(密码启用标识) FKT_CARD(卡信息表)
+	 */
+	public void setPassFlag(String passFlag) {
+		this.passFlag = passFlag;
+	}
+
+	/**
+	 * cardNo(主卡卡号) FKT_GUEST(客户信息表)只有是司机用户的时候才不为空
+	 */
+	public String getMainCardNo() {
+		return this.mainCardNo;
+	}
+
+	/**
+	 * cardNo(主卡卡号) FKT_GUEST(客户信息表)只有是司机用户的时候才不为空
+	 */
+	public void setMainCardNo(String mainCardNo) {
+		this.mainCardNo = mainCardNo;
+	}
+
+	@Override
+	public String toString() {
+		return "RegisterCustomerBean [id=" + this.id + ", guestName=" + this.guestName + ", guestNo=" + this.guestNo
+				+ ", cardNo=" + this.cardNo + ", cardStatus=" + this.cardStatus + ", guestType=" + this.guestType
+				+ ", guestNum=" + this.guestNum + ", guestTel=" + this.guestTel + ", create_date=" + this.create_date
+				+ ", stationNo=" + this.stationNo + ", cardExno=" + this.cardExno + ", cardType=" + this.cardType
+				+ ", deposit=" + this.deposit + ", cardAmount=" + this.cardAmount + ", cardPass=" + this.cardPass
+				+ ", refuelLimit=" + this.refuelLimit + ", refuelTimes=" + this.refuelTimes + ", consumeAmount="
+				+ this.consumeAmount + ", oilTypeLimit=" + this.oilTypeLimit + ", effectiveDate=" + this.effectiveDate
+				+ ", disEffectiveDate=" + this.disEffectiveDate + ", stationInfoLimit=" + this.stationInfoLimit + ", remark="
+				+ this.remark + ", gender=" + this.gender + ", email=" + this.email + ", zipCode=" + this.zipCode
+				+ ", customerAddr=" + this.customerAddr + ", carNoConstr=" + this.carNoConstr + ", billType=" + this.billType
+				+ ", guestStatus=" + this.guestStatus + ", deptNo=" + this.deptNo + ", contactName=" + this.contactName
+				+ ", contactType=" + this.contactType + ", contactNum=" + this.contactNum + ", contactBir=" + this.contactBir
+				+ ", bankType=" + this.bankType + ", bankAcc=" + this.bankAcc + ", taxNum=" + this.taxNum + ", guestRemark="
+				+ this.guestRemark + ", depName=" + this.depName + ", depMaster=" + this.depMaster + ", depTel=" + this.depTel
+				+ ", limitStation=" + this.limitStation + ", corpType=" + this.corpType + ", passFlag=" + this.passFlag
+				+ ", mainCardNo=" + this.mainCardNo + ", pageNumber=" + this.pageNumber + ", pageSize=" + this.pageSize
+				+ ", totalData=" + this.totalData + "]";
+	}
+
+}

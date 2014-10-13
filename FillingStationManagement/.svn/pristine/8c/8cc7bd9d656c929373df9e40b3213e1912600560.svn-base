@@ -1,0 +1,142 @@
+package com.fr.station.common.bean;
+
+/**
+ * @author yangyuan
+ * 
+ */
+
+public class CardMaintainBean implements StandardBean {
+
+	private static final long serialVersionUID = 1L;
+
+	public CardMaintainBean() {
+		super();
+	}
+
+	/**
+	 * display records data
+	 */
+	private String guestName;
+
+	private String guestNo;
+
+	private String cardNo;
+
+	private String guestType;
+
+	private String guestNum;
+
+	private String endDate;
+
+	private String cardType;
+
+	private String cardStatus;
+
+	/**
+	 * search cardMaintain.jsp
+	 */
+
+	/**
+	 * pagination
+	 */
+	private int pageNumber;
+
+	private int pageSize;
+
+	private int totalData;
+
+	public String getGuestName() {
+		return guestName;
+	}
+
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+
+	public String getGuestNo() {
+		return guestNo;
+	}
+
+	public void setGuestNo(String guestNo) {
+		this.guestNo = guestNo;
+	}
+
+	public String getCardNo() {
+		return cardNo;
+	}
+
+	public void setCardNo(String cardNo) {
+		this.cardNo = cardNo;
+	}
+
+	public String getGuestType() {
+		return guestType;
+	}
+
+	public void setGuestType(String guestType) {
+		this.guestType = guestType;
+	}
+
+	public String getGuestNum() {
+		return guestNum;
+	}
+
+	public void setGuestNum(String guestNum) {
+		this.guestNum = guestNum;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getCardType() {
+		return cardType;
+	}
+
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
+	}
+
+	public String getCardStatus() {
+		return cardStatus;
+	}
+
+	public void setCardStatus(String cardStatus) {
+		this.cardStatus = cardStatus;
+	}
+
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getTotalData() {
+		return totalData;
+	}
+
+	public void setTotalData(int totalData) {
+		this.totalData = totalData;
+	}
+
+	@Override
+	public String toString() {
+		return "CardMaintainBean [guestName=" + guestName + ", guestNo=" + guestNo + ", cardNo=" + cardNo + ", guestType="
+				+ guestType + ", guestNum=" + guestNum + ", endDate=" + endDate + ", cardType=" + cardType + ", cardStatus="
+				+ cardStatus + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", totalData=" + totalData + "]";
+	}
+}

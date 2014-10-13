@@ -1,0 +1,330 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CardInfoBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.common.utility.StringUtil;
+import com.fr.station.component.card.dao.CardInfoDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * 卡片明细的DAO的实现
+ * 
+ * @author _yy
+ */
+@Repository
+public class CardInfoDaoImpl extends AbstractBaseDAO<OperatelogEntity> implements CardInfoDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardInfoDaoImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	private static final String CARD_CARD_NO = "card.cardno";
+
+	private static final String STATION_NO = "card.stationNo";
+
+	// 获得主卡下所有副卡信息
+
+	private final String selectViceCardsListSql = "select card.guestName, card.cardNo, card.cardStatus,guest.guestNo,cardTZ.pre,guestdep.depName,guest.cardno as mainCardno from FK_T_GUEST guest, FK_T_CARD card, FK_T_CardTZ cardTZ,FK_T_GUESTDEP guestdep where ";
+
+	// 获得副卡数量
+	private final String selectAllCountViceCardsListSql = "select count(*) from FK_T_GUEST guest, FK_T_CARD card, FK_T_CardTZ cardTZ,FK_T_GUESTDEP guestdep where ";
+
+	// ------- Instance Variables (private) ------------------------------------
+	/**
+	 * 查询卡片明细SQL
+	 */
+	private final String getCardInfoSql = "SELECT card.cardNo,card.cardType,card.deposit,card.enddate,"
+			+ "card.cardStatus,card.guestName,card.guestType,card.guestNum,card.guesttel,card.gender,"
+			+ "card.email,card.guestpost,card.guestadd,card.create_date,card.bz,card.passflag,"
+			+ "card.xcarno,card.xcount,card.xamn,card.xvol,card.xoil,card.billtype,card.xeare,card.id "
+			+ " FROM FK_T_CARD card WHERE  ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardInfoDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 得到个人卡片的内容
+	 */
+	@Override
+	public List<CardInfoBean> getCardInfo(CardInfoBean cardInfoBean) throws Exception {
+		List<CardInfoBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardInfoBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getCardInfoSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get card detail info occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * 得到司机卡的内容
+	 */
+	@Override
+	public List<CardInfoBean> getDriverCardInfo(CardInfoBean cardInfoBean) throws Exception {
+		List<CardInfoBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCardCriteria(cardInfoBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.getCardInfoSql);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get card detail info occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/**
+	 * Inherited java doc
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardInfoBean> getViceCardsRecordsByCriteria(CardInfoBean cardInfoBean) {
+		List<CardInfoBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteria(cardInfoBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.selectViceCardsListSql);
+
+			// get total records by specified sql.
+			int totalSize = this.getTotalCount(builder, this.selectAllCountViceCardsListSql);
+
+			// this is for pagination.
+			this.setPaginationNumber(cardInfoBean, query);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+
+	}
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	/**
+	 * 增加SQL判断条件
+	 */
+	private StringBuilder validateInputCardCriteria(CardInfoBean cardInfoBean) {
+		StringBuilder builder = new StringBuilder();
+		// FK_T_CARD,FK_T_GUEST,FK_T_CARDTZ,FK_T_GUESTACC表关联
+		// FK_T_CARD,FK_T_GUEST通过客户编号guestNo关联，FK_T_CARD，FK_T_CARDTZ通过card的ID关联
+		// FK_T_GUEST,FK_T_GUESTACC通过客户编号guestNo关联
+		if (ApplicationContext.getInstance().getStationNum() != null) {
+			builder.append(STATION_NO).append(SqlConsts.EQUAL)
+					.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum())).append(SqlConsts.ADD);
+		}
+		if (StringUtils.isNotEmpty(cardInfoBean.getCardNo())) {
+			builder.append(CARD_CARD_NO).append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardInfoBean.getCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	/**
+	 * 
+	 * 为获得副卡信息构建where条件
+	 * 
+	 * @param CardInfoBean cardInfoBean
+	 * @return StringBuilder
+	 */
+
+	private StringBuilder validateInputCriteria(CardInfoBean cardInfoBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("guest.stationNo").append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		if (StringUtil.isNotEmpty(cardInfoBean.getMainCardNo())) {
+			builder.append(SqlConsts.ADD).append("guest.cardno").append(SqlConsts.EQUAL).append(SqlConsts.SINGLE_QUOTES)
+					.append(cardInfoBean.getMainCardNo()).append(SqlConsts.SINGLE_QUOTES);
+		}
+		builder.append(SqlConsts.ADD).append("guest.guestno").append(SqlConsts.EQUAL).append("card.guestno");
+		builder.append(SqlConsts.ADD).append("card.cardno").append(SqlConsts.EQUAL).append("cardTZ.cardno");
+		builder.append(SqlConsts.ADD).append("card.depno").append(SqlConsts.EQUAL).append("guestdep.depno");
+
+		return builder;
+	}
+
+	/**
+	 * 将data转换为bean
+	 */
+	private List<CardInfoBean> convertDataToBean(List<Object[]> dataResult) {
+		List<CardInfoBean> cardInfoBeanList = new ArrayList<CardInfoBean>();
+		CardInfoBean cardInfoBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardInfoBean = new CardInfoBean();
+			if (dataRow[0] != null) {
+				cardInfoBean.setCardNo(String.valueOf(dataRow[0]));
+			}
+			if (dataRow[1] != null) {
+				cardInfoBean.setCardType(String.valueOf(dataRow[1]));
+			}
+			if (dataRow[2] != null) {
+				cardInfoBean.setDeposit((BigDecimal) (dataRow[2]));
+			}
+			if (dataRow[3] != null) {
+				cardInfoBean.setDisEffectiveDate(String.valueOf(dataRow[3]));
+			}
+			if (dataRow[4] != null) {
+				cardInfoBean.setCardStatus(String.valueOf(dataRow[4]));
+			}
+			if (dataRow[5] != null) {
+				cardInfoBean.setGuestName(String.valueOf(dataRow[5]));
+			}
+			if (dataRow[6] != null) {
+				cardInfoBean.setGuestType(String.valueOf(dataRow[6]));
+			}
+			if (dataRow[7] != null) {
+				cardInfoBean.setGuestNum(String.valueOf(dataRow[7]));
+			}
+			if (dataRow[8] != null) {
+				cardInfoBean.setGuestTel(String.valueOf(dataRow[8]));
+			}
+			if (dataRow[9] != null) {
+				cardInfoBean.setGender(String.valueOf(dataRow[9]));
+			}
+			if (dataRow[10] != null) {
+				cardInfoBean.setEmail(String.valueOf(dataRow[10]));
+			}
+			if (dataRow[11] != null) {
+				cardInfoBean.setZipCode(String.valueOf(dataRow[11]));
+			}
+			if (dataRow[12] != null) {
+				cardInfoBean.setCustomerAddr(String.valueOf(dataRow[12]));
+			}
+			if (dataRow[13] != null) {
+				cardInfoBean.setCreateDate(String.valueOf(dataRow[13]).substring(0, 10));
+			}
+			if (dataRow[14] != null) {
+				cardInfoBean.setRemark(String.valueOf(dataRow[14]));
+			}
+			if (dataRow[15] != null) {
+				cardInfoBean.setPassFlag(String.valueOf(dataRow[15]));
+			}
+			if (dataRow[16] != null) {
+				cardInfoBean.setCarNoConstr(String.valueOf(dataRow[16]));
+			}
+			if (dataRow[17] != null) {
+				cardInfoBean.setRefuelTimes(String.valueOf(dataRow[17]));
+			}
+			if (dataRow[18] != null) {
+				cardInfoBean.setConsumeAmount(String.valueOf(dataRow[18]));
+			}
+			if (dataRow[19] != null) {
+				cardInfoBean.setRefuelLimit(String.valueOf(dataRow[19]));
+			}
+			if (dataRow[20] != null) {
+				cardInfoBean.setOilTypeLimit(String.valueOf(dataRow[20]));
+			}
+			if (dataRow[21] != null) {
+				cardInfoBean.setBillType(String.valueOf(dataRow[21]));
+			}
+			if (dataRow[22] != null) {
+				cardInfoBean.setStationInfoLimit(String.valueOf(dataRow[22]));
+			}
+			if (dataRow[23] != null) {
+				cardInfoBean.setId(Integer.valueOf(String.valueOf(dataRow[23])));
+			}
+			cardInfoBeanList.add(cardInfoBean);
+		}
+		return cardInfoBeanList;
+	}
+
+	/**
+	 * 
+	 * 将查询到的副卡信息放入javabean中
+	 * 
+	 * @param dataResult
+	 * @return CardInfoBean 的 List
+	 */
+
+	private List<CardInfoBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardInfoBean> cardInfoBeanList = new ArrayList<CardInfoBean>();
+		CardInfoBean cardInfoBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardInfoBean = new CardInfoBean();
+			cardInfoBean.setGuestName(String.valueOf(dataRow[0]));
+			cardInfoBean.setCardNo(String.valueOf(dataRow[1]));
+			cardInfoBean.setCardStatus(String.valueOf(dataRow[2]));
+			cardInfoBean.setGuestNo(String.valueOf(dataRow[3]));
+			cardInfoBean.setProvisionAccount(String.valueOf(dataRow[4]));
+			cardInfoBean.setDepName(String.valueOf(dataRow[5]));
+			cardInfoBean.setMainCardNo(String.valueOf(dataRow[6]));
+			cardInfoBean.setTotalData(totalAccount);
+			cardInfoBeanList.add(cardInfoBean);
+		}
+		return cardInfoBeanList;
+	}
+
+	private void setPaginationNumber(CardInfoBean cardInfoBean, Query query) {
+		query.setFirstResult(cardInfoBean.getStartNumber());
+		query.setMaxResults(cardInfoBean.getTotalNumber());
+	}
+
+	private int getTotalCount(StringBuilder builder, String sql) throws Exception {
+		List<?> dataResultList = this.findBySql(new StringBuilder().append(sql).append(builder).toString());
+		if (dataResultList.size() > 0) {
+			return (int) dataResultList.toArray()[0];
+		}
+		return 0;
+	}
+
+	private Query createSpecifiedQuery(StringBuilder builder, String sql) throws Exception {
+		return this.getQueryByCriteria(new StringBuilder().append(sql).append(builder).toString());
+	}
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

@@ -1,0 +1,29 @@
+package com.fr.station.component.customer.service;
+
+import java.util.List;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+
+public interface RegistMultiCustomerService {
+
+	/**
+	 * get each driver records in order to display in the saleMultiUserCard.jsp page.
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param registerCustomerBean include the search criteria.
+	 * 
+	 * @return return list which is loaded in DB against the search criteria.
+	 */
+	public List<RegisterCustomerBean> findDriverRecordsByCriteria(RegisterCustomerBean registerCustomerBean);
+
+	/**
+	 * save mainCard info to DB
+	 * 
+	 * @param args which is retrieved in the input jsp page
+	 * @param registerCustomerBean include the input jsp page
+	 * 
+	 * @return return void
+	 */
+	public void addCustomer(RegisterCustomerBean registerCustomerBean);
+
+}

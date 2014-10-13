@@ -1,0 +1,1219 @@
+﻿/*
+ * 客户信息 <--> 单位信息表 Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.card;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import com.fr.station.common.entity.base.BaseEntity;
+
+/**
+ * 客户信息表
+ *
+ * @version 1.0
+ * @authorguyj
+ */
+@Entity
+@Table(name = "FK_T_GUEST")
+public class FkTGuestEntity extends BaseEntity {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ID
+	 */
+	@Id
+	@Column(name = "`ID`")
+	@GeneratedValue
+	private Integer id;
+
+	@OneToMany(mappedBy = "guestEntity", cascade=CascadeType.ALL)
+	private Set<FKTGuestDep> guestDep;
+
+	@OneToOne(mappedBy = "guestEntity", cascade=CascadeType.ALL)
+	private FKTGuestAcc guestAcc;
+
+	@OneToOne(mappedBy = "guestEntity", cascade=CascadeType.ALL)
+	private FkTCardEntity card;
+
+	/**
+	 * 客户编号（单位编号）
+	 */
+	@Column(name = "`GUESTNO`")
+	private Integer guestno;
+
+	/**
+	 * 客户名称（单位名）
+	 */
+	@Column(name = "`GUESTNAME`")
+	private String guestname;
+
+	/**
+	 * 客户类型（单位类型）
+	 */
+	@Column(name = "`GUESTTYPE`")
+	private String guesttype;
+
+	/**
+	 * 联系人证件类型
+	 */
+	@Column(name = "`IDCARD_TYPE`")
+	private String idcardType;
+
+	/**
+	 * 联系人证件编号
+	 */
+	@Column(name = "`IDCARD_NUM`")
+	private String idcardNum;
+
+	/**
+	 * 联系人姓名
+	 */
+	@Column(name = "`NAME`")
+	private String name;
+
+	/**
+	 * 地址
+	 */
+	@Column(name = "`ADD`")
+	private String add;
+
+	/**
+	 * 电话
+	 */
+	@Column(name = "`TEL`")
+	private String tel;
+
+	/**
+	 * 邮编
+	 */
+	@Column(name = "`POST`")
+	private String post;
+
+	/**
+	 * 邮件
+	 */
+	@Column(name = "`EMAIL`")
+	private String email;
+
+	/**
+	 * 邮件
+	 */
+	@Column(name = "`birthday`")
+	private Date birthday;
+
+	public Set<FKTGuestDep> getGuestDep() {
+		return this.guestDep;
+	}
+
+	public void setGuestDep(Set<FKTGuestDep> guestDep) {
+		this.guestDep = guestDep;
+	}
+
+	public FKTGuestAcc getGuestAcc() {
+		return this.guestAcc;
+	}
+
+	public void setGuestAcc(FKTGuestAcc guestAcc) {
+		this.guestAcc = guestAcc;
+	}
+
+	public FkTCardEntity getCard() {
+		return this.card;
+	}
+
+	public void setCard(FkTCardEntity card) {
+		this.card = card;
+	}
+
+	/**
+	 * 银行编号
+	 */
+	@Column(name = "`BANKNO`")
+	private String bankno;
+
+	/**
+	 * 银行账号
+	 */
+	@Column(name = "`BANKACC`")
+	private String bankacc;
+
+	/**
+	 * 税号
+	 */
+	@Column(name = "`TAXNO`")
+	private String taxno;
+
+	/**
+	 * 发卡数量
+	 */
+	@Column(name = "`CARDSUM`")
+	private Integer cardsum;
+
+	/**
+	 * 卡上余额
+	 */
+	@Column(name = "`CARDACC`")
+	private BigDecimal cardacc;
+
+	/**
+	 * 账卡余额
+	 */
+	@Column(name = "`BAL`")
+	private BigDecimal bal;
+
+	/**
+	 * 消费金额
+	 */
+	@Column(name = "`DEBITACC`")
+	private BigDecimal debitacc;
+
+	/**
+	 * 交费金额 （充值金额）
+	 */
+	@Column(name = "`CREDITACC`")
+	private BigDecimal creditacc;
+
+	/**
+	 * 限制金额
+	 */
+	@Column(name = "`LIMIT`")
+	private BigDecimal limit;
+
+	/**
+	 * 已分配金额 （使用金额）
+	 */
+	@Column(name = "`INUSE`")
+	private Integer inuse;
+
+	/**
+	 * 用户类型
+	 */
+	@Column(name = "`USERTYPE`")
+	private String usertype;
+
+	/**
+	 * 主卡号
+	 */
+	@Column(name = "`CARDNO`")
+	private String cardno;
+
+	/**
+	 * 积分
+	 */
+	@Column(name = "`INTEGRATION`")
+	private Integer integration;
+
+	/**
+	 * 状态
+	 */
+	@Column(name = "`STATS`")
+	private String stats;
+
+	/**
+	 * ETC
+	 */
+	@Column(name = "`ETC`")
+	private String etc;
+
+	/**
+	 * 网点
+	 */
+	@Column(name = "`STATIONNO`")
+	private String stationno;
+
+	/**
+	 * 备注
+	 */
+	@Column(name = "`BZ`")
+	private String bz;
+
+	/**
+	 * 备注1
+	 */
+	@Column(name = "`BEIZHU`")
+	private String beizhu;
+
+	/**
+	 * 班结号
+	 */
+	@Column(name = "`BJID`")
+	private Integer bjid;
+
+	/**
+	 * 日结号
+	 */
+	@Column(name = "`RJID`")
+	private Integer rjid;
+
+	/**
+	 * 创建时间/开户日期 (日期)
+	 */
+	@Column(name = "`CREATE_DATE`")
+	private Timestamp createDate;
+
+	/**
+	 * 更新时间
+	 */
+	@Column(name = "`UPDATE_DATE`")
+	private Timestamp updateDate;
+
+	/**
+	 * 操作员编号
+	 */
+	@Column(name = "`USERID`")
+	private Integer userid;
+
+	/**
+	 * ID的取得
+	 *
+	 * @return Integer ID
+	 */
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * 客户编号（单位编号）的取得
+	 *
+	 * @return String 客户编号（单位编号）
+	 */
+	public Integer getGuestno() {
+		return this.guestno;
+	}
+
+	/**
+	 * 客户名称（单位名）的取得
+	 *
+	 * @return String 客户名称（单位名）
+	 */
+	public String getGuestname() {
+		return this.guestname;
+	}
+
+	/**
+	 * 客户类型（单位类型）的取得
+	 *
+	 * @return String 客户类型（单位类型）
+	 */
+	public String getGuesttype() {
+		return this.guesttype;
+	}
+
+	/**
+	 * 联系人证件类型的取得
+	 *
+	 * @return String 联系人证件类型
+	 */
+	public String getIdcardType() {
+		return this.idcardType;
+	}
+
+	/**
+	 * 联系人证件编号的取得
+	 *
+	 * @return String 联系人证件编号
+	 */
+	public String getIdcardNum() {
+		return this.idcardNum;
+	}
+
+	/**
+	 * 联系人姓名的取得
+	 *
+	 * @return String 联系人姓名
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * 地址的取得
+	 *
+	 * @return String 地址
+	 */
+	public String getAdd() {
+		return this.add;
+	}
+
+	/**
+	 * 电话的取得
+	 *
+	 * @return String 电话
+	 */
+	public String getTel() {
+		return this.tel;
+	}
+
+	/**
+	 * 邮编的取得
+	 *
+	 * @return String 邮编
+	 */
+	public String getPost() {
+		return this.post;
+	}
+
+	/**
+	 * 邮件的取得
+	 *
+	 * @return String 邮件
+	 */
+	public String getEmail() {
+		return this.email;
+	}
+
+	/**
+	 * 银行编号的取得
+	 *
+	 * @return String 银行编号
+	 */
+	public String getBankno() {
+		return this.bankno;
+	}
+
+	/**
+	 * 银行账号的取得
+	 *
+	 * @return String 银行账号
+	 */
+	public String getBankacc() {
+		return this.bankacc;
+	}
+
+	/**
+	 * 税号的取得
+	 *
+	 * @return String 税号
+	 */
+	public String getTaxno() {
+		return this.taxno;
+	}
+
+	/**
+	 * 发卡数量的取得
+	 *
+	 * @return Integer 发卡数量
+	 */
+	public Integer getCardsum() {
+		return this.cardsum;
+	}
+
+	/**
+	 * 卡上余额的取得
+	 *
+	 * @return BigDecimal 卡上余额
+	 */
+	public BigDecimal getCardacc() {
+		return this.cardacc;
+	}
+
+	/**
+	 * 账卡余额的取得
+	 *
+	 * @return BigDecimal 账卡余额
+	 */
+	public BigDecimal getBal() {
+		return this.bal;
+	}
+
+	/**
+	 * 消费金额的取得
+	 *
+	 * @return BigDecimal 消费金额
+	 */
+	public BigDecimal getDebitacc() {
+		return this.debitacc;
+	}
+
+	/**
+	 * 交费金额 （充值金额）的取得
+	 *
+	 * @return BigDecimal 交费金额 （充值金额）
+	 */
+	public BigDecimal getCreditacc() {
+		return this.creditacc;
+	}
+
+	/**
+	 * 限制金额的取得
+	 *
+	 * @return BigDecimal 限制金额
+	 */
+	public BigDecimal getLimit() {
+		return this.limit;
+	}
+
+	/**
+	 * 已分配金额 （使用金额）的取得
+	 *
+	 * @return Integer 已分配金额 （使用金额）
+	 */
+	public Integer getInuse() {
+		return this.inuse;
+	}
+
+	/**
+	 * 用户类型的取得
+	 *
+	 * @return String 用户类型
+	 */
+	public String getUsertype() {
+		return this.usertype;
+	}
+
+	/**
+	 * 主卡号的取得
+	 *
+	 * @return String 主卡号
+	 */
+	public String getCardno() {
+		return this.cardno;
+	}
+
+	/**
+	 * 积分的取得
+	 *
+	 * @return Integer 积分
+	 */
+	public Integer getIntegration() {
+		return this.integration;
+	}
+
+	/**
+	 * 状态的取得
+	 *
+	 * @return String 状态
+	 */
+	public String getStats() {
+		return this.stats;
+	}
+
+	/**
+	 * ETC的取得
+	 *
+	 * @return String ETC
+	 */
+	public String getEtc() {
+		return this.etc;
+	}
+
+	/**
+	 * 网点的取得
+	 *
+	 * @return String 网点
+	 */
+	public String getStationno() {
+		return this.stationno;
+	}
+
+	/**
+	 * 备注的取得
+	 *
+	 * @return String 备注
+	 */
+	public String getBz() {
+		return this.bz;
+	}
+
+	/**
+	 * 备注1的取得
+	 *
+	 * @return String 备注1
+	 */
+	public String getBeizhu() {
+		return this.beizhu;
+	}
+
+	/**
+	 * 班结号的取得
+	 *
+	 * @return Integer 班结号
+	 */
+	public Integer getBjid() {
+		return this.bjid;
+	}
+
+	/**
+	 * 日结号的取得
+	 *
+	 * @return Integer 日结号
+	 */
+	public Integer getRjid() {
+		return this.rjid;
+	}
+
+	/**
+	 * 创建时间/开户日期 (日期)的取得
+	 *
+	 * @return Timestamp 创建时间/开户日期 (日期)
+	 */
+	public Timestamp getCreateDate() {
+		return this.createDate;
+	}
+
+	/**
+	 * 更新时间的取得
+	 *
+	 * @return Timestamp 更新时间
+	 */
+	public Timestamp getUpdateDate() {
+		return this.updateDate;
+	}
+
+	/**
+	 * 操作员编号的取得
+	 *
+	 * @return Integer 操作员编号
+	 */
+	public Integer getUserid() {
+		return this.userid;
+	}
+
+	/**
+	 * ID的设定
+	 *
+	 * @param newInteger ID
+	 */
+	public void setId(Integer newId) {
+		this.id = newId;
+	}
+
+	/**
+	 * 客户编号（单位编号）的设定
+	 *
+	 * @param newString 客户编号（单位编号）
+	 */
+	public void setGuestno(Integer newGuestno) {
+		this.guestno = newGuestno;
+	}
+
+	/**
+	 * 客户名称（单位名）的设定
+	 *
+	 * @param newString 客户名称（单位名）
+	 */
+	public void setGuestname(String newGuestname) {
+		this.guestname = newGuestname;
+	}
+
+	/**
+	 * 客户类型（单位类型）的设定
+	 *
+	 * @param newString 客户类型（单位类型）
+	 */
+	public void setGuesttype(String newGuesttype) {
+		this.guesttype = newGuesttype;
+	}
+
+	/**
+	 * 联系人证件类型的设定
+	 *
+	 * @param newString 联系人证件类型
+	 */
+	public void setIdcardType(String newIdcardType) {
+		this.idcardType = newIdcardType;
+	}
+
+	/**
+	 * 联系人证件编号的设定
+	 *
+	 * @param newString 联系人证件编号
+	 */
+	public void setIdcardNum(String newIdcardNum) {
+		this.idcardNum = newIdcardNum;
+	}
+
+	/**
+	 * 联系人姓名的设定
+	 *
+	 * @param newString 联系人姓名
+	 */
+	public void setName(String newName) {
+		this.name = newName;
+	}
+
+	/**
+	 * 地址的设定
+	 *
+	 * @param newString 地址
+	 */
+	public void setAdd(String newAdd) {
+		this.add = newAdd;
+	}
+
+	/**
+	 * 电话的设定
+	 *
+	 * @param newString 电话
+	 */
+	public void setTel(String newTel) {
+		this.tel = newTel;
+	}
+
+	/**
+	 * 邮编的设定
+	 *
+	 * @param newString 邮编
+	 */
+	public void setPost(String newPost) {
+		this.post = newPost;
+	}
+
+	/**
+	 * 邮件的设定
+	 *
+	 * @param newString 邮件
+	 */
+	public void setEmail(String newEmail) {
+		this.email = newEmail;
+	}
+
+	/**
+	 * 银行编号的设定
+	 *
+	 * @param newString 银行编号
+	 */
+	public void setBankno(String newBankno) {
+		this.bankno = newBankno;
+	}
+
+	/**
+	 * 银行账号的设定
+	 *
+	 * @param newString 银行账号
+	 */
+	public void setBankacc(String newBankacc) {
+		this.bankacc = newBankacc;
+	}
+
+	/**
+	 * 税号的设定
+	 *
+	 * @param newString 税号
+	 */
+	public void setTaxno(String newTaxno) {
+		this.taxno = newTaxno;
+	}
+
+	/**
+	 * 发卡数量的设定
+	 *
+	 * @param newInteger 发卡数量
+	 */
+	public void setCardsum(Integer newCardsum) {
+		this.cardsum = newCardsum;
+	}
+
+	/**
+	 * 卡上余额的设定
+	 *
+	 * @param newBigDecimal 卡上余额
+	 */
+	public void setCardacc(BigDecimal newCardacc) {
+		this.cardacc = newCardacc;
+	}
+
+	/**
+	 * 账卡余额的设定
+	 *
+	 * @param newBigDecimal 账卡余额
+	 */
+	public void setBal(BigDecimal newBal) {
+		this.bal = newBal;
+	}
+
+	/**
+	 * 消费金额的设定
+	 *
+	 * @param newBigDecimal 消费金额
+	 */
+	public void setDebitacc(BigDecimal newDebitacc) {
+		this.debitacc = newDebitacc;
+	}
+
+	/**
+	 * 交费金额 （充值金额）的设定
+	 *
+	 * @param newBigDecimal 交费金额 （充值金额）
+	 */
+	public void setCreditacc(BigDecimal newCreditacc) {
+		this.creditacc = newCreditacc;
+	}
+
+	/**
+	 * 限制金额的设定
+	 *
+	 * @param newBigDecimal 限制金额
+	 */
+	public void setLimit(BigDecimal newLimit) {
+		this.limit = newLimit;
+	}
+
+	/**
+	 * 已分配金额 （使用金额）的设定
+	 *
+	 * @param newInteger 已分配金额 （使用金额）
+	 */
+	public void setInuse(Integer newInuse) {
+		this.inuse = newInuse;
+	}
+
+	/**
+	 * 用户类型的设定
+	 *
+	 * @param newString 用户类型
+	 */
+	public void setUsertype(String newUsertype) {
+		this.usertype = newUsertype;
+	}
+
+	/**
+	 * 主卡号的设定
+	 *
+	 * @param newString 主卡号
+	 */
+	public void setCardno(String newCardno) {
+		this.cardno = newCardno;
+	}
+
+	/**
+	 * 积分的设定
+	 *
+	 * @param newInteger 积分
+	 */
+	public void setIntegration(Integer newIntegration) {
+		this.integration = newIntegration;
+	}
+
+	/**
+	 * 状态的设定
+	 *
+	 * @param newString 状态
+	 */
+	public void setStats(String newStats) {
+		this.stats = newStats;
+	}
+
+	/**
+	 * ETC的设定
+	 *
+	 * @param newString ETC
+	 */
+	public void setEtc(String newEtc) {
+		this.etc = newEtc;
+	}
+
+	/**
+	 * 网点的设定
+	 *
+	 * @param newString 网点
+	 */
+	public void setStationno(String newStationno) {
+		this.stationno = newStationno;
+	}
+
+	/**
+	 * 备注的设定
+	 *
+	 * @param newString 备注
+	 */
+	public void setBz(String newBz) {
+		this.bz = newBz;
+	}
+
+	public Date getBirthday() {
+		return this.birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	/**
+	 * 备注1的设定
+	 *
+	 * @param newString 备注1
+	 */
+	public void setBeizhu(String newBeizhu) {
+		this.beizhu = newBeizhu;
+	}
+
+	/**
+	 * 班结号的设定
+	 *
+	 * @param newInteger 班结号
+	 */
+	public void setBjid(Integer newBjid) {
+		this.bjid = newBjid;
+	}
+
+	/**
+	 * 日结号的设定
+	 *
+	 * @param newInteger 日结号
+	 */
+	public void setRjid(Integer newRjid) {
+		this.rjid = newRjid;
+	}
+
+	/**
+	 * 创建时间/开户日期 (日期)的设定
+	 *
+	 * @param newTimestamp 创建时间/开户日期 (日期)
+	 */
+	public void setCreateDate(Timestamp newCreateDate) {
+		this.createDate = newCreateDate;
+	}
+
+	/**
+	 * 更新时间的设定
+	 *
+	 * @param newTimestamp 更新时间
+	 */
+	public void setUpdateDate(Timestamp newUpdateDate) {
+		this.updateDate = newUpdateDate;
+	}
+
+	/**
+	 * 操作员编号的设定
+	 *
+	 * @param newInteger 操作员编号
+	 */
+	public void setUserid(Integer newUserid) {
+		this.userid = newUserid;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.add == null) ? 0 : this.add.hashCode());
+		result = prime * result + ((this.bal == null) ? 0 : this.bal.hashCode());
+		result = prime * result + ((this.bankacc == null) ? 0 : this.bankacc.hashCode());
+		result = prime * result + ((this.bankno == null) ? 0 : this.bankno.hashCode());
+		result = prime * result + ((this.beizhu == null) ? 0 : this.beizhu.hashCode());
+		result = prime * result + ((this.birthday == null) ? 0 : this.birthday.hashCode());
+		result = prime * result + ((this.bjid == null) ? 0 : this.bjid.hashCode());
+		result = prime * result + ((this.bz == null) ? 0 : this.bz.hashCode());
+		result = prime * result + ((this.cardacc == null) ? 0 : this.cardacc.hashCode());
+		result = prime * result + ((this.cardno == null) ? 0 : this.cardno.hashCode());
+		result = prime * result + ((this.cardsum == null) ? 0 : this.cardsum.hashCode());
+		result = prime * result + ((this.createDate == null) ? 0 : this.createDate.hashCode());
+		result = prime * result + ((this.creditacc == null) ? 0 : this.creditacc.hashCode());
+		result = prime * result + ((this.debitacc == null) ? 0 : this.debitacc.hashCode());
+		result = prime * result + ((this.email == null) ? 0 : this.email.hashCode());
+		result = prime * result + ((this.etc == null) ? 0 : this.etc.hashCode());
+		result = prime * result + ((this.guestname == null) ? 0 : this.guestname.hashCode());
+		result = prime * result + ((this.guestno == null) ? 0 : this.guestno.hashCode());
+		result = prime * result + ((this.guesttype == null) ? 0 : this.guesttype.hashCode());
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		result = prime * result + ((this.idcardNum == null) ? 0 : this.idcardNum.hashCode());
+		result = prime * result + ((this.idcardType == null) ? 0 : this.idcardType.hashCode());
+		result = prime * result + ((this.integration == null) ? 0 : this.integration.hashCode());
+		result = prime * result + ((this.inuse == null) ? 0 : this.inuse.hashCode());
+		result = prime * result + ((this.limit == null) ? 0 : this.limit.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + ((this.post == null) ? 0 : this.post.hashCode());
+		result = prime * result + ((this.rjid == null) ? 0 : this.rjid.hashCode());
+		result = prime * result + ((this.stationno == null) ? 0 : this.stationno.hashCode());
+		result = prime * result + ((this.stats == null) ? 0 : this.stats.hashCode());
+		result = prime * result + ((this.taxno == null) ? 0 : this.taxno.hashCode());
+		result = prime * result + ((this.tel == null) ? 0 : this.tel.hashCode());
+		result = prime * result + ((this.updateDate == null) ? 0 : this.updateDate.hashCode());
+		result = prime * result + ((this.userid == null) ? 0 : this.userid.hashCode());
+		result = prime * result + ((this.usertype == null) ? 0 : this.usertype.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		FkTGuestEntity other = (FkTGuestEntity) obj;
+		if (this.add == null) {
+			if (other.add != null) {
+				return false;
+			}
+		} else if (!this.add.equals(other.add)) {
+			return false;
+		}
+		if (this.bal == null) {
+			if (other.bal != null) {
+				return false;
+			}
+		} else if (!this.bal.equals(other.bal)) {
+			return false;
+		}
+		if (this.bankacc == null) {
+			if (other.bankacc != null) {
+				return false;
+			}
+		} else if (!this.bankacc.equals(other.bankacc)) {
+			return false;
+		}
+		if (this.bankno == null) {
+			if (other.bankno != null) {
+				return false;
+			}
+		} else if (!this.bankno.equals(other.bankno)) {
+			return false;
+		}
+		if (this.beizhu == null) {
+			if (other.beizhu != null) {
+				return false;
+			}
+		} else if (!this.beizhu.equals(other.beizhu)) {
+			return false;
+		}
+		if (this.birthday == null) {
+			if (other.birthday != null) {
+				return false;
+			}
+		} else if (!this.birthday.equals(other.birthday)) {
+			return false;
+		}
+		if (this.bjid == null) {
+			if (other.bjid != null) {
+				return false;
+			}
+		} else if (!this.bjid.equals(other.bjid)) {
+			return false;
+		}
+		if (this.bz == null) {
+			if (other.bz != null) {
+				return false;
+			}
+		} else if (!this.bz.equals(other.bz)) {
+			return false;
+		}
+		if (this.cardacc == null) {
+			if (other.cardacc != null) {
+				return false;
+			}
+		} else if (!this.cardacc.equals(other.cardacc)) {
+			return false;
+		}
+		if (this.cardno == null) {
+			if (other.cardno != null) {
+				return false;
+			}
+		} else if (!this.cardno.equals(other.cardno)) {
+			return false;
+		}
+		if (this.cardsum == null) {
+			if (other.cardsum != null) {
+				return false;
+			}
+		} else if (!this.cardsum.equals(other.cardsum)) {
+			return false;
+		}
+		if (this.createDate == null) {
+			if (other.createDate != null) {
+				return false;
+			}
+		} else if (!this.createDate.equals(other.createDate)) {
+			return false;
+		}
+		if (this.creditacc == null) {
+			if (other.creditacc != null) {
+				return false;
+			}
+		} else if (!this.creditacc.equals(other.creditacc)) {
+			return false;
+		}
+		if (this.debitacc == null) {
+			if (other.debitacc != null) {
+				return false;
+			}
+		} else if (!this.debitacc.equals(other.debitacc)) {
+			return false;
+		}
+		if (this.email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!this.email.equals(other.email)) {
+			return false;
+		}
+		if (this.etc == null) {
+			if (other.etc != null) {
+				return false;
+			}
+		} else if (!this.etc.equals(other.etc)) {
+			return false;
+		}
+		if (this.guestname == null) {
+			if (other.guestname != null) {
+				return false;
+			}
+		} else if (!this.guestname.equals(other.guestname)) {
+			return false;
+		}
+		if (this.guestno == null) {
+			if (other.guestno != null) {
+				return false;
+			}
+		} else if (!this.guestno.equals(other.guestno)) {
+			return false;
+		}
+		if (this.guesttype == null) {
+			if (other.guesttype != null) {
+				return false;
+			}
+		} else if (!this.guesttype.equals(other.guesttype)) {
+			return false;
+		}
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		if (this.idcardNum == null) {
+			if (other.idcardNum != null) {
+				return false;
+			}
+		} else if (!this.idcardNum.equals(other.idcardNum)) {
+			return false;
+		}
+		if (this.idcardType == null) {
+			if (other.idcardType != null) {
+				return false;
+			}
+		} else if (!this.idcardType.equals(other.idcardType)) {
+			return false;
+		}
+		if (this.integration == null) {
+			if (other.integration != null) {
+				return false;
+			}
+		} else if (!this.integration.equals(other.integration)) {
+			return false;
+		}
+		if (this.inuse == null) {
+			if (other.inuse != null) {
+				return false;
+			}
+		} else if (!this.inuse.equals(other.inuse)) {
+			return false;
+		}
+		if (this.limit == null) {
+			if (other.limit != null) {
+				return false;
+			}
+		} else if (!this.limit.equals(other.limit)) {
+			return false;
+		}
+		if (this.name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
+		if (this.post == null) {
+			if (other.post != null) {
+				return false;
+			}
+		} else if (!this.post.equals(other.post)) {
+			return false;
+		}
+		if (this.rjid == null) {
+			if (other.rjid != null) {
+				return false;
+			}
+		} else if (!this.rjid.equals(other.rjid)) {
+			return false;
+		}
+		if (this.stationno == null) {
+			if (other.stationno != null) {
+				return false;
+			}
+		} else if (!this.stationno.equals(other.stationno)) {
+			return false;
+		}
+		if (this.stats == null) {
+			if (other.stats != null) {
+				return false;
+			}
+		} else if (!this.stats.equals(other.stats)) {
+			return false;
+		}
+		if (this.taxno == null) {
+			if (other.taxno != null) {
+				return false;
+			}
+		} else if (!this.taxno.equals(other.taxno)) {
+			return false;
+		}
+		if (this.tel == null) {
+			if (other.tel != null) {
+				return false;
+			}
+		} else if (!this.tel.equals(other.tel)) {
+			return false;
+		}
+		if (this.updateDate == null) {
+			if (other.updateDate != null) {
+				return false;
+			}
+		} else if (!this.updateDate.equals(other.updateDate)) {
+			return false;
+		}
+		if (this.userid == null) {
+			if (other.userid != null) {
+				return false;
+			}
+		} else if (!this.userid.equals(other.userid)) {
+			return false;
+		}
+		if (this.usertype == null) {
+			if (other.usertype != null) {
+				return false;
+			}
+		} else if (!this.usertype.equals(other.usertype)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "FkTGuestEntity [id=" + this.id + ", guestno=" + this.guestno + ", guestname=" + this.guestname + ", guesttype="
+				+ this.guesttype + ", idcardType=" + this.idcardType + ", idcardNum=" + this.idcardNum + ", name=" + this.name
+				+ ", add=" + this.add + ", tel=" + this.tel + ", post=" + this.post + ", email=" + this.email + ", birthday="
+				+ this.birthday + ", bankno=" + this.bankno + ", bankacc=" + this.bankacc + ", taxno=" + this.taxno
+				+ ", cardsum=" + this.cardsum + ", cardacc=" + this.cardacc + ", bal=" + this.bal + ", debitacc="
+				+ this.debitacc + ", creditacc=" + this.creditacc + ", limit=" + this.limit + ", inuse=" + this.inuse
+				+ ", usertype=" + this.usertype + ", cardno=" + this.cardno + ", integration=" + this.integration + ", stats="
+				+ this.stats + ", etc=" + this.etc + ", stationno=" + this.stationno + ", bz=" + this.bz + ", beizhu="
+				+ this.beizhu + ", bjid=" + this.bjid + ", rjid=" + this.rjid + ", createDate=" + this.createDate
+				+ ", updateDate=" + this.updateDate + ", userid=" + this.userid + "]";
+	}
+
+}

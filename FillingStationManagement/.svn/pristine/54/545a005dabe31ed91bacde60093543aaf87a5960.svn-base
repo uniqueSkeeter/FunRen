@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"  
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">  
+  
+<hibernate-mapping>  
+    <sql-query name="selectOperateLogViewSql">  
+       <![CDATA[
+       	SELECT operV.NZN, operV.sTIME, operV.oilname, operV.PRC, operV.VOL, operV.AMN,
+       		 operV.ASN, operV.G_CODE, operV.V_TOT, operV.ASN, operV.CTC, operV.BAL, operV.POS_P,
+       		 operV.POS_TTC FROM view_all_operatelog operV WHERE
+      ]]>  
+    </sql-query>
+    
+    <sql-query name = "getCountForOperator">
+    <![CDATA[ 
+    	select count(*) from FunctionInfoEntity func where func.upStep = ? and ltree = ?
+     ]]>  
+    </sql-query>
+    
+    <sql-query name="updateSysParameterAttriValueSql">
+    <![CDATA[ 
+    	UPDATE stationParameter SET attriValue = (SELECT attriValue FROM stationParameter WHERE attriName = 'guestNo') WHERE attriName = 'guestNo' "
+     ]]>  
+    </sql-query>
+    
+    
+</hibernate-mapping> 

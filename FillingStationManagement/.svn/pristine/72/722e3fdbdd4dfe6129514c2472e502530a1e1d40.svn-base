@@ -1,0 +1,67 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.customer.service.RegisterCustomerService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get registerCustomer records from DB
+ * 
+ * @author WR
+ */
+@Service
+public class RegisterCustomerServiceImpl extends AbstractBaseService<FkTCardEntity> implements RegisterCustomerService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private RegisterCustomerDAO registerCustomerDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegisterCustomerServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * inherited java doc.
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<RegisterCustomerBean> findRegisterCustomerRecordsByCriteria(RegisterCustomerBean registerCustomerBean) {
+		int pageNumber = registerCustomerBean.getPageNumber();
+		int pageSize = registerCustomerBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return registerCustomerDaoImpl.getRegisterCustomerRecordsByCriteria(registerCustomerBean, start, number);
+	}
+
+	@Autowired
+	public void setRegisterCustomerDAO(RegisterCustomerDAO registerCustomerDaoImpl) {
+		super.setBaseDao(registerCustomerDaoImpl);
+		this.registerCustomerDaoImpl = registerCustomerDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+}

@@ -1,0 +1,192 @@
+	//include in saleMultiUserCard.jsp
+	var readFlag = false;
+	$(document).ready(function(){
+		$("#driver_add").click(function(){
+			alert("增加司机ssss");
+			readFlag = false;
+			var cardNo = $("#cardNo").val();
+			var guestNo =$("#guestNo").val();
+			var guestName = $("#guestName").val();
+			if(cardNo!= ""){
+				$('#addDriverIFrame')[0].src= server_context + '/registMultiCustomer/driverAddInit?registerCustomerBean.cardNo='+cardNo; 
+			}else if(guestNo != ""){
+				$('#addDriverIFrame')[0].src= server_context + '/registMultiCustomer/driverAddInit?registerCustomerBean.guestNo='+guestNo; 
+			}else if(guestName != ""){
+				$('#addDriverIFrame')[0].src= server_context + '/registMultiCustomer/driverAddInit?registerCustomerBean.guestName='+encodeURI(encodeURI(guestName)); 
+			}
+			else{
+				$.messager.alert('错误','主卡号,客户编号,单位名称要有一个不为空!');
+				return;
+			}
+        	$('#addDriverDialog').form('clear');
+            $('#addDriverDialog').dialog({
+                closed : false,
+                title : '增加司机',
+                shadow : true,
+                modal : true,
+                collapsible : true,
+                buttons : [{
+                	text : '读卡',
+                    id : 'readBtn',
+                    handler:function(){
+                    	alert("读卡");
+                    	readFlag = true;
+                    }
+                }, {
+                    text : '售卡',
+                    id : 'saleBtn',
+                    handler : function() {
+                    	alert("readFlag is "+readFlag);
+                    	if(readFlag){
+                    	var dDocument = document.getElementById("addDriverIFrame").contentWindow.document;
+                    	var valideFlag = validateDriverInput(dDocument);
+                    	var driverForm = dDocument.getElementsByTagName('form');
+                    	alert("表单数据为"+$(driverForm).serialize());
+                    	alert("valideFlag is "+valideFlag);
+                    	if(valideFlag){
+                    		alert("验证通过!");
+                    		$.ajax({
+                    			data:$(driverForm).serialize(),
+                    			url:encodeURI(server_context+"/registMultiCustomer/saveDriver"),type:'POST',timeout:3000,dataType:'html',
+	                			success:function(data){
+	    	        				$("#addDriverDialog").dialog("close");
+	    	        				var billTypeSel = dDocument.getElementById('billType');
+	    	        				$('#printCardIFrame')[0].src= server_context+'/view/card/customer/saleMultiUserCard/printMultiUserSonCard.jsp'
+	    	        				+'?cardNo='+dDocument.getElementById('cardNo').value
+                    				+'&cardExno='+dDocument.getElementById('cardExno').value
+                    				+'&cardAmount='+dDocument.getElementById('cardAmount').value
+                    				+'&deposit='+dDocument.getElementById('deposit').value
+                    				+'&amount='+(parseFloat(dDocument.getElementById('cardAmount').value)+parseFloat(dDocument.getElementById('deposit').value))
+                    				+'&guestNo='+dDocument.getElementById('guestNo').value
+                    				+'&guestName='+encodeURI(encodeURI(dDocument.getElementById('guestName').value))
+                    				+'&billType='+encodeURI(encodeURI(billTypeSel.options[billTypeSel.selectedIndex].text));
+	    	        				$('#printCardDialog').dialog({
+	    	       					 closed : false,
+	    	       		                title : '单位卡打印',
+	    	       		                shadow : true,
+	    	       		                modal : true,
+	    	       		                collapsible : true,
+	    	       		                buttons : [{
+	    	       		                	text : '返回',
+	    	       		                    id : 'returnBtn',
+	    	       		                    handler:function(){
+	    	       		                    	$("#printCardDialog").dialog("close");
+	    	       		                    	searchData();
+	    	       		                    }
+	    	       		                }]
+	    	       				});
+	    	        			},
+	    	        			error:function(){
+	    	        				$.messager.alert('错误','保存失败，请重试!');
+	    	        			}
+	            		});
+                    	}
+                    	}
+                    }
+                },{
+                    text : '重置',
+                    id : 'resetBtn',
+                    handler : function() {
+                    	alert("重置");
+                    	var dDocument = document.getElementById("addDriverIFrame").contentWindow.document;
+                    	dDocument.getElementById('driverAdd_form').reset();
+                        
+                    }
+                },{
+                    text : '返回',
+                    id : 'returnBtn',
+                    handler : function() {
+                    	alert("返回");
+                    	$("#addDriverDialog").dialog("close");
+                        
+                    }
+                }]
+        });
+	
+	});
+	});
+
+	function validateDriverInput(dDocument){
+		alert(" in validateDriverInput");
+		//卡号
+    	var cardNo = dDocument.getElementById('cardNo').value;
+    	if(cardNo == ''){
+    		alert('卡号为必填项!');
+			return false;
+    	}
+    	//卡片类型
+		var cardType = dDocument.getElementById('cardType').value;
+		if(cardType != '多用户'){
+    		alert('卡片类型必须为多用户!');
+			return false;
+    	}
+		//押金
+		var deposit = dDocument.getElementById('deposit').value;
+		if(deposit == ''){
+    		alert('押金为必填项!');
+			return false;
+    	}
+		if(isNaN(deposit)){
+			alert('押金必须为数字!');
+			return false;
+		}
+		//卡内金额
+		var cardAmount = dDocument.getElementById('cardAmount').value;
+		if(cardAmount == ''){
+    		alert('卡内金额为必填项!');
+			return false;
+    	}
+		if(isNaN(cardAmount)){
+			alert('卡内金额必须为数字!');
+			return false;
+		}
+		//生效日期
+		var effectiveDate =document.getElementById("addDriverIFrame").contentWindow.window.$("#effectiveDate").datebox('getValue');
+		if(effectiveDate == ''){
+    		alert('生效日期为必填项!');
+			return false;
+    	}
+		//失效日期
+		var disEffectiveDate = document.getElementById("addDriverIFrame").contentWindow.window.$("#disEffectiveDate").datebox('getValue');
+		if(disEffectiveDate == ''){
+    		alert('失效日期为必填项!');
+			return false;
+    	}
+		//印刷号
+		var cardExno = dDocument.getElementById('cardExno').value;
+		if(cardExno == ''){
+    		alert('印刷号为必填项!');
+			return false;
+    	}
+		//印刷号
+		var guestNo = dDocument.getElementById('guestNo').value;
+		if(guestNo == ''){
+    		alert('客户编号为必填项!');
+			return false;
+    	}
+		//持卡人姓名
+		var guestName = dDocument.getElementById('guestName').value;
+		if(guestName == ''){
+    		alert('姓名为必填项!');
+			return false;
+    	}
+		//证件类型
+		var guestType = dDocument.getElementById('guestType').value;
+		if(guestType == ''){
+    		alert('证件类型为必填项!');
+			return false;
+    	}
+		//证件号码
+		var guestNum = dDocument.getElementById('guestNum').value;
+		if(guestNum == ''){
+    		alert('证件号码为必填项!');
+    		return false;
+    	}
+		//把限制区站全选中
+		var stationInfoLimit= dDocument.getElementById('stationInfoLimit');
+		for(var i=0;i<stationInfoLimit.options.length;i++)
+		{
+			stationInfoLimit.options[i].selected=true;
+		}
+		return true;
+	}

@@ -1,0 +1,91 @@
+$(function() {
+	$('#confirmMaincard').window({
+		modal : true,
+		closed : true
+	});
+});
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(document).ready(
+	function() {
+		$("#cardMaintain_cancelLost").click(function() {
+			$('#addCancelLossCardDialog').form('clear');
+			var cardMaintainBean = $('#card_dg').datagrid('getSelected');
+			if (!cardMaintainBean) {
+				alert('请选择记录!');
+			} else {
+				$('#addCancelLossCardIFrame')[0].src = server_context+ '/cardMaintain/showCancelLossCard?cardMaintainBean.id='+ cardMaintainBean.id;
+				  if(cardMaintainBean.cardType=="13"){
+					  alert('不记名卡不能止挂!');
+					  return ;
+				  }
+				  if(cardMaintainBean.cardStatus!="2"){
+					  alert('不在挂失状态下无需止挂!');
+					  return ;
+				  }
+				var iframe = document.getElementById("addCancelLossCardIFrame").contentWindow;
+				$('#addCancelLossCardDialog').dialog(
+				{
+					closed : false,
+					title : '止挂',
+					shadow : true,
+					modal : true,
+					collapsible : true,
+					buttons : [
+					{
+						text : '止挂',
+						id : 'sBtn',
+						handler : function() {
+							var rDocument = document.getElementById("addCancelLossCardIFrame").contentWindow.document;
+							var flag = validateFieldValue(rDocument);
+						}
+					},
+					{
+						text : '取消',
+						id : 'cBtn',
+						handler : function() {
+							$('#addCancelLossCardDialog').dialog('close');
+						}
+					}]
+				});
+			}
+		});
+		function validateFieldValue(rDocument) {
+				var cardNo = rDocument.getElementById('cardNo').textContent;
+				var guestType = rDocument.getElementById("guestType").value;
+				var guestNum = rDocument.getElementById("guestNum").textContent;
+				if (cardNo == '') {
+						alert('卡号必填!');
+						return false;
+					}
+				if(guestNum==''){
+					alert('证件号必填!');
+					return false;
+					}
+						foundCard(cardNo, guestType, guestNum, rDocument);
+						return true;
+					}
+
+				});
+
+function foundCard(cardNo, guestType, guestNum, rDocument) {
+	var yz = $.ajax({
+				type : 'post',
+				url : 'cancelLossCard',
+				data : {
+					"cardMaintainBean.cardNo" : rDocument.getElementById('cardNo').textContent,
+					"cardMaintainBean.guestType" : rDocument.getElementById("guestType").value,
+					"cardMaintainBean.guestNum" : rDocument.getElementById("guestNum").textContent
+				},
+				cache : false,
+				success : function(data) {
+					$("#addCancelLossCardDialog").dialog("close");
+					alert('恭喜你止挂成功!');
+				},
+				error : function() {
+					alert('止挂失败，请重试!');
+				}
+			});
+}

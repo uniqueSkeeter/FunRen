@@ -1,0 +1,158 @@
+package com.fr.station.component.system.service.impl;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.EmployeeBean;
+import com.fr.station.common.entity.system.EmployeeEntity;
+import com.fr.station.component.system.dao.EmployeeDAO;
+import com.fr.station.component.system.dao.impl.EmployeeDaoImpl;
+import com.fr.station.component.system.service.EmployeeService;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites.
+ * Mainly responsible to handle user login
+ * 
+ * @author henry
+ */
+@Service("employeeService")
+public class EmployeeServiceImpl extends AbstractBaseService<EmployeeEntity> implements EmployeeService {
+	
+	// ------- Constants (static final) ----------------------------------------
+	
+	private static Logger log = Logger.getLogger(EmployeeServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private EmployeeDAO employeeDaoImpl;
+	
+	// ------- Constructors ----------------------------------------------------
+
+	public EmployeeServiceImpl() {
+		super();
+	}
+	
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addEmployee(EmployeeBean employeeBean) {
+		log.info("Persist employee entity begain...");
+		EmployeeEntity employeeEntity = this.convertDataToEntity(employeeBean);
+		this.saveOrUpdate(employeeEntity);
+		log.info("Succefully saved employee entity...");
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<EmployeeEntity> getAllEmployees() throws Exception {
+		return this.findAll();
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteEmployee(Integer employeeId) {
+		EmployeeEntity deleteEntity = new EmployeeEntity();
+		deleteEntity.setId(employeeId);
+		this.delete(deleteEntity);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void updateEmployee(EmployeeBean employeeBean, Object... args) {
+		this.employeeDaoImpl.updateEmployee(employeeBean, args);
+		
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<EmployeeBean> getEmplByFormCondition(EmployeeBean employeeBean) throws Exception {
+		if(employeeBean == null){
+			return null;
+		}
+		List<EmployeeBean> emplList = this.employeeDaoImpl.getAllEmployees(employeeBean);
+		return emplList;
+	}
+	
+	@Autowired
+	public void setEmployeeDAO(EmployeeDaoImpl employeeDaoImpl) {
+		super.setBaseDao(employeeDaoImpl);
+		this.employeeDaoImpl = employeeDaoImpl;
+	}
+	
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private EmployeeEntity convertDataToEntity(EmployeeBean employee){
+		
+		EmployeeEntity employeeEntity = new EmployeeEntity();
+		if(employee.getId() != null){
+			employeeEntity.setId(employee.getId());
+		}
+		if(StringUtils.isNotBlank(employee.getBankAccount())){
+			employeeEntity.setBankNum(employee.getBankAccount());
+		}
+		if(StringUtils.isNotBlank(employee.getBankType())){
+			employeeEntity.setBankType(employee.getBankType());
+		}
+		if(StringUtils.isNotBlank(employee.getAddress())){
+			employeeEntity.setContactAddr(employee.getAddress());
+		}
+		if(StringUtils.isNotBlank(employee.getTelephone())){
+			employeeEntity.setContactTel(employee.getTelephone());
+		}
+		if(StringUtils.isNotBlank(employee.getEducation())){
+			employeeEntity.setEducation(employee.getEducation());
+		}
+		if(employee.getIdentity() != null){
+			employeeEntity.setIdNumber(employee.getIdentity());
+		}
+		if(StringUtils.isNotBlank(employee.getEmployeeName())){
+			employeeEntity.setName(employee.getEmployeeName());
+		}
+		if(StringUtils.isNotBlank(employee.getEmployeePass())){
+			employeeEntity.setPassWord(employee.getEmployeePass());
+		}
+		if(StringUtils.isNotBlank(employee.getPolitical())){
+			employeeEntity.setPoliticalStatus(employee.getPolitical());
+		}
+		if(StringUtils.isNotBlank(employee.getShiftType())){
+			employeeEntity.setPostType(employee.getShiftType());
+		}
+		if(StringUtils.isNotBlank(employee.getShiftNum())){
+			employeeEntity.setShiftId(Integer.valueOf(employee.getShiftNum()));
+		}
+		if(StringUtils.isNotBlank(employee.getZipCode())){
+			employeeEntity.setZipCode(employee.getZipCode());
+		}
+		if(employeeEntity.getOperEntity() != null){
+			// foreign key operator entity
+			employeeEntity.setOperEntity(null);
+		}
+		if(employeeEntity.getRoleEntity() != null){
+			// foreign key role entity
+			employeeEntity.setRoleEntity(null);
+		}
+		if(employeeEntity.getStationId() != null){
+			// foreign key sation entity
+			employeeEntity.setStationId(null);
+		}
+		employeeEntity.setPostStats(String.valueOf(12));
+		employeeEntity.setStats(String.valueOf(0));
+		employeeEntity.setCreateDate(new Timestamp(System.currentTimeMillis()));
+		employeeEntity.setUpdateDate(new Timestamp(System.currentTimeMillis()));
+		
+		return employeeEntity;
+	}
+
+}

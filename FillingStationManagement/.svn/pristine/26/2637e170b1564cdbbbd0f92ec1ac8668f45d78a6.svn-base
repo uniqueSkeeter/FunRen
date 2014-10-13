@@ -1,0 +1,51 @@
+
+$(function() {
+	$('#enter_password').window({
+		modal:true,
+		closed:false
+	});
+	$('#enter_new_password').window({
+		modal:true,
+		closed:true
+	});
+	$('#confirm_password').window({
+		modal:true,
+		closed:true
+	});
+});
+
+
+
+$(document).ready(function() {
+	$("#cardMaintain_no1").click(function() {
+		$("#enter_password").window('close');
+	});
+	$("#cardMaintain_yes1").click(function() {
+		$("#enter_password").window('close');
+		$("#enter_new_password").window('open');
+	});
+	$("#cardMaintain_no2").click(function() {
+		$("#enter_new_password").window('close');
+	});
+	$("#cardMaintain_yes2").click(function() {
+		$("#enter_new_password").window('close');
+		$("#confirm_password").window('open');
+	});
+	$("#cardMaintain_no3").click(function() {
+		$("#confirm_password").window('close');
+	});
+	$("#cardMaintain_yes3").click(function() {
+		var a=document.getElementById("cardno2").value;
+		var b=document.getElementById("cardno3").value;
+		if(a!=b){
+			alert("2次输入的密码不一致");
+			$("#confirm_password").window('close');
+			$("#enter_new_password").window('open');
+		}
+	});
+});
+
+	
+	
+
+

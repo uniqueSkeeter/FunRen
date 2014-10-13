@@ -1,0 +1,62 @@
+//此JS用于单位卡维护的更改单位信息操作
+//绝对路径
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(function(){
+});
+$(document).ready(function(){
+	$('#changeGuestInfo').click(function(){
+		var mainCardNo=$('#mainCardNo').val();
+		if(mainCardNo==''){
+			$.messager.alert("错误","请输入主卡号");
+			return ;
+		}
+		$('#changeGuestInfoIFrame')[0].src= server_context + '/updateCorpInfo/showGuestInfo?updateCardInfoBean.mainCardNo='+mainCardNo;
+		var iframe = document.getElementById("changeGuestInfoIFrame").contentWindow;
+		 $('#changeGuestInfoDialog').dialog({
+			 closed : false,
+	         title : '单位信息修改',
+	         shadow : true,
+	         modal : true,
+	         collapsible : true,
+	         buttons : [{
+	            text : '保存并写卡',
+	            id : 'sBtn',
+	            handler:function() {
+	               var rDocument = document.getElementById("changeGuestInfoIFrame").contentWindow.document;
+	               var driver_form = rDocument.getElementsByTagName('form');
+	               $.ajax({
+	            	   data:$(driver_form).serialize(),
+	            	   url:encodeURI(server_context+"/updateCorpInfo/saveGuestInfo"),type:'POST',timeout:3000,dataType:'html',
+	            	   success:function(data){
+	            		   $.messager.alert("成功","保存成功！");
+	                		$('#changeGuestInfoDialog').dialog('close');
+	            	   },
+	                	error:function(){
+	                		$.messager.alert("失败","保存失败，请重试！");
+	                	}
+	               });
+	            }
+	         }, {
+	              text : '取消',
+	              id : 'cBtn',
+	              handler : function() {
+	                  $('#changeGuestInfoDialog').dialog('close');
+	              }
+	         }]
+		 });
+	});
+	$('#saveGuestInfo').click(function(){
+		$.ajax({
+			data:$(guestInfoForm).serialize(),
+			url:encodeURI(server_context+"/updateCorpInfo/saveGuestInfo"),type:'POST',timeout:3000,dataType:'html',
+			success:function(data){
+			},
+			error:function(){
+			}
+		});
+	
+	});
+});

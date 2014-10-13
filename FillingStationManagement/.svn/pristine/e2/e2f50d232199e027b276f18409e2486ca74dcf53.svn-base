@@ -1,0 +1,456 @@
+﻿/*
+ * 卡片管理表 <-- > 卡领取
+ * Revised history
+ * Copyright(c) 2010 FR Co.,Ltd
+ */
+
+
+package com.fr.station.common.entity.card;
+
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+
+/**
+ * 卡领取
+ * 
+ * @version 1.0
+ * @authorguyj
+ */
+ @Entity
+ @Table(name = "FK_T_CARDIN")
+public class FkTCardinEntity implements StandardBean {
+
+
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ID
+     */
+     @Id
+     @Column(name = "`ID`")
+     @GeneratedValue
+    private Integer id;
+
+    /**
+     * 日期
+     */
+     @Column(name = "`WORKDATE`")
+    private Timestamp workdate;
+
+    /**
+     * 送货人
+     */
+     @Column(name = "`WORKER`")
+    private String worker;
+
+    /**
+     * 卡类型
+     */
+     @Column(name = "`CARDTYPE`")
+    private String cardtype;
+
+    /**
+     * 数量
+     */
+     @Column(name = "`CARDSUM`")
+    private Integer cardsum;
+
+    /**
+     * 开始号
+     */
+     @Column(name = "`BEGEXNO`")
+    private String begexno;
+
+    /**
+     * 结束号
+     */
+     @Column(name = "`ENDEXNO`")
+    private String endexno;
+
+    /**
+     * 操作员
+     */
+     @Column(name = "`USERNAME`")
+    private String username;
+
+    /**
+     * 备用
+     */
+     @Column(name = "`BZ`")
+    private String bz;
+
+    /**
+     * 单价
+     */
+     @Column(name = "`PRICE`")
+    private Integer price;
+
+    /**
+     * 状态
+     */
+     @Column(name = "`STATS`")
+    private String stats;
+
+    /**
+     * 班结号
+     */
+     @Column(name = "`BJID`")
+    private Integer bjid;
+
+    /**
+     * 日结号
+     */
+     @Column(name = "`RJID`")
+    private Integer rjid;
+
+    /**
+     * 网点
+     */
+     @Column(name = "`STATIONNO`")
+    private Integer stationno;
+
+    /**
+     * 创建时间
+     */
+     @Column(name = "`CREATE_DATE`")
+    private Timestamp createDate;
+
+    /**
+     * 操作员编号
+     */
+     @Column(name = "`USERID`")
+    private Integer userid;
+
+
+
+    /**
+     * ID的取得
+     *
+     * @return Integer ID
+     */
+    public Integer getId() {
+        return id;
+    }
+
+
+    /**
+     * 日期的取得
+     *
+     * @return Timestamp 日期
+     */
+    public Timestamp getWorkdate() {
+        return workdate;
+    }
+
+
+    /**
+     * 送货人的取得
+     *
+     * @return String 送货人
+     */
+    public String getWorker() {
+        return worker;
+    }
+
+
+    /**
+     * 卡类型的取得
+     *
+     * @return String 卡类型
+     */
+    public String getCardtype() {
+        return cardtype;
+    }
+
+
+    /**
+     * 数量的取得
+     *
+     * @return Integer 数量
+     */
+    public Integer getCardsum() {
+        return cardsum;
+    }
+
+
+    /**
+     * 开始号的取得
+     *
+     * @return String 开始号
+     */
+    public String getBegexno() {
+        return begexno;
+    }
+
+
+    /**
+     * 结束号的取得
+     *
+     * @return String 结束号
+     */
+    public String getEndexno() {
+        return endexno;
+    }
+
+
+    /**
+     * 操作员的取得
+     *
+     * @return String 操作员
+     */
+    public String getUsername() {
+        return username;
+    }
+
+
+    /**
+     * 备用的取得
+     *
+     * @return String 备用
+     */
+    public String getBz() {
+        return bz;
+    }
+
+
+    /**
+     * 单价的取得
+     *
+     * @return Integer 单价
+     */
+    public Integer getPrice() {
+        return price;
+    }
+
+
+    /**
+     * 状态的取得
+     *
+     * @return String 状态
+     */
+    public String getStats() {
+        return stats;
+    }
+
+
+    /**
+     * 班结号的取得
+     *
+     * @return Integer 班结号
+     */
+    public Integer getBjid() {
+        return bjid;
+    }
+
+
+    /**
+     * 日结号的取得
+     *
+     * @return Integer 日结号
+     */
+    public Integer getRjid() {
+        return rjid;
+    }
+
+
+    /**
+     * 网点的取得
+     *
+     * @return Integer 网点
+     */
+    public Integer getStationno() {
+        return stationno;
+    }
+
+
+    /**
+     * 创建时间的取得
+     *
+     * @return Timestamp 创建时间
+     */
+    public Timestamp getCreateDate() {
+        return createDate;
+    }
+
+
+    /**
+     * 操作员编号的取得
+     *
+     * @return Integer 操作员编号
+     */
+    public Integer getUserid() {
+        return userid;
+    }
+
+
+    /**
+     * ID的设定
+     *
+     * @param newInteger ID
+     */
+    public void setId(Integer newId) {
+        this.id = newId;
+    }
+
+
+    /**
+     * 日期的设定
+     *
+     * @param newTimestamp 日期
+     */
+    public void setWorkdate(Timestamp newWorkdate) {
+        this.workdate = newWorkdate;
+    }
+
+
+    /**
+     * 送货人的设定
+     *
+     * @param newString 送货人
+     */
+    public void setWorker(String newWorker) {
+        this.worker = newWorker;
+    }
+
+
+    /**
+     * 卡类型的设定
+     *
+     * @param newString 卡类型
+     */
+    public void setCardtype(String newCardtype) {
+        this.cardtype = newCardtype;
+    }
+
+
+    /**
+     * 数量的设定
+     *
+     * @param newInteger 数量
+     */
+    public void setCardsum(Integer newCardsum) {
+        this.cardsum = newCardsum;
+    }
+
+
+    /**
+     * 开始号的设定
+     *
+     * @param newString 开始号
+     */
+    public void setBegexno(String newBegexno) {
+        this.begexno = newBegexno;
+    }
+
+
+    /**
+     * 结束号的设定
+     *
+     * @param newString 结束号
+     */
+    public void setEndexno(String newEndexno) {
+        this.endexno = newEndexno;
+    }
+
+
+    /**
+     * 操作员的设定
+     *
+     * @param newString 操作员
+     */
+    public void setUsername(String newUsername) {
+        this.username = newUsername;
+    }
+
+
+    /**
+     * 备用的设定
+     *
+     * @param newString 备用
+     */
+    public void setBz(String newBz) {
+        this.bz = newBz;
+    }
+
+
+    /**
+     * 单价的设定
+     *
+     * @param newInteger 单价
+     */
+    public void setPrice(Integer newPrice) {
+        this.price = newPrice;
+    }
+
+
+    /**
+     * 状态的设定
+     *
+     * @param newString 状态
+     */
+    public void setStats(String newStats) {
+        this.stats = newStats;
+    }
+
+
+    /**
+     * 班结号的设定
+     *
+     * @param newInteger 班结号
+     */
+    public void setBjid(Integer newBjid) {
+        this.bjid = newBjid;
+    }
+
+
+    /**
+     * 日结号的设定
+     *
+     * @param newInteger 日结号
+     */
+    public void setRjid(Integer newRjid) {
+        this.rjid = newRjid;
+    }
+
+
+    /**
+     * 网点的设定
+     *
+     * @param newInteger 网点
+     */
+    public void setStationno(Integer newStationno) {
+        this.stationno = newStationno;
+    }
+
+
+    /**
+     * 创建时间的设定
+     *
+     * @param newTimestamp 创建时间
+     */
+    public void setCreateDate(Timestamp newCreateDate) {
+        this.createDate = newCreateDate;
+    }
+
+
+    /**
+     * 操作员编号的设定
+     *
+     * @param newInteger 操作员编号
+     */
+    public void setUserid(Integer newUserid) {
+        this.userid = newUserid;
+    }
+}

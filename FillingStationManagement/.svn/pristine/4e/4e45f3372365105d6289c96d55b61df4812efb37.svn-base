@@ -1,0 +1,54 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.*"%>
+
+<%@include file="../../common/common.jsp" %>
+<script type="text/javascript" src="<%=basePath%>js/card/cardMaintain/changePass.js"></script>
+</head>
+<body>
+    <div id="enter_password" class="easyui-window" title="第一步：请持卡人输入原密码" data-options="modal:true,closed:false,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+    <tr>
+    	<p>原密码</p>
+    </tr>
+    <tr>
+    	<td height="3px" style="width:40px">密码:</td>
+		<td height="30px" style="width:30px"></td>
+		<input type="password"name="cardMaintainBean.password" style="width:140px" id="cardno1"></input>
+    </tr>
+    <tr><p>
+    	<td><input type='button' value='确&nbsp;定'text-align='right'id="cardMaintain_yes1"></td>
+    	<td><input type='button' value='取&nbsp;消'text-align='right'id="cardMaintain_no1"></td>
+    </tr>
+	</div>
+	<div id="enter_new_password" class="easyui-window" title="第二步：请持卡人输入新密码" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+    <tr>
+    	<p>新密码</p>
+    </tr>
+    <tr>
+    	<td height="3px" style="width:40px">密码:</td>
+		<td height="30px" style="width:30px"></td>
+		<input type="password"name="cardMaintainBean.password" style="width:140px" id="cardno2"></input>
+    </tr>
+    <tr><p>
+    	<td><input type='button' value='确&nbsp;定'text-align='right'id="cardMaintain_yes2"></td>
+    	<td><input type='button' value='取&nbsp;消'text-align='right'id="cardMaintain_no2"></td>
+    </tr>
+	</div>
+	<div id="confirm_password" class="easyui-window" title="第三步：请持卡人再次输入新密码" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+    <tr>
+    	<p>再次输入新密码</p>
+    </tr>
+    <tr>
+    	<td height="3px" style="width:40px">密码:</td>
+		<td height="30px" style="width:30px"></td>
+		<input type="password"name="cardMaintainBean.password" style="width:140px" id="cardno3"></input>
+    </tr>
+    <tr><p>
+    	<td><input type='button' value='确&nbsp;定'text-align='right'id="cardMaintain_yes3"></td>
+    	<td><input type='button' value='取&nbsp;消'text-align='right'id="cardMaintain_no3"></td>
+    </tr>
+	</div>
+</body>

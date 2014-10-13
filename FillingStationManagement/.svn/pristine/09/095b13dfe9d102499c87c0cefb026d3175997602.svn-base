@@ -1,0 +1,68 @@
+package com.fr.station.component.card.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CardDetailBean;
+import com.fr.station.common.entity.report.OilGunConsumeEntity;
+import com.fr.station.common.utility.CommonUtility;
+import com.fr.station.component.card.dao.CardDetailDAO;
+import com.fr.station.component.card.service.CardDetailService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * 该service用于查询卡片明细
+ * 
+ * @author yy
+ */
+@Service
+public class CardDetailServiceImpl extends AbstractBaseService<OilGunConsumeEntity> implements CardDetailService {
+
+	protected static Logger log = Logger.getLogger(CardDetailServiceImpl.class);
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+	private CardDetailDAO cardDetailsDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardDetailServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 通过条件查找并挂失卡片，，实现
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardDetailBean> getCardDetail(CardDetailBean cardDetailBean) throws Exception {
+		CommonUtility.countPaginationNumber(cardDetailBean);
+		if (cardDetailBean == null) {
+			return new ArrayList<CardDetailBean>();
+		}
+		List<CardDetailBean> cardDetailList = this.cardDetailsDaoImpl.getCardDetailInfo(cardDetailBean);
+		return cardDetailList;
+	}
+
+	@Override
+	@Autowired
+	public void setCardDetailDAO(CardDetailDAO reportCardDetailsDaoImpl) {
+		super.setBaseDao(reportCardDetailsDaoImpl);
+		this.cardDetailsDaoImpl = reportCardDetailsDaoImpl;
+	}
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+}

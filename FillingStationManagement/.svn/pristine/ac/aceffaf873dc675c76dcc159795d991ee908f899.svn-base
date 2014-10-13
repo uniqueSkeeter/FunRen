@@ -1,0 +1,162 @@
+package com.fr.station.component.customer.service.impl;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.RegisterCustomerBean;
+import com.fr.station.common.entity.card.FkTCardEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.component.customer.dao.RegisterCustomerDAO;
+import com.fr.station.component.customer.service.RegisterCustomerService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get registerCustomer records from DB
+ * 
+ * @author WR
+ */
+@Service
+public class RegisterCustomerServiceImpl extends AbstractBaseService<FkTCardEntity> implements RegisterCustomerService {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(RegisterCustomerServiceImpl.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private RegisterCustomerDAO registerCustomerDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public RegisterCustomerServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * inherited java doc.
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<RegisterCustomerBean> findRegisterCustomerRecordsByCriteria(RegisterCustomerBean registerCustomerBean) {
+		int pageNumber = registerCustomerBean.getPageNumber();
+		int pageSize = registerCustomerBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return registerCustomerDaoImpl.getRegisterCustomerRecordsByCriteria(registerCustomerBean, start, number);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addCardInfo(RegisterCustomerBean registerCustomerBean) {
+		log.info("Persist registerCustomerBean entity begain...");
+		FkTCardEntity fktCardEntity = convertDataToEntity(registerCustomerBean);
+		saveOrUpdate(fktCardEntity);
+		log.info("Succefully saved registerCustomerBean entity...");
+	}
+
+	@Autowired
+	public void setRegisterCustomerDAO(RegisterCustomerDAO registerCustomerDaoImpl) {
+		super.setBaseDao(registerCustomerDaoImpl);
+		this.registerCustomerDaoImpl = registerCustomerDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	private FkTCardEntity convertDataToEntity(RegisterCustomerBean registerCustomerBean) {
+
+		FkTCardEntity fktCardEntity = new FkTCardEntity();
+		if (registerCustomerBean.getId() != null) {
+			fktCardEntity.setId(registerCustomerBean.getId());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestName())) {
+			fktCardEntity.setGuestname(registerCustomerBean.getGuestName());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestNo())) {
+			fktCardEntity.setGuestno(registerCustomerBean.getGuestNo());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardNo())) {
+			fktCardEntity.setCardno(registerCustomerBean.getCardNo());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardStatus())) {
+			fktCardEntity.setCardstatus(registerCustomerBean.getCardStatus());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestType())) {
+			fktCardEntity.setGuesttype(registerCustomerBean.getGuestType());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestNum())) {
+			fktCardEntity.setGuestnum(registerCustomerBean.getGuestNum());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getGuestTel())) {
+			fktCardEntity.setGuesttel(registerCustomerBean.getGuestTel());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCreate_date())) {
+			fktCardEntity.setCreateDate(Timestamp.valueOf(registerCustomerBean.getCreate_date()));
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getStationNo())) {
+			fktCardEntity.setStationno(registerCustomerBean.getStationNo());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardExno())) {
+			fktCardEntity.setCardexno(registerCustomerBean.getCardExno());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardType())) {
+			fktCardEntity.setCardtype(registerCustomerBean.getCardType());
+		}
+		if (registerCustomerBean.getDeposit() != null) {
+			fktCardEntity.setDeposit(registerCustomerBean.getDeposit());
+		}
+		if (registerCustomerBean.getCardAmount() != null) {
+			fktCardEntity.setCardbal(registerCustomerBean.getCardAmount());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getCardPass())) {
+			fktCardEntity.setPassword(registerCustomerBean.getCardPass());
+		}
+		// 每次加油限量
+		if (StringUtils.isNotBlank(registerCustomerBean.getRefuelLimit())) {
+			fktCardEntity.setXvol(registerCustomerBean.getRefuelLimit());
+		}
+		// 每天加油次数
+		if (StringUtils.isNotBlank(registerCustomerBean.getRefuelTimes())) {
+			fktCardEntity.setXcount(registerCustomerBean.getRefuelTimes());
+		}
+		// 每天加油限额
+		if (StringUtils.isNotBlank(registerCustomerBean.getConsumeAmount())) {
+			fktCardEntity.setXamn(registerCustomerBean.getConsumeAmount());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getOilTypeLimit())) {
+			fktCardEntity.setXoil(registerCustomerBean.getOilTypeLimit());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getEffectiveDate())) {
+			fktCardEntity.setBegdate(DateUtil.formatStrTOStampBySmt(registerCustomerBean.getEffectiveDate(),
+					DateUtil.DATE_PATTERN_17));
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getDisEffectiveDate())) {
+			fktCardEntity.setEnddate(DateUtil.formatStrTOStampBySmt(registerCustomerBean.getDisEffectiveDate(),
+					DateUtil.DATE_PATTERN_17));
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getStationInfoLimit())) {
+			fktCardEntity.setXeare(registerCustomerBean.getStationInfoLimit());
+		}
+		if (StringUtils.isNotBlank(registerCustomerBean.getRemark())) {
+			fktCardEntity.setBz(registerCustomerBean.getRemark());
+		}
+		return fktCardEntity;
+	}
+
+}

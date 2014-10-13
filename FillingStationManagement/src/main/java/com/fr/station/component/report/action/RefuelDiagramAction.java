@@ -1,0 +1,143 @@
+package com.fr.station.component.report.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.jfree.chart.JFreeChart;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
+import com.fr.station.common.bean.report.ShiftChangeBean;
+import com.fr.station.common.bean.system.OperateLogBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.service.RefuelDiagramService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * The action for dataCenter operatelog display info.
+ * 
+ * 
+ * @author _wsq
+ */
+@Namespace("/refuelDiagram")
+@Scope("prototype")
+@ParentPackage("jfree")
+public class RefuelDiagramAction extends AbstractAction {
+	
+	// ------- Constants (static final) ----------------------------------------
+	private static final long serialVersionUID = 1L;
+	
+	private static Logger log = Logger.getLogger(RefuelDiagramAction.class);
+	
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private List<OperateLogBean> operateLogBeanList = new ArrayList<OperateLogBean>();
+	
+    @Autowired
+    protected RefuelDiagramService reportService;
+    
+	private ShiftChangeBean shiftChangeBean;
+	
+	private JFreeChart chart;
+    
+	// ------- Constructors ----------------------------------------------------
+    
+	public RefuelDiagramAction() {
+		super();
+	}
+    
+	// ------- Instance Methods (public) ---------------------------------------
+	
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 * @throws com.fr.station.card.ICCard.exception.ICCardException 
+	 */
+    @Action(value = "showRefuelLogChartInit",
+    		results = {@Result(name = "success", location = "/view/card/chart/displayRefuelChart.jsp"),
+            })
+        public String showRefuelLogChartInit() {
+        return SUCCESS;
+        }
+    
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 * @throws com.fr.station.card.ICCard.exception.ICCardException 
+	 */
+	@Action(value = "redirectRefuelLogChart",
+			results = {@Result(name = "success", location = "/view/card/chart/displayRefuelChart.jsp"),
+            })
+	public String redirectRefuelLogChart(){
+		shiftChangeBean.setDisplayFlag(true);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 
+	 * receive the request from http and handle the request to dispatch different ways based on the parameters
+	 * 
+	 * @param 
+	 * @return dashboard jsp
+	 * @throws com.fr.station.card.ICCard.exception.ICCardException 
+	 */
+	public String showRefuelLogChart() {
+		log.info("Starting to load oil log records infomation from DB");
+		boolean flag = false;
+		try {
+			chart = this.reportService.genChartRepForOilRecords(shiftChangeBean);
+			flag = true;
+		} catch (Exception e) {
+			log.info("Get oil log for report is occured error, more detail pelase refer the detail log\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		
+		if(flag){
+			log.info("Successfully load oil log records data from DB");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+	
+	public List<OperateLogBean> getOperateLogBeanList() {
+		return operateLogBeanList;
+	}
+
+	public void setOperateLogBeanList(List<OperateLogBean> operateLogBeanList) {
+		this.operateLogBeanList = operateLogBeanList;
+	}
+
+	public ShiftChangeBean getShiftChangeBean() {
+		return shiftChangeBean;
+	}
+
+	public void setShiftChangeBean(ShiftChangeBean shiftChangeBean) {
+		this.shiftChangeBean = shiftChangeBean;
+	}
+
+	public JFreeChart getChart() {
+		return chart;
+	}
+
+	public void setChart(JFreeChart chart) {
+		this.chart = chart;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+	
+}

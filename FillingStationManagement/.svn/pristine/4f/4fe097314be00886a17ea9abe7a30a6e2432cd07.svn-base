@@ -1,0 +1,63 @@
+package com.fr.station.component.system.action;
+
+
+import java.io.Serializable;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+
+/**
+ * The method is parent of dashboard. It handles common method for the dashboard
+ * action. Mainly responsible to handle user login
+ * @author henry
+ */
+public abstract class AbstractAction extends ActionSupport implements Serializable {
+
+    // ------- Constants (static final) ----------------------------------------
+
+    private static final long serialVersionUID = 1L;
+
+    // ------- Static Variables (static) ---------------------------------------
+
+    // ------- Instance Variables (private) ------------------------------------
+    
+    // ------- Instance Variables (protected) ------------------------------------
+    
+    protected int currfunc;
+    
+    protected int process;
+    
+    // ------- Constructors ----------------------------------------------------
+
+    public AbstractAction() {
+		super();
+	}
+
+    
+    // ------- Instance Methods (public) ---------------------------------------
+
+    // ------- Instance Methods (protected) ------------------------------------
+
+    public int getCurrfunc() {
+        return currfunc;
+    }
+
+	public void setCurrfunc(int currfunc) {
+        this.currfunc = currfunc;
+    }
+
+    public int getProcess() {
+        return process;
+    }
+
+    public void setProcess(int process) {
+        this.process = process;
+    }
+    
+    // ------- Instance Methods (public) ---------------------------------------
+
+    // ------- Instance Methods (protected) ------------------------------------
+
+    // ------- Instance Methods (private) --------------------------------------
+    
+}

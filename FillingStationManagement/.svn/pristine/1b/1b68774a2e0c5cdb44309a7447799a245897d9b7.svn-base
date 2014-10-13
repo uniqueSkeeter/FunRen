@@ -1,0 +1,191 @@
+package com.fr.station.component.card.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CardMaintainBean;
+import com.fr.station.common.entity.report.OperatelogEntity;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.dao.CardMaintainDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ * 
+ * @author _yy
+ */
+@Repository
+public class CardMaintainDaoImpl extends AbstractBaseDAO<OperatelogEntity> implements CardMaintainDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardMaintainDaoImpl.class);
+
+	// private static final String CARDNO = "cardNo";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String selectOperateLogViewSql = "SELECT fk_t.guestname,fk_t.guestno,fk_t.cardno,fk_t.guesttype,"
+			+ "fk_t.guestnum,fk_t.enddate,fk_t.cardtype,fk_t.cardstatus FROM FK_T_CARD fk_t WHERE ";
+
+	private final String selectAllCountOperateLogViewSql = "SELECT count(*) FROM FK_T_CARD fk_t WHERE ";
+
+	private final String changeCardLostSql = "UPDATE FK_T_CARD SET CARDSTATUS='2' WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardMaintainDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * inherited java doc.
+	 */
+	@Override
+	public List<CardMaintainBean> getAllCardMaintainRecords(CardMaintainBean operateLogBean) throws Exception {
+		return null;
+	}
+
+	/*
+	 * 
+	 * 
+	 * get data in cardMaintain
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardMaintainBean> getCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean, int startPage, int number) {
+		List<CardMaintainBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(selectOperateLogViewSql);
+		builderForTotalResult.append(selectAllCountOperateLogViewSql);
+		try {
+			StringBuilder builder = validateInputCriteria(cardMaintainBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	/*
+	 * 
+	 * 
+	 * change card status and insert record into blackcard
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardMaintainBean> changeCardLostByCriteria(CardMaintainBean cardMaintainBean, int startPage, int number) {
+		List<CardMaintainBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(changeCardLostSql);
+		builderForTotalResult.append(selectAllCountOperateLogViewSql);
+		try {
+			StringBuilder builder = cardLostCriteria(cardMaintainBean);
+			builderForPagination.append(builder);
+			Query query = getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			// List<Object[]> result = (List<Object[]>) this.findBySql(builder.toString());
+			List<Object[]> result = query.list();
+			resultList = convertDataToBean(result, totalSize);
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+	/*
+	 * continue to add sql (get cardMaintain record)
+	 */
+	private StringBuilder validateInputCriteria(CardMaintainBean cardMaintainBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(cardMaintainBean.getCardNo())) {
+			builder.append("cardno").append(" = '").append(cardMaintainBean.getCardNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestName())) {
+			builder.append(" AND ").append("guestName").append(" = '").append(cardMaintainBean.getGuestName()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestNo())) {
+			builder.append(" AND ").append("guestNo").append(" = '").append(cardMaintainBean.getGuestNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestType())) {
+			builder.append(" AND ").append("guestType").append(" = '").append(cardMaintainBean.getGuestType()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestNum())) {
+			builder.append(" AND ").append("guestNum").append(" = '").append(cardMaintainBean.getGuestNum()).append("'");
+		}
+		return builder;
+	}
+
+	/*
+	 * continue to add sql(change cardstatus when card lost)
+	 */
+	private StringBuilder cardLostCriteria(CardMaintainBean cardMaintainBean) {
+		StringBuilder builder = new StringBuilder();
+		if (StringUtils.isNotEmpty(cardMaintainBean.getCardNo())) {
+			builder.append("cardno").append(" = '").append(cardMaintainBean.getCardNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestNo())) {
+			builder.append(" AND ").append("guestNo").append(" = '").append(cardMaintainBean.getGuestNo()).append("'");
+		}
+		if (StringUtils.isNotEmpty(cardMaintainBean.getGuestType())) {
+			builder.append(" AND ").append("guestType").append(" = '").append(cardMaintainBean.getGuestType()).append("'");
+		}
+		return builder;
+	}
+
+	private List<CardMaintainBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardMaintainBean> cardMaintainBeanList = new ArrayList<CardMaintainBean>();
+		CardMaintainBean cardMaintainBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardMaintainBean = new CardMaintainBean();
+			cardMaintainBean.setGuestName(String.valueOf(dataRow[0]));
+			cardMaintainBean.setGuestNo(String.valueOf(dataRow[1]));
+			cardMaintainBean.setCardNo(String.valueOf(dataRow[2]));
+			cardMaintainBean.setGuestNum(String.valueOf(dataRow[4]));
+			cardMaintainBean.setEndDate(String.valueOf(dataRow[5]));
+			cardMaintainBean.setCardType(String.valueOf(dataRow[6]));
+			cardMaintainBean.setCardStatus(String.valueOf(dataRow[7]));
+			cardMaintainBean.setTotalData(totalAccount);
+
+			cardMaintainBeanList.add(cardMaintainBean);
+		}
+		return cardMaintainBeanList;
+	}
+}

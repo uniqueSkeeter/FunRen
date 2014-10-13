@@ -1,0 +1,138 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%@include file="../../common/common.jsp" %>
+<!-- css -->
+<!-- js -->
+<script type="text/javascript" src="<%=basePath%>js/card/cardCharge/customerDepositCharge.js"></script>
+<html>
+<head>
+<title>备用金充值</title>
+</head>
+<body>
+	<hr>
+	<TABLE style="width:100%;">
+	<TR>
+	<TD>
+		<s:form id="customAccount_form" method="post" action="showCustomAccountInfo">
+		<table style="font-size: 12px; width: 90%; height: 40px;">
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center;">卡号</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.cardNo" id="cardNo" value="${customerChargeBean.cardNo}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">客户编号</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.guestNo" id="guestNo" value="${customerChargeBean.guestNo}">
+				</td>
+				<td style="height: 30px; width: 80px">
+					<input type="button" id="readCard" value="读卡" style="width:60%;">
+				</td>
+				<td style="height: 30px; width: 80px">
+					<input type="button" id="search" value="查询" style="width:60%;">
+				</td>
+			</tr>
+		</table>
+		<hr >
+		<p>备付账户信息</p>
+		<hr>
+		<table style="font-size: 12px; width: 100%; height: 40px;">
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center;">卡片类型</td>
+				<td style="height: 30px; width: 80px">
+				<input name="customerChargeBean.cardType" id="cardType" value="${cardType[customerChargeBean.cardType]}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">卡状态</td>
+				<td style="height: 30px; width: 80px">
+				<input name="customerChargeBean.cardStatus" id="cardStatus" value="${cardStatus[customerChargeBean.cardStatus]}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">客户状态</td>
+				<td style="height: 30px; width: 80px">
+				<input name="customerChargeBean.guestStatus" id="guestStatus" value="${guestStatus[customerChargeBean.guestStatus]}">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center;">客户姓名</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.guestName" id="guestName" value="${customerChargeBean.guestName}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">证件类型</td>
+				<td style="height: 30px; width: 80px">
+				<input name="customerChargeBean.guestType" id="guestType" value="${guestType[customerChargeBean.guestType]}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">证件号</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.guestNum" id="guestNum" value="${customerChargeBean.guestNum}">
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center;">卡内余额</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.cardAccount" id="cardAccount" value="${customerChargeBean.cardAccount}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">备用金余额</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.spareAccount" id="spareAccount" value="${customerChargeBean.spareAccount}">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">卡账户余额</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.cardAccountLeft" id="cardAccountLeft" value="${customerChargeBean.cardAccountLeft}">
+				</td>
+				<td style="height: 30px; width: 80px; ">
+					<input name="customerChargeBean.id" id="guestAccId" value="${customerChargeBean.id}">
+				</td>
+				<td style="height: 30px; width: 80px; ">
+					<input name="customerChargeBean.rechargeAmount" id="rechargeAmount" value="${customerChargeBean.rechargeAmount}">
+				</td>
+			</tr>
+		</table>
+		<hr>
+		<p>充值信息</p>
+		<hr>
+		<table style="font-size: 12px; width: 100%; height: 40px;">
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center;">充值额</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.chargeAmount" id="chargeAmount">
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">支付方式</td>
+				<td style="height: 30px; width: 80px">
+					<select name="customerChargeBean.payType" id="payType" style="width:135px;">
+						<c:forEach var="payType" items="${payType}">
+							<option value="${payType.key}">${payType.value}</option>
+						</c:forEach>
+					</select>
+				</td>
+				<td style="height: 30px; width: 80px; text-align: center;">交易类型</td>
+				<td style="height: 30px; width: 80px">
+					<select name="customerChargeBean.tradeType" id="tradeType" style="width:135px;">
+						<c:forEach var="chargeTradeType" items="${chargeTradeType}">
+							<option value="${chargeTradeType.key}">${chargeTradeType.value}</option>
+						</c:forEach>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td style="height: 30px; width: 80px; text-align: center; display:none;" id="serialNumLabel">交易流水号</td>
+				<td style="height: 30px; width: 80px">
+					<input name="customerChargeBean.bankSerialNum" id="bankSerialNum" style="display:none;">
+				</td>
+			</tr>
+		</table>
+		</s:form>
+		<div style="width: 100%; height: 40px; text-align:center;">
+			<input type="button" id="depositCharge" value="备用金充值">
+			<input type="button" id="reset" value="重置">
+		</div>
+	</TD>
+	</TR>
+	</TABLE>
+	<div id="printCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 850px; height: 450px;">
+		<iframe scrolling="auto" id='printCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	</div>
+	<hr>
+</body>
+</html>

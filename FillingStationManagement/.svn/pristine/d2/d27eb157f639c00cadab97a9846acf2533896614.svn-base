@@ -1,0 +1,28 @@
+package com.fr.station.component.card.dao;
+
+import java.util.List;
+
+import com.fr.station.common.bean.CardInfoBean;
+
+/**
+ * 卡片明细DAO
+ *
+ * @author _yy
+ */
+public interface CardInfoDAO {
+
+	/**
+	 * 传递carddetail数据
+	 */
+	public CardInfoBean getCardInfo(CardInfoBean cardInfoBean) throws Exception;
+
+	/**
+	 * 传递carddetail数据
+	 */
+	// public List<CardInfoBean> getDriverCardInfo(CardInfoBean cardInfoBean) throws Exception;
+
+	/**
+	 * get each vice card records in order to display in the jsp page.
+	 */
+	public List<CardInfoBean> getViceCardsRecordsByCriteria(CardInfoBean cardInfoBean);
+}

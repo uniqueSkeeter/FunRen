@@ -1,0 +1,34 @@
+
+$(document).ready(function(){
+	$("#saveCurrentShift").click(function(){
+		saveCurrentShiftConfirm();
+	});
+	
+});
+
+function saveCurrentShiftConfirm(){
+	$.messager.confirm('提示', '您确认进行班结?提交后将不可更改', function(correct){
+		if (correct){
+			saveCurrentShiftAction();
+		}else{
+			return correct;
+		}
+	});
+	
+}
+
+function saveCurrentShiftAction(){
+	$.ajax({
+		data : {
+			"classChangeBean.classNo" : $("#classNo").text(),
+			"classChangeBean.id" : $("#shiftId").text()
+			},
+		url:encodeURI(server_context+"/shiftChangeManage/shiftChangeManage"),type:'POST',timeout:5000,dataType:'html',
+		success:function(data){
+			$.messager.alert("成功","保存信息成功");
+		},
+		error:function(){
+			$.messager.alert("失败","保存信息失败");
+		}
+	});
+}

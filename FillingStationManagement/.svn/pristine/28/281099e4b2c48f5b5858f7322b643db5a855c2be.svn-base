@@ -1,0 +1,57 @@
+/**
+ * 
+ */
+$(function(){
+	$(function(){
+		var lastIndex;
+		$('#tt').datagrid({
+			toolbar:[{
+				text:'添加一行',
+				iconCls:'icon-add',
+				handler:function(){
+					if($('#receiptStatus').val()=='2'){
+						$.messager.alert('错误','单据状态为已入库，无法编辑！');
+						return false;
+					}
+					else if($('#receiptStatus').val()=='3' && $('#receiver').val() == $('#stationNum').val()){
+						$.messager.alert('错误','单据状态为已出库，您作为领取方无法编辑！');
+						return false;
+					}
+					else{
+						$('#tt').datagrid('endEdit', lastIndex);
+						$('#tt').datagrid('appendRow',{
+							startNo:'',
+							endNo:'',
+							cardSum:'',
+							note:''
+						});
+						lastIndex = $('#tt').datagrid('getRows').length-1;
+						$('#tt').datagrid('selectRow', lastIndex);
+						$('#tt').datagrid('beginEdit', lastIndex);
+					}
+					
+				}
+			},'-',{
+				text:'删除一行',
+				iconCls:'icon-remove',
+				handler:function(){
+					var row = $('#tt').datagrid('getSelected');
+					if (row){
+						var index = $('#tt').datagrid('getRowIndex', row);
+						$('#tt').datagrid('deleteRow', index);
+					}
+				}
+			}],
+			onBeforeLoad:function(){
+				$(this).datagrid('rejectChanges');
+			},
+			onClickRow:function(rowIndex){
+				if (lastIndex != rowIndex){
+					$('#tt').datagrid('endEdit', lastIndex);
+					$('#tt').datagrid('beginEdit', rowIndex);
+				}
+				lastIndex = rowIndex;
+			}
+		});
+	});
+});

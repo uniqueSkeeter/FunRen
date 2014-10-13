@@ -1,0 +1,147 @@
+package com.fr.station.component.report.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.DayExchangeBean;
+import com.fr.station.common.consts.SqlConsts;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCardInOutEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.report.dao.DayExchangeDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+@Repository
+public class DayExchangeDaoImpl extends AbstractBaseDAO<FkTCardInOutEntity> implements DayExchangeDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(DayExchangeDaoImpl.class);
+
+	private static final String RJ_DATE = "RJRQ";
+
+	private static final String STATION_NO = "stationno";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private final String selectDayExchangeListSql = "select CONVERT(varchar(19), workdate, 21) workdate,cardinc,carddec,cardbal,cardbal2,cardbal1,sendcount,badcount,cardcount,userid from FK_TT_CARDRJBB WHERE ";
+
+	private final String selectAllCountDayExchangeListSql = "select count(*) from FK_TT_CARDRJBB WHERE ";
+
+	// ------- Constructors ----------------------------------------------------
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DayExchangeBean> getDayExchangeRecordsByCriteria(DayExchangeBean dayExchangeBean) {
+		List<DayExchangeBean> resultList = null;
+		try {
+			// retrieve search value from client request.
+			StringBuilder builder = this.validateInputCriteria(dayExchangeBean);
+
+			// retrieve current query by input sql.
+			Query query = this.createSpecifiedQuery(builder, this.selectDayExchangeListSql);
+
+			// get total records by specified sql.
+			int totalSize = this.getTotalCount(builder, this.selectAllCountDayExchangeListSql);
+
+			// this is for pagination.
+			this.setPaginationNumber(dayExchangeBean, query);
+
+			// get result list.
+			List<Object[]> result = query.list();
+
+			resultList = this.convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+
+	}
+
+	private List<DayExchangeBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		// TODO Auto-generated method stub
+		List<DayExchangeBean> dayExchangeBeanList = new ArrayList<DayExchangeBean>();
+		DayExchangeBean dayExchangeBean = null;
+		for (Object[] dataRow : dataResult) {
+			dayExchangeBean = new DayExchangeBean();
+			dayExchangeBean.setWorkDate(DateUtil.formatDateYYYY_MM_DD((String) (dataRow[0])));
+			dayExchangeBean.setChargeAmount((BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[1])))));
+			dayExchangeBean.setReturnAmount((BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[2])))));
+			dayExchangeBean.setHandInAmount((BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[3])))));
+			dayExchangeBean.setReturnForegiftAmount((BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[4])))));
+			dayExchangeBean.setReceiveForegiftAmount((BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[5])))));
+			dayExchangeBean.setSendCardQuantity(Integer.valueOf(String.valueOf(dataRow[6])));
+			dayExchangeBean.setRecoverCardQuantity(Integer.valueOf(String.valueOf(dataRow[7])));
+			dayExchangeBean.setCardStorageQuantity(Integer.valueOf(String.valueOf(dataRow[8])));
+			dayExchangeBean.setUserId(Integer.valueOf(String.valueOf(dataRow[9])));
+			dayExchangeBean.setTotalData(totalAccount);
+			dayExchangeBeanList.add(dayExchangeBean);
+		}
+		return dayExchangeBeanList;
+
+	}
+
+	private StringBuilder validateInputCriteria(DayExchangeBean dayExchangeBean) {
+		// TODO Auto-generated method stub
+		StringBuilder builder = new StringBuilder();
+		builder.append(STATION_NO).append(SqlConsts.EQUAL)
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		if (dayExchangeBean.getStartDate() != null && dayExchangeBean.getEndDate() != null) {
+			String startDate = DateUtil.formatDate(dayExchangeBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+			String endDate = DateUtil.formatDate(dayExchangeBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+			builder.append(SqlConsts.ADD).append(RJ_DATE).append(SqlConsts.BETWEEN).append(SqlConsts.SINGLE_QUOTES)
+					.append(startDate).append(SqlConsts.SINGLE_QUOTES).append(SqlConsts.ADD).append(SqlConsts.SINGLE_QUOTES)
+					.append(endDate).append(SqlConsts.SINGLE_QUOTES);
+		} else if (dayExchangeBean.getStartDate() != null && dayExchangeBean.getEndDate() == null) {
+			String startDate = DateUtil.formatDate(dayExchangeBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+			builder.append(SqlConsts.ADD).append(RJ_DATE).append(SqlConsts.GT).append(SqlConsts.SINGLE_QUOTES)
+					.append(startDate).append(SqlConsts.SINGLE_QUOTES);
+		} else if (dayExchangeBean.getStartDate() == null && dayExchangeBean.getEndDate() != null) {
+			String endDate = DateUtil.formatDate(dayExchangeBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+			builder.append(SqlConsts.ADD).append(RJ_DATE).append(SqlConsts.LT).append(SqlConsts.SINGLE_QUOTES).append(endDate)
+					.append(SqlConsts.SINGLE_QUOTES);
+		}
+		return builder;
+	}
+
+	private void setPaginationNumber(DayExchangeBean dayExchangeBean, Query query) {
+		query.setFirstResult(dayExchangeBean.getStartNumber());
+		query.setMaxResults(dayExchangeBean.getTotalNumber());
+	}
+
+	private int getTotalCount(StringBuilder builder, String sql) throws Exception {
+		List<?> dataResultList = this.findBySql(new StringBuilder().append(sql).append(builder).toString());
+		if (dataResultList.size() > 0) {
+			return (int) dataResultList.toArray()[0];
+		}
+		return 0;
+	}
+
+	private Query createSpecifiedQuery(StringBuilder builder, String sql) throws Exception {
+		return this.getQueryByCriteria(new StringBuilder().append(sql).append(builder).toString());
+	}
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

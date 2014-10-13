@@ -1,0 +1,7 @@
+	$(function(){
+		$('#w').window({
+			modal:true,
+			closed:true
+		});
+	   });
+

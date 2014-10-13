@@ -1,0 +1,42 @@
+//此JS用于个人卡维护的查询，保存并写卡操作
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol + "//" + localObj.host + "/" + contextPath;
+var server_context = basePath;
+$(document).ready(function(){
+	$("#cardMaintain_searchfor").click(function(){
+		 var cardno=document.getElementById("cardNo").value;
+		 if(cardno==''){
+			 $.messager.alert("错误","请读卡!");
+			return false;
+		 }
+		 document.myForm.reset();
+		 $("#cardNo").val(cardno);
+		 document.myForm.submit();
+	});
+	
+	$("#cardMaintain_clear").click(function(){
+		document.myForm.reset();
+	});
+	
+	$("#cardMaintain_saveCardInfo").click(function(){
+    	var flag = validateAnonyFieldValue();
+    	alert($(myForm).serialize());
+    	if(flag){
+    		$.ajax({
+    			data:$(myForm).serialize(),
+    			url:encodeURI(server_context+"/updateCardInfo/saveCardInfo"),type:'POST',timeout:3000,dataType:'html',
+    			success:function(data){
+    				$.messager.alert("成功","保存信息成功");
+    			},
+    			error:function(){
+    				$.messager.alert("失败","保存信息失败");
+    			}
+    		});
+    	}
+	});
+});
+
+function validateAnonyFieldValue(){
+	return true;
+}

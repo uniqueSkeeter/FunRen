@@ -1,0 +1,235 @@
+/**
+ * this js works for gatherAccounts.jsp
+ */
+var localObj = window.location;
+var contextPath = localObj.pathname.split("/")[1];
+var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+var server_context=basePath;
+
+$(document).ready(function(){
+	$("#account_gather").click(function() {
+		$('#gatherAccountDialog').form('clear');
+	  var transferAccountsBean = $('#viceCardTable').datagrid('getSelected');
+	  if (!transferAccountsBean){
+		  $.messager.alert('错误','请选择记录!');
+	  }else{
+		  if(transferAccountsBean.viceCardStatus!='1'){
+			  $.messager.alert('错误','当前副卡状态非正常，不能进行圈存圈提，请重新选择!');
+			  return false;
+		  }
+			$('#gatherAccountIFrame')[0].src= server_context + '/transferAccounts/showAccountsInfoForGather?transferAccountsBean.mainCardNo='+transferAccountsBean.mainCardNo+'&'+'transferAccountsBean.viceCardNo='+transferAccountsBean.viceCardNo;
+	        	$('#gatherAccountDialog').dialog({
+	        		closed : false,
+	                title : '圈存圈提',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '保存',
+	                    iconCls : 'icon-save',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	saveInformation();	                    	
+	                    }
+	                }, {
+	                    text : '取消',
+	                    id : 'cBtn',
+	                    handler : function() {
+	                        $('#gatherAccountDialog').dialog('close');
+	                    }
+	                } ]
+	        });
+	  }
+  });
+});		
+	function validateValues(rDocument){
+		var gatherAmount = rDocument.getElementById('gatherAmount');
+		var tradeType = rDocument.getElementById('tradeType');
+		if(ck(gatherAmount)){
+			$.messager.alert('错误',"汇总金额不能为空！");
+			return false;
+		}
+		if(ck(tradeType)){
+			$.messager.alert('错误',"交易方式不能为空");
+			return false;
+		}
+		if(ck(tradeType)==false && tradeType.value!='4' && tradeType.value!='5'){
+			$.messager.alert('错误',"交易方式只能为圈存或圈提");
+			return false;
+		}
+		if(tradeType.value=='4'){
+			alert(gatherAmount.value);
+			alert(rDocument.getElementById('viceCardBalance').value);
+			if(gatherAmount.value > rDocument.getElementById('viceCardBalance').value){
+				alert("here");
+			}
+			if(ck(gatherAmount)==false && gatherAmount.value > rDocument.getElementById('viceCardProvisionAccount').value){
+				$.messager.alert('错误',"卡内余额不足，无法进行圈存，请重新输入");
+				return false;
+			}
+		}
+		if(tradeType.value=='5'){
+			if(ck(gatherAmount)==false && gatherAmount.value > rDocument.getElementById('viceCardProvisionAccount').value){
+				$.messager.alert('错误',"备付账户余额不足，无法进行圈提，请重新输入");
+				return false;
+			}
+		}
+		return true;
+	}
+	// 表单验证
+	var ck = function (input) {
+	    if (input.value == '') {
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	    };
+	};
+
+function saveInformation(){
+	var rDocument = document.getElementById("gatherAccountIFrame").contentWindow.document;
+	var flag = validateValues(rDocument);
+	var addEmplform = rDocument.getElementsByTagName('form');
+	if(flag){
+		
+		alert("---"+$(addEmplform).serialize());
+		if(rDocument.getElementById('tradeType').value=='5'){
+			alert("5");
+			if(rDocument.getElementById('viceCardStatus').value!='1' ){
+				$.messager.alert('错误','卡片处于非正常状态，无法进行圈存!');
+				$('#gatherAccountDialog').dialog('close');
+			}
+			else{
+				var yz = $.ajax({
+					type : 'post',
+					url : server_context+'/transferAccounts/saveGatherRecords',
+					data:$(addEmplform).serialize(),
+					cache : false,
+					dataType : 'json',
+					success : function(loaddata) {
+						$.messager.alert('成功','保存圈提信息成功!');
+						var mainProvisionAccount = parseFloat(rDocument.getElementById("mainCardProvisionAccount").value)+parseFloat(rDocument.getElementById("gatherAmount").value);
+						var viceProvisionAccount = document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardProvisionAccount").val()-document.getElementById("gatherAccountIFrame").contentWindow.window.$("#gatherAmount").val();
+						$('#printIFrame')[0].src= server_context + '/view/card/customer/printGatherAccounts.jsp?guestNo='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#guestNo").val()+'&mainCardGuestName='+
+						encodeURI(encodeURI(document.getElementById("gatherAccountIFrame").contentWindow.window.$("#mainCardGuestName").val()))+'&gatherAmount='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#gatherAmount").val()+'&mainCardProvisionAccount='+
+						mainProvisionAccount+'&viceCardNo='+document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardNo").val()+'&viceCardProvisionAccount='+
+						viceProvisionAccount+'&tradeType='+document.getElementById("gatherAccountIFrame").contentWindow.window.$("#tradeType").val();
+						$('#printDialog').dialog({
+							 closed : false,
+				                title : '加油卡汇总打印',
+				                shadow : true,
+				                modal : true,
+				                collapsible : true,
+				                buttons : [{
+				                	text : '返回',
+				                    id : 'returnBtn',
+				                    handler:function(){
+				                    	updateTable();
+				                    	$("#printDialog").dialog("close");
+				                    }
+				                }],
+				                onBeforeClose:function(){
+				                	updateTable();
+				                }
+						});
+						$('#gatherAccountDialog').dialog('close');
+					},
+					error : function() {
+						$.messager.alert('错误','保存失败，请重试!');
+					}
+				});
+			}
+		}
+		if(rDocument.getElementById('tradeType').value=='4'){
+			if(rDocument.getElementById('viceCardStatus').value!='1' ){
+					$.messager.alert('错误','卡片处于非正常状态，无法进行圈存!');
+					$('#gatherAccountDialog').dialog('close');
+			}
+			else{
+				var gz = $.ajax({
+					type : 'post',
+					url : server_context+'/transferAccounts/saveCreditForLoadRecords',
+					data:$(addEmplform).serialize(),
+					cache : false,
+					dataType : 'json',
+					success : function(loaddata) {
+						$.messager.alert('成功','保存圈存信息成功!');
+						var moneyInCard = parseFloat(rDocument.getElementById("viceCardBalance").value)+parseFloat(rDocument.getElementById("gatherAmount").value);
+						var moneyInAccount = document.getElementById("gatherAmountIFrame").contentWindow.window.$("#viceCardProvisionAccount").val()-document.getElementById("gatherAccountIFrame").contentWindow.window.$("#gatherAmount").val();
+						$('#printIFrame')[0].src= server_context + '/view/card/customer/printCreditForLoadRecords.jsp?guestNo='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#guestNo").val()+'&viceCardGuestName='+
+						encodeURI(encodeURI(document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardGuestName").val()))+'&gatherAmount='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#gatherAmount").val()+'&viceCardProvisionAccount='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardProvisionAccount").val()+'&viceCardNo='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardNo").val()+'&viceCardBalance='+
+						document.getElementById("gatherAccountIFrame").contentWindow.window.$("#viceCardBalance").val()+'&moneyInCard='+moneyInCard+'&moneyInAccount='+moneyInAccount;
+						$('#printDialog').dialog({
+							 closed : false,
+				                title : '加油卡汇总打印',
+				                shadow : true,
+				                modal : true,
+				                collapsible : true,
+				                buttons : [{
+				                	text : '返回',
+				                    id : 'returnBtn',
+				                    handler:function(){
+				                    	updateTable();
+				                    	$("#printDialog").dialog("close");
+				                    }
+				                }],
+				                onBeforeClose:function(){
+				                	updateTable();
+				                }
+						});
+						$('#gatherAccountDialog').dialog('close');
+					},
+					error : function() {
+						$.messager.alert('错误','保存失败，请重试!');
+					}
+				});
+			}
+		}
+		/*$.ajax({
+			data:$(addEmplform).serialize(),
+			url:encodeURI(server_context+"/cardStorage/saveCardOrder"),type:'POST',timeout:3000,dataType:'html',
+			success:function(data){
+				
+			},
+			error:function(){
+				$.messager.alert('错误','请重试!');
+			}
+		});*/
+		
+		
+	}
+};
+function updateTable(){
+	alert("update");
+	alert($("#mainCardNo").val());
+	var pageSize=$('#viceCardTable').datagrid('getPager').data("pagination").options.pageSize;
+	var pageNumber=$('#viceCardTable').datagrid('getPager').data("pagination").options.pageNumber;
+	var yz = $.ajax({
+		type : 'post',
+		url : server_context+'/transferAccounts/showViceCardsRecords',
+		data : {
+			"transferAccountsBean.mainCardNo" : $("#mainCardNo").val(),
+			"transferAccountsBean.guestNo" : $("#guestNo").val(),
+			"transferAccountsBean.pageNumber" : pageNumber,
+			"transferAccountsBean.pageSize" : pageSize
+			},
+		cache : false,
+		dataType : 'json',
+		success : function(loaddata) {
+			gridData = loaddata.jsonData;
+			if(gridData == null){
+				$('#viceCardTable').datagrid('loadData',{total:0,rows:[]});
+			}
+			var data = $.parseJSON(gridData);    
+			$('#viceCardTable').datagrid('loadData', data);
+		},
+		error : function() {
+		}
+	});
+}

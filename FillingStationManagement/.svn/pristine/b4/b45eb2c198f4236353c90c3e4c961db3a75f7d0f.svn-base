@@ -1,0 +1,87 @@
+package com.fr.station.component.card.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fr.station.common.bean.CardMaintainBean;
+import com.fr.station.common.entity.report.OilGunConsumeEntity;
+import com.fr.station.component.card.dao.CardMaintainDAO;
+import com.fr.station.component.card.service.CardMaintainService;
+import com.fr.station.component.system.service.impl.AbstractBaseService;
+
+/**
+ * The service is mainly to used get station trade logs for each car. Mainly responsible to handle different scenario
+ * search
+ * 
+ * @author yy
+ */
+@Service
+public class CardMaintainServiceImpl extends AbstractBaseService<OilGunConsumeEntity> implements CardMaintainService {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	private CardMaintainDAO reportRecordsDaoImpl;
+
+	// ------- Constructors ----------------------------------------------------
+
+	public CardMaintainServiceImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	/**
+	 * 通过条件查找卡片维护界面的数据，，实现
+	 * 
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<CardMaintainBean> findCardMaintainRecordsByCriteria(CardMaintainBean cardMaintainBean) {
+		int pageNumber = cardMaintainBean.getPageNumber();
+		int pageSize = cardMaintainBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return reportRecordsDaoImpl.getCardMaintainRecordsByCriteria(cardMaintainBean, start, number);
+	}
+
+	/**
+	 * 通过条件查找并挂失卡片，，实现
+	 * 
+	 */
+	@Override
+	public List<CardMaintainBean> cardLostByCriteria(CardMaintainBean cardMaintainBean) {
+		// TODO Auto-generated method stub
+		int pageNumber = cardMaintainBean.getPageNumber();
+		int pageSize = cardMaintainBean.getPageSize();
+		// 当前页
+		int intPage = pageNumber == 0 ? 1 : pageNumber;
+		// 每页显示条数
+		int number = pageSize == 0 ? 20 : pageSize;
+		// 每页的开始记录 第一页为1 第二页为number +1
+		int start = (intPage - 1) * number;
+		return reportRecordsDaoImpl.changeCardLostByCriteria(cardMaintainBean, start, number);
+	}
+
+	@Override
+	@Autowired
+	public void setCardMaintainDAO(CardMaintainDAO reportRecordsDaoImpl) {
+		super.setBaseDao(reportRecordsDaoImpl);
+		this.reportRecordsDaoImpl = reportRecordsDaoImpl;
+	}
+
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+}

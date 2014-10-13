@@ -1,0 +1,49 @@
+.pageFontStyle {
+	border-left: #7BAED5 solid 0px;
+	padding: 2px;
+	font-family: georgia, serif;
+	font-size: 15px;
+	font-weight: bold;
+	color: #0000FF
+}
+
+.pageFontSubStyle {
+	border-left: #7BAED5 solid 0px;
+	padding: 2px;
+	font-family: georgia, serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #808080;
+}
+
+.lineColor {
+	color: #6a6aff;
+	width: 100%;
+	margin: 1px 1px 2px;
+}
+
+.lineColorAboveTable {
+	color: #6a6aff;
+	width: 100%;
+	margin: 1px 1px 6px 1px;
+}
+
+.subLineColor {
+	color: #ff8000;
+	width: 95%;
+}
+
+.halfLineColor {
+	color: #ff8000;
+	width: 80%;
+	margin-left: 5px;
+}
+
+.tableButton{
+	font-family: georgia, serif;
+	margin: -13px 0;
+}
+
+.tableContent{
+	margin: -10px 1px 3px 1px;
+}

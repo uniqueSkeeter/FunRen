@@ -1,0 +1,119 @@
+/**
+ * this js works for returnCardStorage.jsp
+ */
+
+	var localObj = window.location;
+	var contextPath = localObj.pathname.split("/")[1];
+	var basePath = localObj.protocol+"//"+localObj.host+"/"+contextPath;
+	var server_context=basePath;
+	
+	$(document).ready(function(){
+		$("#card_return").click(function(){
+			$('#applyCardIFrame')[0].src= server_context + '/view/card/card/returnCardStorage.jsp';
+			$('#applyCardDialog').form('clear');
+			 $('#applyCardDialog').dialog({
+				 	closed : false,
+	                title : '申请退卡',
+	                shadow : true,
+	                modal : true,
+	                collapsible : true,
+	                buttons : [{
+	                	text : '保存',
+	                    iconCls : 'icon-save',
+	                    id : 'sBtn',
+	                    handler:function() {
+	                    	$('#confirmApplyCardDialog').window('open');
+                    		$('#confirmApply').click(function(){
+                    			saveReturnCardInfo();
+                    			/*$.ajax({
+	                    			data:$(applyCardListform).serialize(),
+	                    			url:encodeURI(server_context + "/cardStorage/saveCardOrder"),type:'POST',timeout:3000,dataType:'html',
+		                			success:function(data){
+		                				//updateTable();
+		                				$('#confirmApplyCardDialog').window('close');
+		    	        				$("#applyCardDialog").dialog("close");
+		    	        				$.messager.alert('成功','恭喜你保存成功!');
+		    	        			},
+		    	        			error:function(){
+		    	        				$('#confirmApplyCardDialog').window('close');
+		    	        				$.messager.alert('错误','保存失败，请重试!');
+		    	        			}
+    	                		});*/
+                    		});
+                    		$('#cancelApply').click(function(){
+                    			$('#confirmApplyCardDialog').window('close');
+                    			return;
+                    		});
+	                    	
+	                    }
+	                }, {
+	                    text : '取消',
+	                    id : 'cBtn',
+	                    handler : function() {
+	                        $('#applyCardDialog').dialog("close");
+	                    }
+	                }]
+				 
+			 });
+		});
+	});
+	function validateReturnCardValue(rDocument){
+		
+		alert("here");
+		var cardSum = rDocument.getElementById('cardAcount');
+		
+		var receiver = rDocument.getElementById('receiver');
+		
+		var applyDate = document.getElementById("applyCardIFrame").contentWindow.window.$("#datepicker3").datebox('getValue');
+		
+		if(applyDate == ''){
+			$.messager.alert('错误',"申请日期不能为空！");
+			return false;
+		}
+		if(ck(cardSum)){
+			alert("数量不能为空！");
+			return false;
+		}
+		if(ck(receiver)){
+			alert("领取方不能为空！");
+			return false;
+		}
+		alert("true");
+		return true;
+	}
+	// 表单验证
+	var ck = function (input) {
+	    if (input.value == '') {
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	    };
+	};
+	
+	function saveReturnCardInfo(){
+		var rDocument = document.getElementById("applyCardIFrame").contentWindow.document;
+		var flag = validateReturnCardValue(rDocument);
+		var addEmplform = rDocument.getElementsByTagName('form');
+		if(flag){
+			$.ajax({
+				data:$(addEmplform).serialize(),
+				url:encodeURI(server_context+"/cardStorage/saveCardOrder"),type:'POST',timeout:3000,dataType:'html',
+				success:function(data){
+					$.messager.alert('成功','恭喜您成功保存退库申请单!');
+					//updateTable();
+					$('#confirmApplyCardDialog').window('close');
+					 $('#applyCardDialog').dialog("close");
+				},
+				error:function(){
+					$.messager.alert('错误','请重试!');
+					$('#confirmApplyCardDialog').window('close');
+				}
+			});
+			
+			
+		}
+	};
+
+	
+	

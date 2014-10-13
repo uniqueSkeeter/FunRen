@@ -1,0 +1,107 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.*"%>
+<%@include file="../../common/common.jsp" %>
+<html>
+<head>
+<!-- css -->
+<!-- js -->
+<script type="text/javascript" src="<%=basePath%>js/card/customer/displayRegisterCustomer.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/card/customer/saleAnonymousCard.js"></script>
+<script type="text/javascript"	src="<%=basePath%>js/card/customer/salePersonalCard.js"></script>  
+<title>开户售卡</title>
+</head>
+<body>
+	<TABLE style="font-size: 9px; font-family: Arial; table-layout: fixed; width: 100%; height: 64%">
+		<TR>
+			<TD width="86%" valign="top" style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<span class="pageFontStyle">卡片销售</span>
+				<hr class="lineColor">
+				<table style="font-size: 12px; width: 100%; height: 50px; font-weight: bold;">
+					<tr>
+						<td style="height:30px;width:60px">卡号</td>
+						<td style="height:30px;width:100px">
+							<input name="registerCustomerBean.cardNo" style="width: 150px"  id="cardNo" onkeyup="value=value.replace(/[^\d]/g,'')" maxlength="20">
+						</td>
+						<td style="height:30px;width:60px">姓名</td>
+						<td style="height:30px;width:100px">
+							<input name="registerCustomerBean.guestName"  style="width: 140px" id="guestName" maxlength="10">
+						</td>
+						<td style="height:30px;width:60px">印刷号</td>
+						<td style="height:30px;width:50px">
+							<input name="registerCustomerBean.cardExno" onkeyup="value=value.replace(/[^\d]/g,'')" style="width: 140px" id="cardExno" maxlength="8">
+						</td>
+					</tr>
+					<tr>
+						<td style="height:30px;width:60px">卡片类型</td>
+						<td style="height:30px;width:100px">
+							<select name="registerCustomerBean.cardType" id="cardType" style="width:150px;">
+								<option></option>
+								<c:forEach var="cardType" items="${cardType}">
+									<option value="${cardType.key}">${cardType.value}</option>
+								</c:forEach>
+							</select>
+						</td>
+						<td style="height:30px;width:60px">证件类型</td>
+						<td style="height:30px;width:100px">
+							<select name="registerCustomerBean.guestType" id="guestType" style="width:140px;">
+								<option></option>
+								<c:forEach var="guestType" items="${guestType}">
+									<option value="${guestType.key}">${guestType.value}</option>
+								</c:forEach>
+							</select>
+						</td>
+						<td style="height:30px;width:60px">证件号码</td>
+						<td style="height:30px;width:50px">
+							<input name="registerCustomerBean.guestNum" style="width: 140px" id="guestNum" onkeyup="value=value.replace(/[^\d]/g,'')" maxlength="18">
+							
+						</td>
+						<td style="height:25px; width:100px;">
+							<input type="button" id="search_button" value="查询" style="height:25px; width:50px;">
+						</td>
+						<td style="width:50px">
+						</td>
+					</tr>
+					<tr>
+						<td style="display:none;">
+							<select name="registerCustomerBean.cardStatus" id="cardStatus">
+								<c:forEach var="cardSta" items="${cardStatus}">
+									<option value="${cardSta.key}">
+										${cardSta.value}
+									</option>
+								</c:forEach>
+							</select>
+						</td>
+					</tr>
+				</table>
+				<hr class="lineColorAboveTable">
+				<table class="tableButton">
+					<tr>
+						<td>
+							<input type="button" id="anonymousCard_add" value="不记名卡售卡">
+						</td>
+						<td>
+							<input type="button" id="personalCard_add" value="单用户卡售卡">
+						</td>
+						<td>
+							<input type=button id="corpCard_add" value="多用户卡售卡" onclick="window.location.href='<%=basePath%>registMultiCustomer/registMultiCustomerInit';">
+						</td>
+					</tr>
+				</table>
+				<br>
+				<table id="dg" title="已售卡一览" style="width: auto; height: auto;">
+				</table>
+			</TD>
+		</TR>
+	</TABLE>
+	<div id="saleCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 900px; height: 500px;">
+		<iframe scrolling="auto" id='saleCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	</div>
+	<div id="printCardDialog" class="easyui-window" closed="true" modal="true" title="标题" style="width: 850px; height: 450px;">
+		<iframe scrolling="auto" id='printCardIFrame' frameborder="0" src="" style="width: 100%; height: 100%;"></iframe>
+	</div>
+</body>
+</html>

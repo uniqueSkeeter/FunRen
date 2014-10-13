@@ -1,0 +1,450 @@
+/*
+ * 对客户进行的一览基本信息进行管理和维护
+ * 提供检索、导出功能。衔接交费、发卡、编辑、预分配等功能实现
+ * 更新履历： guyj 2014/05/26 新规作成
+ */
+
+
+package com.fr.station.component.customer.action;
+
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.customer.CustomBean;
+import com.fr.station.common.data.DataCollections;
+import com.fr.station.common.entity.card.FkTGuestEntity;
+import com.fr.station.common.utility.DateJsonValueProcessor;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.StringUtil;
+import com.fr.station.component.customer.service.CustomService;
+import com.fr.station.component.system.action.AbstractAction;
+
+
+/**
+ * 客户管理一览
+ * @version 1.0
+ * @author guyj
+ */
+@Namespace("")
+@ParentPackage("custom-default")
+public class CustomAction extends AbstractAction {
+
+    // ------- Constants (static final) ----------------------------------------
+    /**
+     * 序列化
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * LOG
+     */
+    private Logger log = Logger.getLogger(CustomAction.class);
+
+    /**
+     * 客户SERVICE
+     */
+    @Autowired
+    private CustomService customService;
+
+    /**
+     * 用户类型
+     */
+    public Map<String, String> userTypeCom = DataCollections.dicUseType;
+
+    /**
+     * 证件类型
+     */
+    public Map<String, String> credType = DataCollections.dicCredType;
+
+    /**
+     * 客户状态
+     */
+    public Map<String, String> customStats = DataCollections.dicCustomStats;
+
+    /**
+     * 单位类型
+     */
+    public Map<String, String> company = DataCollections.companyType;
+
+    /**
+     * 银行编号
+     */
+    public Map<String, String> bank = DataCollections.dicBank;
+
+    /**
+     * 支付方式
+     */
+    public Map<String, String> payType = DataCollections.dicPayType;
+
+    /**
+     * 检索条件_状态
+     */
+    private String stats;
+
+    /**
+     * 检索条件_联系人证件类型
+     */
+    private String idcardType;
+
+    /**
+     * 检索条件_联系人证件编号
+     */
+    private String idcardNum;
+
+    /**
+     * 检索条件_用户类型
+     */
+    private String userType;
+
+    /**
+     * 检索条件_开始时间
+     */
+    private Timestamp beginDate;
+
+    /**
+     * 检索条件_结束时间
+     */
+    private Timestamp endDate;
+
+    /**
+     * 注册/修改画面对象
+     */
+    private CustomBean fkTGuest;
+
+    /**
+     * 左侧树
+     */
+    private JSONObject tree;
+
+    /**
+     * 画面一览检索结果
+     */
+    private JSONArray customDatas;
+
+    /**
+     * 当前选择客户ID
+     */
+    private String customId;
+
+    /**
+     * 交费金额
+     */
+    private String money;
+
+
+    /**
+     * 客户一览初期化
+     * @param
+     * @return dashboard jsp
+     */
+    @Action(value = "customInit", results = {
+        @Result(name = "success", location = "/view/card/custom/customList.jsp"),
+        @Result(name = "error", location = "/view/login.jsp") })
+    public String customInit() {
+        this.log.info(" 客户一览初期化 开始");
+
+        JSONObject jsonObject = JSONObject.fromObject(DataCollections.dicMenuTree.get(
+            this.currfunc).get(0));
+        this.tree = jsonObject;
+        this.log.info(" 客户一览初期化 结束");
+        return SUCCESS;
+    }
+
+
+    /**
+     * 客户一览检索
+     * @param
+     * @return dashboard jsp
+     */
+    @Action(value = "customSearch", results = { @Result(name = "success", type = "json") })
+    public String customSearch() {
+        this.log.info(" 客户一览检索 开始");
+
+        // 客户信息表检索
+        List<FkTGuestEntity> list = this.customService.getCustomInfo(this.userType, this.idcardType,
+            this.idcardNum, this.stats, this.beginDate, this.endDate);
+        JsonConfig config = new JsonConfig();
+        // TimeStamp 日期转换
+        config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(
+            DateUtil.DATE_PATTERN_2));
+        // 转JSON数据格式
+        JSONArray array = new JSONArray();
+        array.addAll(list, config);
+        this.customDatas = array;
+        this.log.info(" 客户一览检索 检索");
+        return SUCCESS;
+    }
+
+
+    /**
+     * 客户注册
+     * @param
+     * @return dashboard jsp
+     */
+    @Action(value = "customAdd", results = { @Result(name = "success", type = "json"),
+        @Result(name = "input", location = "/view/card/custom/customAdd.jsp"),
+        @Result(name = "error", location = "/view/card/custom/customAdd.jsp") })
+    public String customAdd() {
+        this.log.info(" 客户一览注册 开始");
+        this.log.info(" 客户一览注册 当前处理：" + this.process);
+        boolean ret = false;
+        if (this.process == 1) {
+            this.log.info(" 客户一览注册 结束");
+            return INPUT;
+        } else if (this.process == 2) {
+            this.log.info(" 客户一览更新 结束" + this.fkTGuest);
+            ret = this.customService.saveOrUpdateCustom(this.fkTGuest);
+        } else if (this.process == 3) {
+            this.log.info(" 客户一览注册 结束" + this.customId);
+            this.fkTGuest = this.customService.getCustomInfoById(this.customId);
+            return INPUT;
+        } else if (this.process == 4) {
+            if (!StringUtil.isEmpty(this.customId)) {
+                this.fkTGuest.setId(Integer.parseInt(this.customId));
+            }
+            ret= this.customService.saveOrUpdateCustom(this.fkTGuest);
+        }
+        this.log.info(" 客户一览注册 结束");
+        if (ret) {
+            return SUCCESS;
+        } else {
+            return ERROR;
+        }
+    }
+
+    /**
+     * 客户交费
+     * @param
+     * @return dashboard jsp
+     */
+    @Action(value = "customPay", results = { @Result(name = "success", type = "json"),
+        @Result(name = "input", location = "/view/card/custom/customPay.jsp"),
+        @Result(name = "error", location = "/view/card/custom/customPay.jsp") })
+    public String customPay() {
+        this.log.info(" 客户一览交费 开始");
+        this.log.info(" 客户一览交费 当前处理：" + this.process);
+        boolean ret = false;
+        if (this.process == 1) {
+            this.fkTGuest = this.customService.getCustomInfoById(this.customId);
+            return INPUT;
+        } else if (this.process == 2) {
+            ret= this.customService.customPayMoney(this.customId, this.fkTGuest.getPaymoney());
+        }
+        this.log.info(" 客户一览注册 结束");
+        if (ret) {
+            return SUCCESS;
+        } else {
+            return ERROR;
+        }
+    }
+
+    /**
+     * 检索条件_状态的取得
+     * @return String - 检索条件_状态
+     */
+    public String getStats() {
+        return this.stats;
+    }
+
+
+    /**
+     * 检索条件_联系人证件类型的取得
+     * @return String - 检索条件_联系人证件类型
+     */
+    public String getIdcardType() {
+        return this.idcardType;
+    }
+
+
+    /**
+     * 检索条件_联系人证件编号的取得
+     * @return String - 检索条件_联系人证件编号
+     */
+    public String getIdcardNum() {
+        return this.idcardNum;
+    }
+
+
+    /**
+     * 检索条件_用户类型的取得
+     * @return String - 检索条件_用户类型
+     */
+    public String getUserType() {
+        return this.userType;
+    }
+
+
+    /**
+     * 检索条件_开始时间的取得
+     * @return Timestamp - 检索条件_开始时间
+     */
+    public Timestamp getBeginDate() {
+        return this.beginDate;
+    }
+
+
+    /**
+     * 检索条件_结束时间的取得
+     * @return String - 检索条件_结束时间
+     */
+    public Timestamp getEndDate() {
+        return this.endDate;
+    }
+
+
+    /**
+     * 注册/修改画面对象的取得
+     * @return CustomAddBean - 注册/修改画面对象
+     */
+    public CustomBean getFkTGuest() {
+        return this.fkTGuest;
+    }
+
+
+    /**
+     * 左侧树的取得
+     * @return String - 左侧树
+     */
+    public JSONObject getTree() {
+        return this.tree;
+    }
+
+
+    /**
+     * 画面一览检索结果的取得
+     * @return String - 画面一览检索结果
+     */
+    public JSONArray getCustomDatas() {
+        return this.customDatas;
+    }
+
+
+    /**
+     * 检索条件_状态的设定
+     * @param newstats - 检索条件_状态
+     */
+    public void setStats(String newStats) {
+        this.stats = newStats;
+    }
+
+
+    /**
+     * 检索条件_联系人证件类型的设定
+     * @param newidcardtype - 检索条件_联系人证件类型
+     */
+    public void setIdcardType(String newIdcardtype) {
+        this.idcardType = newIdcardtype;
+    }
+
+
+    /**
+     * 检索条件_联系人证件编号的设定
+     * @param newidcardnum - 检索条件_联系人证件编号
+     */
+    public void setIdcardNum(String newIdcardnum) {
+        this.idcardNum = newIdcardnum;
+    }
+
+
+    /**
+     * 检索条件_用户类型的设定
+     * @param newusertype - 检索条件_用户类型
+     */
+    public void setUserType(String newUsertype) {
+        this.userType = newUsertype;
+    }
+
+
+    /**
+     * 检索条件_开始时间的设定
+     * @param newbegindate - 检索条件_开始时间
+     */
+    public void setBeginDate(Timestamp newBegindate) {
+        this.beginDate = newBegindate;
+    }
+
+
+    /**
+     * 检索条件_结束时间的设定
+     * @param newenddate - 检索条件_结束时间
+     */
+    public void setEndDate(Timestamp newEnddate) {
+        this.endDate = newEnddate;
+    }
+
+
+    /**
+     * 注册/修改画面对象的设定
+     * @param newfktguest - 注册/修改画面对象
+     */
+    public void setFkTGuest(CustomBean newFktguest) {
+        this.fkTGuest = newFktguest;
+    }
+
+
+    /**
+     * 左侧树的设定
+     * @param newtree - 左侧树
+     */
+    public void setTree(JSONObject newTree) {
+        this.tree = newTree;
+    }
+
+
+    /**
+     * 画面一览检索结果的设定
+     * @param newcustomdatas - 画面一览检索结果
+     */
+    public void setCustomDatas(JSONArray newCustomdatas) {
+        this.customDatas = newCustomdatas;
+    }
+
+
+    /**
+     * 当前选择客户ID的取得
+     * @return 当前选择客户ID
+     */
+    public String getCustomId() {
+        return this.customId;
+    }
+
+
+    /**
+     * 当前选择客户ID的设定
+     * @param customId 当前选择客户ID
+     */
+    public void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    /**
+     * 交费金额的取得
+     * @return 交费金额
+     */
+    public String getMoney() {
+        return this.money;
+    }
+
+
+    /**
+     * 交费金额的设定
+     * @param money 交费金额
+     */
+    public void setMoney(String money) {
+        this.money = money;
+    }
+
+}

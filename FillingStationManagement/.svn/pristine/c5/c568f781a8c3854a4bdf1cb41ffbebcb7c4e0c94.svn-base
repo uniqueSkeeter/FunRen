@@ -1,0 +1,41 @@
+	// 表单验证
+	var check = function(input) {
+	    if (input.value == '') {
+	    	inputError(input);
+	        input.focus();
+	        return true;
+	    } else {
+	        return false;
+	       
+	    };
+	};
+
+	
+	// 输入错误提示
+	
+	var inputError = function (input) {
+	    clearTimeout(inputError.timer);
+	    var num = 0;
+	    var fn = function () {
+	        inputError.timer = setTimeout(function () {
+	            input.className = input.className == '' ? 'form-error' : '';
+	            if (num == 5) {
+	                input.className = '';
+		            } else {
+		                fn(num ++);
+		            };
+		        }, 150);
+		    };
+		    fn();
+		};
+
+		//email验证
+		function checkEmail(email){
+			 var reg=/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@[_a-z\d\-]+(\.[_a-z\d\-]+)*(\.(info|biz|com|edu|gov|net|am|bz|cn|cx|hk|jp|tw|vc|vn))$/;
+			 if(reg.test(email.value))
+			  return true;
+			 else{
+			 $.messager.alert("错误","输入Email格式错误");
+			 return false;
+			 }
+		}

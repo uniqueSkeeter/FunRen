@@ -1,0 +1,359 @@
+package com.fr.station.component.report.dao.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.springframework.stereotype.Repository;
+
+import com.fr.station.common.bean.CardTradeReportBean;
+import com.fr.station.common.data.ApplicationContext;
+import com.fr.station.common.entity.card.FkTCreditEntity;
+import com.fr.station.common.utility.DateUtil;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.common.utility.StringUtil;
+import com.fr.station.component.report.dao.CardTradeReportDAO;
+import com.fr.station.component.system.dao.AbstractBaseDAO;
+
+/**
+ * The action for dashboard. It handles the user request from the web sites. Mainly responsible to handle user login
+ * 
+ * @author hjq
+ */
+@Repository
+public class CardTradeReportDaoImpl extends AbstractBaseDAO<FkTCreditEntity> implements CardTradeReportDAO {
+
+	// ------- Constants (static final) ----------------------------------------
+	private static Logger log = Logger.getLogger(CardTradeReportDaoImpl.class);
+
+	private static final String CARD_GUEST_NAME = "card.guestname";
+
+	private static final String CREDIT_GUEST_NAME = "credit.guestname";
+
+	private static final String CARD_GUEST_NO = "card.guestno";
+
+	private static final String CREDIT_GUEST_NO = "credit.guestno";
+
+	private static final String CARDPRE_GUEST_NO = "cardpre.guestno";
+
+	private static final String CARD_CARD_NO = "card.cardno";
+
+	private static final String CREDIT_CARD_NO = "credit.cardno";
+
+	private static final String CARDPRE_CARD_NO = "cardpre.cardno";
+
+	private static final String TRADE_DATE = "credit.workdate";
+
+	private static final String CARDPRE_TRADE_DATE = "cardpre.create_date";
+
+	private static final String CARD_TYPE = "card.cardtype";
+
+	private static final String PAY_TYPE = "credit.zffs";
+
+	private static final String TRADE_TYPE = "credit.inctype";
+
+	private static final String INC_TYPE = "credit.jylx";
+
+	private static final String STATION_NO = "credit.stationNo";
+
+	private static final String CARDPRE_STATION_NO = "cardpre.stationNo";
+
+	private final String selectCommonSql = "select count(*) from FK_T_CARD card, ";
+
+	private final String selectCardTradeRecordsSql = "select CONVERT(varchar(19), credit.workdate, 21) workdate, credit.incno, credit.guestname, credit.cardno, card.cardstatus, credit.cardbeg, credit.cardinc, credit.cardbal, credit.inctype, credit.userid card.cardtype from FK_T_CARD card, FK_TT_CREDIT credit WHERE ";
+
+	private final String selectAllCountCardTradeRecordsSql = this.selectCommonSql + " FK_TT_CREDIT credit WHERE ";
+
+	private final String selectGuestCreditRecordsSql = "select CONVERT(varchar(19), credit.workdate, 21) workdate, credit.incno, credit.guestname, card.cardno, card.cardstatus, credit.pre, credit.amn, credit.bal, credit.jylx, credit.userid,credit.zffs from FK_T_CARD card, FK_TT_GUESTCREDIT credit WHERE ";
+
+	private final String selectAllCountGuestCreditRecordsSql = this.selectCommonSql + " FK_TT_GUESTCREDIT credit WHERE ";
+
+	private final String selectCardPreRecordsSql = "select CONVERT(varchar(19), cardpre.create_date, 21) workdate, cardpre.guestno, cardpre.cardno, cardpre.pre, cardpre.billsNo, cardpre.userid from FK_T_CARD card, FK_TT_CARDPRE cardpre WHERE ";
+
+	private final String selectAllCountCardPreRecordsSql = this.selectCommonSql + "  FK_TT_CARDPRE cardpre WHERE ";
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	// ------- Instance Variables (private) ------------------------------------
+
+	// ------- Constructors ----------------------------------------------------
+	public CardTradeReportDaoImpl() {
+		super();
+	}
+
+	// ------- Instance Methods (public) ---------------------------------------
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardTradeReportBean> getCardTradeRecordsByCriteria(CardTradeReportBean cardTradeBean, int startPage, int number) {
+		List<CardTradeReportBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.selectCardTradeRecordsSql);
+		builderForTotalResult.append(this.selectAllCountCardTradeRecordsSql);
+
+		try {
+			StringBuilder builder = this.validateInputCriteria(cardTradeBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			Object[] resultAccount = this.findBySql(builderForTotalResult.toString()).toArray();
+			if (resultAccount != null) {
+				totalSize = (int) resultAccount[0];
+			}
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBean(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardTradeReportBean> getGuestCreditRecordsByCriteria(CardTradeReportBean cardTradeBean, int startPage,
+			int number) {
+		List<CardTradeReportBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.selectGuestCreditRecordsSql);
+		builderForTotalResult.append(this.selectAllCountGuestCreditRecordsSql);
+
+		try {
+			Object[] resultAccount = null;
+			StringBuilder builder = this.validate(cardTradeBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			List<?> dataResultList = this.findBySql(builderForTotalResult.toString());
+			if (dataResultList.size() > 0) {
+				resultAccount = dataResultList.toArray();
+			}
+			totalSize = (int) resultAccount[0];
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBeanForGuestPayment(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CardTradeReportBean> getCardPredistributionRecordsByCriteria(CardTradeReportBean cardTradeBean, int startPage,
+			int number) {
+		List<CardTradeReportBean> resultList = null;
+		int totalSize = 0;
+		StringBuilder builderForPagination = new StringBuilder();
+		StringBuilder builderForTotalResult = new StringBuilder();
+		builderForPagination.append(this.selectCardPreRecordsSql);
+		builderForTotalResult.append(this.selectAllCountCardPreRecordsSql);
+
+		try {
+			Object[] resultAccount = null;
+			StringBuilder builder = this.cardpreValidate(cardTradeBean);
+			builderForPagination.append(builder);
+			builderForTotalResult.append(builder);
+			Query query = this.getQueryByCriteria(builderForPagination.toString());
+			List<?> dataResultList = this.findBySql(builderForTotalResult.toString());
+			if (dataResultList.size() > 0) {
+				resultAccount = dataResultList.toArray();
+			}
+			totalSize = (int) resultAccount[0];
+			query.setFirstResult(startPage);
+			query.setMaxResults(number);
+			List<Object[]> result = query.list();
+			resultList = this.convertDataToBeanForCardPre(result, totalSize);
+
+		} catch (QueryException e) {
+			log.info("Sql is not correct, please check it again, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+			return resultList;
+		} catch (Exception e) {
+			log.info("Get DB data occured error, more detail please see the detail log" + e.getMessage() + "\n"
+					+ ErrorLogUtil.printInfo(e));
+		}
+		return resultList;
+	}
+
+	private StringBuilder validateInputCriteria(CardTradeReportBean cardTradeBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(STATION_NO).append(" = ").append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		builder.append(" AND ").append(CARD_CARD_NO).append(" = ").append(CREDIT_CARD_NO);
+		if (StringUtil.isNotEmpty(cardTradeBean.getGuestName())) {
+			builder.append(" AND ").append(CARD_GUEST_NAME).append(" = ").append(CREDIT_GUEST_NAME);
+			builder.append(" AND ").append(CREDIT_GUEST_NAME).append(" = '").append(cardTradeBean.getGuestName()).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getCardNo())) {
+			builder.append(" AND ").append(CARD_CARD_NO).append(" = '").append(cardTradeBean.getCardNo()).append("'");
+		}
+		if (cardTradeBean.getGuestNo() != null) {
+			builder.append(" AND ").append(CARD_GUEST_NO).append(" = ").append(cardTradeBean.getGuestNo());
+		}
+		String startDate = DateUtil.formatDate(cardTradeBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getStartDate() != null) {
+			builder.append(" AND ").append(TRADE_DATE).append(" >= '").append(startDate).append("'");
+		}
+		String endDate = DateUtil.formatDate(cardTradeBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getEndDate() != null) {
+			builder.append(" AND ").append(TRADE_DATE).append(" <= '").append(endDate).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getCardType())) {
+			builder.append(" AND ").append(CARD_TYPE).append(" = '").append(cardTradeBean.getCardType()).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getTradeType())) {
+			builder.append(" AND ").append(TRADE_TYPE).append(" = '").append(cardTradeBean.getTradeType()).append("'");
+		}
+		return builder;
+	}
+
+	private StringBuilder validate(CardTradeReportBean cardTradeBean) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(STATION_NO).append(" = ").append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		builder.append(" AND ").append(CREDIT_GUEST_NO).append(" = ").append(CARD_GUEST_NO);
+
+		if (StringUtil.isNotEmpty(cardTradeBean.getGuestName())) {
+			builder.append(" AND ").append(CARD_GUEST_NAME).append(" = ").append(CREDIT_GUEST_NAME);
+			builder.append(" AND ").append(CREDIT_GUEST_NAME).append(" = '").append(cardTradeBean.getGuestName()).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getCardNo())) {
+			builder.append(" AND ").append(CARD_CARD_NO).append(" = '").append(cardTradeBean.getCardNo()).append("'");
+		}
+		if (cardTradeBean.getGuestNo() != null) {
+			builder.append(" AND ").append(CARD_GUEST_NO).append(" = ").append(cardTradeBean.getGuestNo());
+		}
+		String startDate = DateUtil.formatDate(cardTradeBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getStartDate() != null) {
+			builder.append(" AND ").append(TRADE_DATE).append(" >= '").append(startDate).append("'");
+		}
+		String endDate = DateUtil.formatDate(cardTradeBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getEndDate() != null) {
+			builder.append(" AND ").append(TRADE_DATE).append(" <= '").append(endDate).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getPayType())) {
+			builder.append(" AND ").append(PAY_TYPE).append(" = '").append(cardTradeBean.getPayType()).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getTradeType())) {
+			builder.append(" AND ").append(INC_TYPE).append(" = '").append(cardTradeBean.getTradeType()).append("'");
+		}
+		return builder;
+	}
+
+	private StringBuilder cardpreValidate(CardTradeReportBean cardTradeBean) {
+		// TODO Auto-generated method stub
+		StringBuilder builder = new StringBuilder();
+		builder.append(CARDPRE_STATION_NO).append(" = ")
+				.append(Integer.valueOf(ApplicationContext.getInstance().getStationNum()));
+		builder.append(" AND ").append(CARD_CARD_NO).append(" = ").append(CARDPRE_CARD_NO);
+		if (StringUtil.isNotEmpty(cardTradeBean.getGuestName())) {
+			builder.append(" AND ").append(CARD_GUEST_NAME).append(" = '").append(cardTradeBean.getGuestName()).append("'");
+		}
+		if (StringUtil.isNotEmpty(cardTradeBean.getCardNo())) {
+
+			builder.append(" AND ").append(CARDPRE_CARD_NO).append(" = '").append(cardTradeBean.getCardNo()).append("'");
+		}
+		if (cardTradeBean.getGuestNo() != null) {
+			builder.append(" AND ").append(CARDPRE_GUEST_NO).append(" = ").append(CARD_GUEST_NO);
+			builder.append(" AND ").append(CARDPRE_GUEST_NO).append(" = ").append(cardTradeBean.getGuestNo());
+		}
+		String startDate = DateUtil.formatDate(cardTradeBean.getStartDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getStartDate() != null) {
+			builder.append(" AND ").append(CARDPRE_TRADE_DATE).append(" >= '").append(startDate).append("'");
+		}
+		String endDate = DateUtil.formatDate(cardTradeBean.getEndDate(), DateUtil.DATE_PATTERN_8);
+		if (cardTradeBean.getEndDate() != null) {
+			builder.append(" AND ").append(CARDPRE_TRADE_DATE).append(" <= '").append(endDate).append("'");
+		}
+		return builder;
+	}
+
+	private List<CardTradeReportBean> convertDataToBean(List<Object[]> dataResult, int totalAccount) {
+		List<CardTradeReportBean> cardTradeBeanList = new ArrayList<CardTradeReportBean>();
+		CardTradeReportBean cardTradeBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardTradeBean = new CardTradeReportBean();
+			cardTradeBean.setTradeDate(DateUtil.formatDateYYYY_MM_DD((String) (dataRow[0])));
+			cardTradeBean.setIncNo(String.valueOf(dataRow[1]));
+			cardTradeBean.setGuestName(String.valueOf(dataRow[2]));
+			cardTradeBean.setCardNo(String.valueOf(dataRow[3]));
+			cardTradeBean.setCardStatus(String.valueOf(dataRow[4]));
+			cardTradeBean.setMoneyBefore(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[5]))));
+			cardTradeBean.setTradeMoney(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[6]))));
+			cardTradeBean.setMoneyAfter(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[7]))));
+			cardTradeBean.setTradeType(String.valueOf(dataRow[8]));
+			cardTradeBean.setUserId(Integer.valueOf(String.valueOf(dataRow[9])));
+			cardTradeBean.setCardType(String.valueOf(dataRow[10]));
+			cardTradeBean.setTotalData(totalAccount);
+			cardTradeBeanList.add(cardTradeBean);
+		}
+		return cardTradeBeanList;
+	}
+
+	private List<CardTradeReportBean> convertDataToBeanForGuestPayment(List<Object[]> dataResult, int totalAccount) {
+		List<CardTradeReportBean> cardTradeBeanList = new ArrayList<CardTradeReportBean>();
+		CardTradeReportBean cardTradeBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardTradeBean = new CardTradeReportBean();
+			cardTradeBean.setTradeDate(DateUtil.formatDateYYYY_MM_DD((String) (dataRow[0])));
+			cardTradeBean.setIncNo(String.valueOf(dataRow[1]));
+			cardTradeBean.setGuestName(String.valueOf(dataRow[2]));
+			cardTradeBean.setCardNo(String.valueOf(dataRow[3]));
+			cardTradeBean.setCardStatus(String.valueOf(dataRow[4]));
+			cardTradeBean.setMoneyBefore(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[5]))));
+			cardTradeBean.setTradeMoney(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[6]))));
+			cardTradeBean.setMoneyAfter(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[7]))));
+			cardTradeBean.setTradeType(String.valueOf(dataRow[8]));
+			cardTradeBean.setUserId(Integer.valueOf(String.valueOf(dataRow[9])));
+			cardTradeBean.setPayType(String.valueOf(dataRow[10]));
+			cardTradeBean.setTotalData(totalAccount);
+			cardTradeBeanList.add(cardTradeBean);
+		}
+		return cardTradeBeanList;
+	}
+
+	private List<CardTradeReportBean> convertDataToBeanForCardPre(List<Object[]> dataResult, int totalAccount) {
+		List<CardTradeReportBean> cardTradeBeanList = new ArrayList<CardTradeReportBean>();
+		CardTradeReportBean cardTradeBean = null;
+		for (Object[] dataRow : dataResult) {
+			cardTradeBean = new CardTradeReportBean();
+			cardTradeBean.setTradeDate(DateUtil.formatDateYYYY_MM_DD((String) (dataRow[0])));
+			cardTradeBean.setGuestNo(Integer.valueOf(String.valueOf(dataRow[1])));
+			cardTradeBean.setCardNo(String.valueOf(dataRow[2]));
+			cardTradeBean.setPreAmount(BigDecimal.valueOf(Double.valueOf(String.valueOf(dataRow[3]))));
+			cardTradeBean.setReceiptNo(String.valueOf(dataRow[4]));
+			cardTradeBean.setUserId(Integer.valueOf(String.valueOf(dataRow[5])));
+			cardTradeBean.setTotalData(totalAccount);
+			cardTradeBeanList.add(cardTradeBean);
+		}
+		return cardTradeBeanList;
+	}
+	// ------- Instance Methods (protected) ------------------------------------
+
+	// ------- Instance Methods (private) --------------------------------------
+
+	// ------- Static Methods --------------------------------------------------
+
+	// ------- Optional Inner Class ------------------------------------------
+
+}

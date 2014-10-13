@@ -1,0 +1,867 @@
+﻿/*
+ * 客户信息 <--> 单位信息表 Revised history Copyright(c) 2010 FR Co.,Ltd
+ */
+
+package com.fr.station.common.entity.card;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fr.station.common.bean.StandardBean;
+
+/**
+ * 客户信息表
+ *
+ * @version 1.0
+ * @authorguyj
+ */
+@Entity
+@Table(name = "FK_T_GUEST")
+public class FkTGuestEntity implements StandardBean {
+
+	/**
+	 * 序列化
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * ID
+	 */
+	@Id
+	@Column(name = "`ID`")
+	@GeneratedValue
+	private Integer id;
+
+	/**
+	 * 客户编号（单位编号）
+	 */
+	@Column(name = "`GUESTNO`")
+	private String guestno;
+
+	/**
+	 * 客户名称（单位名）
+	 */
+	@Column(name = "`GUESTNAME`")
+	private String guestname;
+
+	/**
+	 * 客户类型（单位类型）
+	 */
+	@Column(name = "`GUESTTYPE`")
+	private String guesttype;
+
+	/**
+	 * 联系人证件类型
+	 */
+	@Column(name = "`IDCARD_TYPE`")
+	private String idcardType;
+
+	/**
+	 * 联系人证件编号
+	 */
+	@Column(name = "`IDCARD_NUM`")
+	private String idcardNum;
+
+	/**
+	 * 联系人姓名
+	 */
+	@Column(name = "`NAME`")
+	private String name;
+
+	/**
+	 * 地址
+	 */
+	@Column(name = "`ADD`")
+	private String add;
+
+	/**
+	 * 电话
+	 */
+	@Column(name = "`TEL`")
+	private String tel;
+
+	/**
+	 * 邮编
+	 */
+	@Column(name = "`POST`")
+	private String post;
+
+	/**
+	 * 邮件
+	 */
+	@Column(name = "`EMAIL`")
+	private String email;
+
+	/**
+	 * 邮件
+	 */
+	@Column(name = "`birthday`")
+	private Date birthday;
+
+	/**
+	 * 银行编号
+	 */
+	@Column(name = "`BANKNO`")
+	private String bankno;
+
+	/**
+	 * 银行账号
+	 */
+	@Column(name = "`BANKACC`")
+	private String bankacc;
+
+	/**
+	 * 税号
+	 */
+	@Column(name = "`TAXNO`")
+	private String taxno;
+
+	/**
+	 * 发卡数量
+	 */
+	@Column(name = "`CARDSUM`")
+	private Integer cardsum;
+
+	/**
+	 * 卡上余额
+	 */
+	@Column(name = "`CARDACC`")
+	private BigDecimal cardacc;
+
+	/**
+	 * 账卡余额
+	 */
+	@Column(name = "`BAL`")
+	private BigDecimal bal;
+
+	/**
+	 * 消费金额
+	 */
+	@Column(name = "`DEBITACC`")
+	private BigDecimal debitacc;
+
+	/**
+	 * 交费金额 （充值金额）
+	 */
+	@Column(name = "`CREDITACC`")
+	private BigDecimal creditacc;
+
+	/**
+	 * 限制金额
+	 */
+	@Column(name = "`LIMIT`")
+	private BigDecimal limit;
+
+	/**
+	 * 已分配金额 （使用金额）
+	 */
+	@Column(name = "`INUSE`")
+	private Integer inuse;
+
+	/**
+	 * 用户类型
+	 */
+	@Column(name = "`USERTYPE`")
+	private String usertype;
+
+	/**
+	 * 主卡号
+	 */
+	@Column(name = "`CARDNO`")
+	private String cardno;
+
+	/**
+	 * 积分
+	 */
+	@Column(name = "`INTEGRATION`")
+	private Integer integration;
+
+	/**
+	 * 状态
+	 */
+	@Column(name = "`STATS`")
+	private String stats;
+
+	/**
+	 * ETC
+	 */
+	@Column(name = "`ETC`")
+	private String etc;
+
+	/**
+	 * 网点
+	 */
+	@Column(name = "`STATIONNO`")
+	private String stationno;
+
+	/**
+	 * 备注
+	 */
+	@Column(name = "`BZ`")
+	private String bz;
+
+	/**
+	 * 备注1
+	 */
+	@Column(name = "`BEIZHU`")
+	private String beizhu;
+
+	/**
+	 * 班结号
+	 */
+	@Column(name = "`BJID`")
+	private Integer bjid;
+
+	/**
+	 * 日结号
+	 */
+	@Column(name = "`RJID`")
+	private Integer rjid;
+
+	/**
+	 * 创建时间/开户日期 (日期)
+	 */
+	@Column(name = "`CREATE_DATE`")
+	private Timestamp createDate;
+
+	/**
+	 * 更新时间
+	 */
+	@Column(name = "`UPDATE_DATE`")
+	private Timestamp updateDate;
+
+	/**
+	 * 操作员编号
+	 */
+	@Column(name = "`USERID`")
+	private Integer userid;
+
+	/**
+	 * ID的取得
+	 *
+	 * @return Integer ID
+	 */
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * 客户编号（单位编号）的取得
+	 *
+	 * @return String 客户编号（单位编号）
+	 */
+	public String getGuestno() {
+		return this.guestno;
+	}
+
+	/**
+	 * 客户名称（单位名）的取得
+	 *
+	 * @return String 客户名称（单位名）
+	 */
+	public String getGuestname() {
+		return this.guestname;
+	}
+
+	/**
+	 * 客户类型（单位类型）的取得
+	 *
+	 * @return String 客户类型（单位类型）
+	 */
+	public String getGuesttype() {
+		return this.guesttype;
+	}
+
+	/**
+	 * 联系人证件类型的取得
+	 *
+	 * @return String 联系人证件类型
+	 */
+	public String getIdcardType() {
+		return this.idcardType;
+	}
+
+	/**
+	 * 联系人证件编号的取得
+	 *
+	 * @return String 联系人证件编号
+	 */
+	public String getIdcardNum() {
+		return this.idcardNum;
+	}
+
+	/**
+	 * 联系人姓名的取得
+	 *
+	 * @return String 联系人姓名
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * 地址的取得
+	 *
+	 * @return String 地址
+	 */
+	public String getAdd() {
+		return this.add;
+	}
+
+	/**
+	 * 电话的取得
+	 *
+	 * @return String 电话
+	 */
+	public String getTel() {
+		return this.tel;
+	}
+
+	/**
+	 * 邮编的取得
+	 *
+	 * @return String 邮编
+	 */
+	public String getPost() {
+		return this.post;
+	}
+
+	/**
+	 * 邮件的取得
+	 *
+	 * @return String 邮件
+	 */
+	public String getEmail() {
+		return this.email;
+	}
+
+	/**
+	 * 银行编号的取得
+	 *
+	 * @return String 银行编号
+	 */
+	public String getBankno() {
+		return this.bankno;
+	}
+
+	/**
+	 * 银行账号的取得
+	 *
+	 * @return String 银行账号
+	 */
+	public String getBankacc() {
+		return this.bankacc;
+	}
+
+	/**
+	 * 税号的取得
+	 *
+	 * @return String 税号
+	 */
+	public String getTaxno() {
+		return this.taxno;
+	}
+
+	/**
+	 * 发卡数量的取得
+	 *
+	 * @return Integer 发卡数量
+	 */
+	public Integer getCardsum() {
+		return this.cardsum;
+	}
+
+	/**
+	 * 卡上余额的取得
+	 *
+	 * @return BigDecimal 卡上余额
+	 */
+	public BigDecimal getCardacc() {
+		return this.cardacc;
+	}
+
+	/**
+	 * 账卡余额的取得
+	 *
+	 * @return BigDecimal 账卡余额
+	 */
+	public BigDecimal getBal() {
+		return this.bal;
+	}
+
+	/**
+	 * 消费金额的取得
+	 *
+	 * @return BigDecimal 消费金额
+	 */
+	public BigDecimal getDebitacc() {
+		return this.debitacc;
+	}
+
+	/**
+	 * 交费金额 （充值金额）的取得
+	 *
+	 * @return BigDecimal 交费金额 （充值金额）
+	 */
+	public BigDecimal getCreditacc() {
+		return this.creditacc;
+	}
+
+	/**
+	 * 限制金额的取得
+	 *
+	 * @return BigDecimal 限制金额
+	 */
+	public BigDecimal getLimit() {
+		return this.limit;
+	}
+
+	/**
+	 * 已分配金额 （使用金额）的取得
+	 *
+	 * @return Integer 已分配金额 （使用金额）
+	 */
+	public Integer getInuse() {
+		return this.inuse;
+	}
+
+	/**
+	 * 用户类型的取得
+	 *
+	 * @return String 用户类型
+	 */
+	public String getUsertype() {
+		return this.usertype;
+	}
+
+	/**
+	 * 主卡号的取得
+	 *
+	 * @return String 主卡号
+	 */
+	public String getCardno() {
+		return this.cardno;
+	}
+
+	/**
+	 * 积分的取得
+	 *
+	 * @return Integer 积分
+	 */
+	public Integer getIntegration() {
+		return this.integration;
+	}
+
+	/**
+	 * 状态的取得
+	 *
+	 * @return String 状态
+	 */
+	public String getStats() {
+		return this.stats;
+	}
+
+	/**
+	 * ETC的取得
+	 *
+	 * @return String ETC
+	 */
+	public String getEtc() {
+		return this.etc;
+	}
+
+	/**
+	 * 网点的取得
+	 *
+	 * @return String 网点
+	 */
+	public String getStationno() {
+		return this.stationno;
+	}
+
+	/**
+	 * 备注的取得
+	 *
+	 * @return String 备注
+	 */
+	public String getBz() {
+		return this.bz;
+	}
+
+	/**
+	 * 备注1的取得
+	 *
+	 * @return String 备注1
+	 */
+	public String getBeizhu() {
+		return this.beizhu;
+	}
+
+	/**
+	 * 班结号的取得
+	 *
+	 * @return Integer 班结号
+	 */
+	public Integer getBjid() {
+		return this.bjid;
+	}
+
+	/**
+	 * 日结号的取得
+	 *
+	 * @return Integer 日结号
+	 */
+	public Integer getRjid() {
+		return this.rjid;
+	}
+
+	/**
+	 * 创建时间/开户日期 (日期)的取得
+	 *
+	 * @return Timestamp 创建时间/开户日期 (日期)
+	 */
+	public Timestamp getCreateDate() {
+		return this.createDate;
+	}
+
+	/**
+	 * 更新时间的取得
+	 *
+	 * @return Timestamp 更新时间
+	 */
+	public Timestamp getUpdateDate() {
+		return this.updateDate;
+	}
+
+	/**
+	 * 操作员编号的取得
+	 *
+	 * @return Integer 操作员编号
+	 */
+	public Integer getUserid() {
+		return this.userid;
+	}
+
+	/**
+	 * ID的设定
+	 *
+	 * @param newInteger ID
+	 */
+	public void setId(Integer newId) {
+		this.id = newId;
+	}
+
+	/**
+	 * 客户编号（单位编号）的设定
+	 *
+	 * @param newString 客户编号（单位编号）
+	 */
+	public void setGuestno(String newGuestno) {
+		this.guestno = newGuestno;
+	}
+
+	/**
+	 * 客户名称（单位名）的设定
+	 *
+	 * @param newString 客户名称（单位名）
+	 */
+	public void setGuestname(String newGuestname) {
+		this.guestname = newGuestname;
+	}
+
+	/**
+	 * 客户类型（单位类型）的设定
+	 *
+	 * @param newString 客户类型（单位类型）
+	 */
+	public void setGuesttype(String newGuesttype) {
+		this.guesttype = newGuesttype;
+	}
+
+	/**
+	 * 联系人证件类型的设定
+	 *
+	 * @param newString 联系人证件类型
+	 */
+	public void setIdcardType(String newIdcardType) {
+		this.idcardType = newIdcardType;
+	}
+
+	/**
+	 * 联系人证件编号的设定
+	 *
+	 * @param newString 联系人证件编号
+	 */
+	public void setIdcardNum(String newIdcardNum) {
+		this.idcardNum = newIdcardNum;
+	}
+
+	/**
+	 * 联系人姓名的设定
+	 *
+	 * @param newString 联系人姓名
+	 */
+	public void setName(String newName) {
+		this.name = newName;
+	}
+
+	/**
+	 * 地址的设定
+	 *
+	 * @param newString 地址
+	 */
+	public void setAdd(String newAdd) {
+		this.add = newAdd;
+	}
+
+	/**
+	 * 电话的设定
+	 *
+	 * @param newString 电话
+	 */
+	public void setTel(String newTel) {
+		this.tel = newTel;
+	}
+
+	/**
+	 * 邮编的设定
+	 *
+	 * @param newString 邮编
+	 */
+	public void setPost(String newPost) {
+		this.post = newPost;
+	}
+
+	/**
+	 * 邮件的设定
+	 *
+	 * @param newString 邮件
+	 */
+	public void setEmail(String newEmail) {
+		this.email = newEmail;
+	}
+
+	/**
+	 * 银行编号的设定
+	 *
+	 * @param newString 银行编号
+	 */
+	public void setBankno(String newBankno) {
+		this.bankno = newBankno;
+	}
+
+	/**
+	 * 银行账号的设定
+	 *
+	 * @param newString 银行账号
+	 */
+	public void setBankacc(String newBankacc) {
+		this.bankacc = newBankacc;
+	}
+
+	/**
+	 * 税号的设定
+	 *
+	 * @param newString 税号
+	 */
+	public void setTaxno(String newTaxno) {
+		this.taxno = newTaxno;
+	}
+
+	/**
+	 * 发卡数量的设定
+	 *
+	 * @param newInteger 发卡数量
+	 */
+	public void setCardsum(Integer newCardsum) {
+		this.cardsum = newCardsum;
+	}
+
+	/**
+	 * 卡上余额的设定
+	 *
+	 * @param newBigDecimal 卡上余额
+	 */
+	public void setCardacc(BigDecimal newCardacc) {
+		this.cardacc = newCardacc;
+	}
+
+	/**
+	 * 账卡余额的设定
+	 *
+	 * @param newBigDecimal 账卡余额
+	 */
+	public void setBal(BigDecimal newBal) {
+		this.bal = newBal;
+	}
+
+	/**
+	 * 消费金额的设定
+	 *
+	 * @param newBigDecimal 消费金额
+	 */
+	public void setDebitacc(BigDecimal newDebitacc) {
+		this.debitacc = newDebitacc;
+	}
+
+	/**
+	 * 交费金额 （充值金额）的设定
+	 *
+	 * @param newBigDecimal 交费金额 （充值金额）
+	 */
+	public void setCreditacc(BigDecimal newCreditacc) {
+		this.creditacc = newCreditacc;
+	}
+
+	/**
+	 * 限制金额的设定
+	 *
+	 * @param newBigDecimal 限制金额
+	 */
+	public void setLimit(BigDecimal newLimit) {
+		this.limit = newLimit;
+	}
+
+	/**
+	 * 已分配金额 （使用金额）的设定
+	 *
+	 * @param newInteger 已分配金额 （使用金额）
+	 */
+	public void setInuse(Integer newInuse) {
+		this.inuse = newInuse;
+	}
+
+	/**
+	 * 用户类型的设定
+	 *
+	 * @param newString 用户类型
+	 */
+	public void setUsertype(String newUsertype) {
+		this.usertype = newUsertype;
+	}
+
+	/**
+	 * 主卡号的设定
+	 *
+	 * @param newString 主卡号
+	 */
+	public void setCardno(String newCardno) {
+		this.cardno = newCardno;
+	}
+
+	/**
+	 * 积分的设定
+	 *
+	 * @param newInteger 积分
+	 */
+	public void setIntegration(Integer newIntegration) {
+		this.integration = newIntegration;
+	}
+
+	/**
+	 * 状态的设定
+	 *
+	 * @param newString 状态
+	 */
+	public void setStats(String newStats) {
+		this.stats = newStats;
+	}
+
+	/**
+	 * ETC的设定
+	 *
+	 * @param newString ETC
+	 */
+	public void setEtc(String newEtc) {
+		this.etc = newEtc;
+	}
+
+	/**
+	 * 网点的设定
+	 *
+	 * @param newString 网点
+	 */
+	public void setStationno(String newStationno) {
+		this.stationno = newStationno;
+	}
+
+	/**
+	 * 备注的设定
+	 *
+	 * @param newString 备注
+	 */
+	public void setBz(String newBz) {
+		this.bz = newBz;
+	}
+
+
+	public Date getBirthday() {
+		return this.birthday;
+	}
+
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	/**
+	 * 备注1的设定
+	 *
+	 * @param newString 备注1
+	 */
+	public void setBeizhu(String newBeizhu) {
+		this.beizhu = newBeizhu;
+	}
+
+	/**
+	 * 班结号的设定
+	 *
+	 * @param newInteger 班结号
+	 */
+	public void setBjid(Integer newBjid) {
+		this.bjid = newBjid;
+	}
+
+	/**
+	 * 日结号的设定
+	 *
+	 * @param newInteger 日结号
+	 */
+	public void setRjid(Integer newRjid) {
+		this.rjid = newRjid;
+	}
+
+	/**
+	 * 创建时间/开户日期 (日期)的设定
+	 *
+	 * @param newTimestamp 创建时间/开户日期 (日期)
+	 */
+	public void setCreateDate(Timestamp newCreateDate) {
+		this.createDate = newCreateDate;
+	}
+
+	/**
+	 * 更新时间的设定
+	 *
+	 * @param newTimestamp 更新时间
+	 */
+	public void setUpdateDate(Timestamp newUpdateDate) {
+		this.updateDate = newUpdateDate;
+	}
+
+	/**
+	 * 操作员编号的设定
+	 *
+	 * @param newInteger 操作员编号
+	 */
+	public void setUserid(Integer newUserid) {
+		this.userid = newUserid;
+	}
+}

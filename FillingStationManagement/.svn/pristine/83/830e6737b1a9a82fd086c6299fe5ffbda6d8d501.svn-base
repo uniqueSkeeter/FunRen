@@ -1,0 +1,425 @@
+package com.fr.station.component.card.action;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fr.station.common.bean.BlackCardBean;
+import com.fr.station.common.bean.CardMaintainBean;
+import com.fr.station.common.utility.ErrorLogUtil;
+import com.fr.station.component.card.service.CardMaintainService;
+import com.fr.station.component.system.action.AbstractAction;
+
+/**
+ * 卡维护的action，用于处理得到挂失，止挂，修改密码，补卡的信息和对数据库的操作
+ * 
+ * @author yy
+ */
+@Namespace("/cardMaintain")
+@ParentPackage("custom-default")
+public class CardMaintainAction extends AbstractAction {
+
+	// ------- Constants (static final) ----------------------------------------
+
+	private static final long serialVersionUID = 1L;
+
+	protected static Logger log = Logger.getLogger(CardMaintainAction.class);
+
+	// ------- Static Variables (static) ---------------------------------------
+
+	@Autowired
+	protected CardMaintainService cardMaintainService;
+
+	protected CardMaintainBean cardMaintainBean;
+
+	protected BlackCardBean blackCardBean;
+
+	private String jsonData;
+
+	private List<CardMaintainBean> cardLostList = new ArrayList<CardMaintainBean>();
+
+	private List<CardMaintainBean> cancelLossCardList = new ArrayList<CardMaintainBean>();
+
+	private List<CardMaintainBean> changePassList = new ArrayList<CardMaintainBean>();
+
+	private List<CardMaintainBean> checkPassList = new ArrayList<CardMaintainBean>();
+
+	private List<CardMaintainBean> existCardList = new ArrayList<CardMaintainBean>();
+
+	// ------- Instance Methods (public) ---------------------------------------
+	public CardMaintainBean getCardMaintainBean() {
+		return this.cardMaintainBean;
+	}
+
+	public void setCardMaintainBean(CardMaintainBean cardMaintainBean) {
+		this.cardMaintainBean = cardMaintainBean;
+	}
+
+	public String getJsonData() {
+		return this.jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
+	}
+
+	public BlackCardBean getBlackCardBean() {
+		return this.blackCardBean;
+	}
+
+	public void setBlackCardBean(BlackCardBean blackCardBean) {
+		this.blackCardBean = blackCardBean;
+	}
+
+	/**
+	 * 
+	 * 卡片维护
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "cardMaintainList", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cardMaintain.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardMaintain() {
+		return SUCCESS;
+	}
+
+	@Action(value = "showCardMaintainList", results = { @Result(name = "success", type = "json") })
+	public String showUser() {
+		log.info("Starting to load card maintain infomation from DB");
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag = false;
+		List<CardMaintainBean> cardMaintainBeanList = null;
+		try {
+			cardMaintainBeanList = this.cardMaintainService.findCardMaintainRecordsByCriteria(this.cardMaintainBean);
+			if (!cardMaintainBeanList.isEmpty()) {
+				map.put(TOTAL, cardMaintainBeanList.get(0).getTotalData());
+				map.put(ROWS, cardMaintainBeanList);
+				this.jsonData = JSONObject.fromObject(map).toString();
+				log.info("Successfully load card maintain data from DB");
+			} else {
+				log.info("Can not find coresponding card maintain data from database based on the input criteria.");
+				this.cardMaintainBean = null;
+			}
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("Loading card maintain data from DB occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 挂失卡片的信息
+	 * 
+	 */
+	@Action(value = "showCardLost", results = { @Result(name = "success", location = "/view/card/cardMaintain/cardLost.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String showCardLost() {
+		log.info("Starting to search for (lost) card information data");
+		boolean flag = false;
+		try {
+			this.cardLostList = this.cardMaintainService.getCardLost(this.cardMaintainBean);
+			if (this.cardLostList.size() > 0) {
+				this.cardMaintainBean = this.cardLostList.get(0);
+				log.info("Successfully find card lost data");
+			} else {
+				log.info("Can not find coresponding card lost data from database based on the input criteria.");
+				this.cardMaintainBean = null;
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("find card lost data occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 执行挂失操作
+	 */
+
+	@Action(value = "cardLost", results = { @Result(name = "success", type = "chain", location = "showCardMaintainList"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cardLost() {
+		log.info("Starting to transfer card lost infomation to service ");
+		boolean flag = false;
+		try {
+			this.cardMaintainService.updateCardLost(this.cardMaintainBean);
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("transfer card lost data to service occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 卡片解挂
+	 * 
+	 */
+	@Action(value = "showCancelLossCard", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cancelLossCard.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String showCancelLossCard() {
+		log.info("Starting to search for card (cancel loss) data");
+		boolean flag = false;
+		try {
+			this.cancelLossCardList = this.cardMaintainService.getCancelLossCard(this.cardMaintainBean);
+			if (this.cancelLossCardList.size() > 0) {
+				this.cardMaintainBean = this.cancelLossCardList.get(0);
+				log.info("Successfully find card cancel loss data");
+			} else {
+				log.info("Can not find coresponding card cancel loss data from database based on the input criteria.");
+				this.cardMaintainBean = null;
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("find card cancel loss data occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "cancelLossCard", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/cardMaintain.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String cancelLossCard() {
+		log.info("Starting to transfer card cancel loss  infomation to service");
+		boolean flag = false;
+		try {
+			this.cardMaintainService.updateCancelLossCard(this.cardMaintainBean);
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("transfer card cancel loss data to service occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+
+		}
+
+		if (flag) {
+			log.info("Successfully  cancel loss card");
+			this.cardMaintainBean = null;
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * 密码修改
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "showChangePass", results = { @Result(name = "success", location = "/view/card/cardMaintain/changePassword.jsp") })
+	public String showChangePass() {
+		log.info("Starting to search for card (changepass) data");
+		boolean flag = false;
+		try {
+			this.changePassList = this.cardMaintainService.getChangePass(this.cardMaintainBean);
+			if (this.changePassList.size() > 0) {
+				this.cardMaintainBean = this.changePassList.get(0);
+				log.info("Successfully find card changepass data");
+			} else {
+				log.info("Can not find coresponding card change pass data from database based on the input criteria.");
+				this.cardMaintainBean = null;
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("search for card changepass data occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 判断密码是否正确
+	 */
+	@Action(value = "judgePass", results = { @Result(name = "success", location = "/view/card/cardMaintain/judgePass.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String judgePass() {
+		log.info("jump to judgePass.jsp");
+		return SUCCESS;
+	}
+
+	/**
+	 * 
+	 * do the action of checkpass
+	 * 
+	 */
+	@Action(value = "checkPass", results = { @Result(name = "success", type = "json"), })
+	public String checkPass() {
+		log.info("Starting to search for card exist password data ");
+		boolean flag = false;
+		try {
+			String oldPass = this.cardMaintainBean.getCardPass();
+			this.checkPassList = this.cardMaintainService.findPassRecodes(this.cardMaintainBean);
+			if (this.checkPassList.size() > 0) {
+				this.cardMaintainBean = this.checkPassList.get(0);
+			}
+			String Pass = this.cardMaintainBean.getCardPass();
+			if (oldPass.equals(Pass)) {
+				flag = true;
+			} else {
+				flag = false;
+			}
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("search for card exist password data from DB occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+
+		}
+
+		if (flag) {
+			log.info("Successfully find card exist password data from DB");
+			return SUCCESS;
+		}
+		log.info("error password");
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * do the action of changepass
+	 * 
+	 */
+	@Action(value = "changePass", results = { @Result(name = "success", type = "json") })
+	public String changePass() {
+		log.info("Starting to transfer card changePass infomation to service ");
+		boolean flag = false;
+		try {
+			String cardpass = this.getCardMaintainBean().getCardPass();
+			this.cardMaintainService.updateChangePass(this.cardMaintainBean, cardpass, this.getCardMaintainBean().getCardNo());
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("transfer card changepass data to service occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+
+		}
+
+		if (flag) {
+			log.info("Successfully change card pass ");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	/**
+	 * 
+	 * change card
+	 * 
+	 * @param
+	 * @return dashboard jsp
+	 */
+	@Action(value = "showReplaceCard", results = {
+			@Result(name = "success", location = "/view/card/cardMaintain/replaceCard.jsp"),
+			@Result(name = "error", location = "/view/login.jsp") })
+	public String showReplaceCard() {
+		log.info("Starting to search for card showReplaceCard info data");
+		boolean flag = false;
+		try {
+			this.existCardList = this.cardMaintainService.getExistCard(this.cardMaintainBean);
+			if (this.existCardList.size() > 0) {
+				this.cardMaintainBean = this.existCardList.get(0);
+				log.info("Successfully find card showReplaceCard info data");
+			} else {
+				log.info("Can not find coresponding replace card  data from database based on the input criteria.");
+				this.cardMaintainBean = null;
+			}
+			flag = true;
+		} catch (Exception e) {
+			log.info("search for showReplaceCard data occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+			return ERROR;
+		}
+		if (flag) {
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+	@Action(value = "replaceCard", results = { @Result(name = "success", type = "json") })
+	public String replaceCard() {
+		log.info("Starting to transfer card replaceCard infomation to service ");
+		boolean flag = false;
+		String newcardno = this.getCardMaintainBean().getNewCardNo();
+		try {
+			this.existCardList = this.cardMaintainService.getExistCard(this.cardMaintainBean);
+			if (this.existCardList.size() > 0) {
+				this.cardMaintainBean = this.existCardList.get(0);
+			}
+			this.cardMaintainBean.setNewCardNo(newcardno);
+			this.cardMaintainService.updateReplaceCard(this.cardMaintainBean, this.getCardMaintainBean().getNewCardNo(), this
+					.getCardMaintainBean().getCardNo());
+			flag = true;
+		} catch (net.sf.json.JSONException e) {
+			log.info("Convert to Json object occured error, please references the detail log\n " + "[" + e + "]\n"
+					+ ErrorLogUtil.printInfo(e));
+		} catch (Exception e) {
+			log.info("transfer card replaceCard data to service occured error, please references the detail log\n " + "[" + e
+					+ "]\n" + ErrorLogUtil.printInfo(e));
+			return ERROR;
+
+		}
+
+		if (flag) {
+			log.info("Successfully change cardno ");
+			return SUCCESS;
+		}
+		return ERROR;
+	}
+
+}

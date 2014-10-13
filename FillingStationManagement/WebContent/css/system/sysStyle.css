@@ -1,0 +1,49 @@
+body {
+	font: 12px/20px "微软雅黑", "宋体", Arial, sans-serif, Verdana, Tahoma;
+	padding: 0;
+	margin: 0;
+}
+a:link {
+ text-decoration: none;
+}
+a:visited {
+ text-decoration: none;
+}
+a:hover {
+ text-decoration: underline;
+ color: red;
+ font-weight: bold;
+ font-size: 13px;
+ font-family: monospace;
+}
+a:active {
+ text-decoration: none;
+}
+.cs-north {
+	height:60px;background:#B3DFDA;
+}
+.cs-north-bg {
+	width: 100%;
+	height: 100%;
+	background: url(themes/gray/images/header_bg.png) repeat-x;
+}
+.cs-north-logo {
+	height: 40px;
+	padding: 15px 0px 0px 5px;
+	color:#fff;font-size:22px;font-weight:bold;text-decoration:none
+}
+.cs-west {
+	width:200px;padding:0px;border-left:1px solid #99BBE8;
+}
+.cs-south {
+	height:25px;background:url('themes/gray/images/panel_title.gif') repeat-x;padding:0px;text-align:center;
+}
+.cs-navi-tab {
+	padding: 10px;
+}
+.cs-tab-menu {
+	width:120px;
+}
+.cs-home-remark {
+	padding: 10px;
+}

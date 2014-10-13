@@ -1,0 +1,146 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sx" uri="/struts-dojo-tags"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.*"%>
+
+<%@include file="../../common/common.jsp" %>
+<script type="text/javascript" src="<%=basePath%>js/card/cardMaintain/cardDetail.js"></script>
+</head>
+<body>
+		<tr>
+			<td width="86%" valign="top"
+				style="border-left: #7BAED5 solid 0px; padding-left: 2px">
+				<div class="title">卡片信息</div>
+				<table style="font-size: 12px;width: 100%; height: 50px; font-weight: bold;">
+					<tr>
+						<td height="3px" style="width:80px">卡号:
+						<td height="30px" style="width:30px">
+							<input name="cardMaintainBean.cardno" style="width:140px" id="cardno"></input>
+						</td>
+						<td height="30px" style="width:80px" >客户名称:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+						<td height="30px" style="width:80px" >证件类型:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guesttype" style="width:140px" id="guesttype"></input>
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" style="width:80px" >证件号:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestnum" style="width:140px" id="guestnum"></input>
+						</td>
+	<!--合同类别未知  -->				<td height="30px" style="width:80px" >合同类别:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+						<td height="30px" style="width:80px" >客户编号:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestno" style="width:140px" id="guestno"></input>
+						</td>
+					</tr>
+					<tr>
+	<!--单位编号未知  -->					<td height="30px" style="width:80px" >单位编号:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.idnum" style="width:140px" id="idnum"></input>
+						</td>
+						<td height="30px" style="width:80px" >每天加油次数:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xcount" style="width:140px" id="xcount"></input>
+						</td>
+						<td height="30px" style="width:80px" >每天消费金额:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xamn" style="width:140px" id="xamn"></input>
+						</td>
+					</tr>
+					<tr>
+	<!--加油频率未知  -->						<td height="30px" style="width:80px" >加油频率:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.idnum" style="width:140px" id="idnum"></input>
+						</td>
+	<!--每天加油限量未知  -->						<td height="30px" style="width:80px" >每天加油限量:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xvol" style="width:140px" id="xvol"></input>
+						</td>
+						<td height="30px" style="width:80px" >每次加油限量:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xvol" style="width:140px" id="xvol"></input>
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" style="width:80px" >车辆牌照:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xcarno" style="width:140px" id="xcarno"></input>
+						</td>
+						<td height="30px" style="width:80px" >油品限制:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xoil" style="width:140px" id="xoil"></input>
+						</td>
+						<td height="30px" style="width:80px" >限制油站:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.xeare" style="width:140px" id="xeare"></input>
+						</td>
+					</tr>
+					<tr>
+	<!--启用卡密码未知  -->					<td height="30px" style="width:80px" >启用卡密吗:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.idnum" style="width:140px" id="idnum"></input>
+						</td>
+						<td height="30px" style="width:80px" >卡类型:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.cardtype" style="width:140px" id="cardtype"></input>
+						</td>
+	<!--卡子类型未知  -->					<td height="30px" style="width:80px" >卡子类型:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" style="width:80px" >卡片状态:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.cardstatus" style="width:140px" id="cardstatus"></input>
+						</td>
+	<!--黑名单类型未知  -->					<td height="30px" style="width:80px" >黑名单类型:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+						<td height="30px" style="width:80px" >卡余额:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.cardacc" style="width:140px" id="cardacc"></input>
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" style="width:80px" >卡内积分:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.idnum" style="width:140px" id="idnum"></input>
+						</td>
+						<td height="30px" style="width:80px" >后台卡余额:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+						<td height="30px" style="width:80px" >后台积分:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+					</tr>
+					<tr>
+						<td height="30px" style="width:80px" >备用金余额:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.idnum" style="width:140px" id="idnum"></input>
+						</td>
+						<td height="30px" style="width:80px" >备用金积分:</td>
+						<td height="30px" width="80px" style="width:30px">
+							<input name="cardMaintainBean.guestname" style="width:140px" id="guestname"></input>
+						</td>
+					</tr>
+					<tr>
+						<td><input type='button' value='读&nbsp;卡'text-align='right'id="cardMaintain_read"></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+</body>
+</html>
